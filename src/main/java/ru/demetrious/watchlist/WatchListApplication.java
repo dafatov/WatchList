@@ -1,9 +1,12 @@
 package ru.demetrious.watchlist;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import java.awt.AWTException;
 import java.awt.Desktop;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -11,25 +14,73 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.imageio.ImageIO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@Slf4j
 public class WatchListApplication {
     private static final String ELECTRON_EXE = "./electron.exe";
 
     public static void main(String[] args) {
         SpringApplication.run(WatchListApplication.class, args);
-//        openHomePage();
-        launchElectron();
+        System.setProperty("java.awt.headless", "false");
+
+        addSystemTray();
+        openHomePage();
     }
 
-    private static void launchElectron() {
+    private static void addSystemTray() {
+        if (SystemTray.isSupported()) {
+            try {
+                Image image = ImageIO.read(Objects.requireNonNull(WatchListApplication.class.getResourceAsStream("/static/logo192.png")));
+                PopupMenu popupMenu = new PopupMenu();
+                MenuItem open = new MenuItem("Open Electron");
+                MenuItem exit = new MenuItem("Exit");
+                TrayIcon trayIcon = new TrayIcon(image, "WatchList", popupMenu);
+
+                open.addActionListener(e -> {
+                    open.setEnabled(false);
+                    ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+                    executorService.submit(() -> {
+                        launchElectron().ifPresentOrElse(
+                            process -> process.onExit().thenAccept(p -> open.setEnabled(true)),
+                            () -> open.setEnabled(true)
+                        );
+                        executorService.shutdown();
+                    });
+                });
+                exit.addActionListener(e -> {
+                    exit.setEnabled(false);
+                    System.exit(13);
+                });
+                popupMenu.add(open);
+                popupMenu.add(exit);
+                trayIcon.setImageAutoSize(true);
+                SystemTray.getSystemTray().add(trayIcon);
+            } catch (IOException | AWTException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            log.warn("System tray does not supported");
+        }
+    }
+
+    private static Optional<Process> launchElectron() {
         extractElectron();
         try {
-            Process process = new ProcessBuilder(ELECTRON_EXE).start();
-            System.out.println("ended");
+            return Optional.of(new ProcessBuilder(ELECTRON_EXE).start());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return Optional.empty();
     }
 
     private static void extractElectron() {
@@ -45,20 +96,14 @@ public class WatchListApplication {
     }
 
     private static void openHomePage() {
-        var url = "http://localhost:8080/";
-
         if (Desktop.isDesktopSupported()) {
             try {
-                Desktop.getDesktop().browse(new URI(url));
+                Desktop.getDesktop().browse(new URI("http://localhost:8080/"));
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
         } else {
-            try {
-                new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", url).start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            log.warn("System desktop does not supported");
         }
     }
 }

@@ -60,6 +60,31 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <exec executable="cmd">
+                                    <arg value="/c"/>
+                                    <arg line="mklink /D ${project.basedir}\node\electron\node ${project.basedir}\node\node"/>
+                                </exec>
+                                <exec executable="cmd">
+                                    <arg value="/c"/>
+                                    <arg line="mklink /D ${project.basedir}\node\frontend\node ${project.basedir}\node\node"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
                 <executions>
@@ -113,14 +138,14 @@
                         <goals>
                             <goal>install-node-and-npm</goal>
                         </goals>
-                        <phase>generate-resources</phase>
+                        <phase>generate-sources</phase>
                     </execution>
                     <execution>
                         <id>set-npm-registry</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>generate-resources</phase>
+                        <phase>generate-sources</phase>
                         <configuration>
                             <arguments>config set registry=${npm.registry.url}</arguments>
                         </configuration>
@@ -239,28 +264,22 @@
                             <directory>node/frontend/build</directory>
                         </fileset>
                         <fileset>
-                            <directory>node/frontend/node_modules</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>node/frontend</directory>
-                            <includes>
-                                <include>package-lock.json</include>
-                            </includes>
+                            <directory>node/frontend/node</directory>
                         </fileset>
                         <fileset>
                             <directory>node/electron/dist</directory>
                         </fileset>
                         <fileset>
-                            <directory>node/electron/node_modules</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>node/electron</directory>
-                            <includes>
-                                <include>package-lock.json</include>
-                            </includes>
+                            <directory>node/electron/node</directory>
                         </fileset>
                         <fileset>
                             <directory>node/node</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>${project.basedir}</directory>
+                            <includes>
+                                <include>electron.exe</include>
+                            </includes>
                         </fileset>
                     </filesets>
                 </configuration>
