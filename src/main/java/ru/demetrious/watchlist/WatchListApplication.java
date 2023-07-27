@@ -40,19 +40,30 @@ public class WatchListApplication {
             try {
                 Image image = ImageIO.read(Objects.requireNonNull(WatchListApplication.class.getResourceAsStream("/static/logo192.png")));
                 PopupMenu popupMenu = new PopupMenu();
-                MenuItem open = new MenuItem("Open Electron");
+                MenuItem openElectron = new MenuItem("Open Electron");
+                MenuItem openBrowser = new MenuItem("Open Browser");
                 MenuItem exit = new MenuItem("Exit");
                 TrayIcon trayIcon = new TrayIcon(image, "WatchList", popupMenu);
 
-                open.addActionListener(e -> {
-                    open.setEnabled(false);
+                openElectron.addActionListener(e -> {
+                    openElectron.setEnabled(false);
                     ExecutorService executorService = Executors.newSingleThreadExecutor();
 
                     executorService.submit(() -> {
                         launchElectron().ifPresentOrElse(
-                            process -> process.onExit().thenAccept(p -> open.setEnabled(true)),
-                            () -> open.setEnabled(true)
+                            process -> process.onExit().thenAccept(p -> openElectron.setEnabled(true)),
+                            () -> openElectron.setEnabled(true)
                         );
+                        executorService.shutdown();
+                    });
+                });
+                openBrowser.addActionListener(e -> {
+                    openBrowser.setEnabled(false);
+                    ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+                    executorService.submit(() -> {
+                        openHomePage();
+                        openBrowser.setEnabled(true);
                         executorService.shutdown();
                     });
                 });
@@ -60,7 +71,8 @@ public class WatchListApplication {
                     exit.setEnabled(false);
                     System.exit(13);
                 });
-                popupMenu.add(open);
+                popupMenu.add(openElectron);
+                popupMenu.add(openBrowser);
                 popupMenu.add(exit);
                 trayIcon.setImageAutoSize(true);
                 SystemTray.getSystemTray().add(trayIcon);
