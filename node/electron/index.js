@@ -1,15 +1,10 @@
-const {app, BrowserWindow} = require("electron");
+const {app, BrowserWindow} = require('electron');
 
-const createWindow = () => {
-  const browserWindow = new BrowserWindow({
+app.on('ready', () =>
+  new BrowserWindow({
     fullscreen: true,
     autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true
-    }
-  });
-
-  browserWindow.loadURL("http://localhost:8080/");
-}
-
-app.on("ready", createWindow);
+      nodeIntegration: true,
+    },
+  }).loadURL('http://localhost:8080/'));

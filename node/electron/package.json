@@ -1,12 +1,23 @@
 {
-  "name": "electron",
+  "name": "ru.demetrious.watch-list.electron",
   "version": "1.0.0",
+  "description": "A local browser to only one url",
+  "type": "commonjs",
+  "private": true,
+  "build": {
+    "artifactName": "electron.${ext}"
+  },
   "scripts": {
     "start": "electron .",
     "package": "electron-builder"
   },
+  "author": "DemetriouS",
+  "license": "MIT",
   "devDependencies": {
     "electron": "25.3.1",
     "electron-builder": "24.6.3"
+  },
+  "engines": {
+    "node": "16.13.0"
   }
 }

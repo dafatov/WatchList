@@ -98,7 +98,7 @@ public class WatchListApplication {
     private static void extractElectron() {
         try {
             Files.copy(
-                Objects.requireNonNull(WatchListApplication.class.getResourceAsStream("/electron/electron Setup 1.0.0.exe")),
+                Objects.requireNonNull(WatchListApplication.class.getResourceAsStream("/electron" + ELECTRON_EXE)),
                 new File(ELECTRON_EXE).toPath(),
                 StandardCopyOption.REPLACE_EXISTING
             );
