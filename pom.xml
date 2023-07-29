@@ -103,26 +103,27 @@
                             </resources>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
                     <execution>
-                        <id>copy-resources electron</id>
-                        <phase>process-classes</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/electron</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>node/electron/dist</directory>
-                                    <includes>
-                                        <include>*.exe</include>
-                                    </includes>
-                                </resource>
-                            </resources>
+                            <classifier>spring-boot</classifier>
+                            <mainClass>ru.demetrious.watchlist.WatchListApplication</mainClass>
+                            <finalName>${project.name}</finalName>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
@@ -188,69 +189,10 @@
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <configuration>
                             <arguments>run package</arguments>
                             <workingDirectory>node/electron</workingDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <shadedClassifierName>shaded</shadedClassifierName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>2.3.3</version>
-                <executions>
-                    <execution>
-                        <id>l4j-clui</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
-                        <configuration>
-                            <headerType>gui</headerType>
-                            <jar>${project.build.directory}/${project.name}-${project.version}-shaded.jar</jar>
-                            <outfile>${project.build.directory}/${project.name}.exe</outfile>
-                            <downloadUrl>https://java.com/download</downloadUrl>
-                            <classPath>
-                                <mainClass>ru.demetrious.watchlist.WatchListApplication</mainClass>
-                                <preCp>anything</preCp>
-                            </classPath>
-                            <icon>${project.build.directory}/classes/static/favicon.ico</icon>
-                            <jre>
-                                <minVersion>${java.version}.0</minVersion>
-                                <requiresJdk>preferJre</requiresJdk>
-                                <path>%JAVA_HOME%;%PATH%</path>
-                            </jre>
-                            <versionInfo>
-                                <fileVersion>${project.version}.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
-                                <fileDescription>${project.name}</fileDescription>
-                                <copyright>DemetriouS</copyright>
-                                <productVersion>${project.version}.0</productVersion>
-                                <txtProductVersion>${project.version}.0</txtProductVersion>
-                                <productName>${project.name}</productName>
-                                <companyName>DemetriouS</companyName>
-                                <internalName>${project.name}</internalName>
-                                <originalFilename>${project.name}.exe</originalFilename>
-                            </versionInfo>
                         </configuration>
                     </execution>
                 </executions>

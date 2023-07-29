@@ -5,7 +5,16 @@
   "type": "commonjs",
   "private": true,
   "build": {
-    "artifactName": "electron.${ext}"
+    "artifactName": "WatchList.${ext}",
+    "win": {
+      "target": "nsis",
+      "extraFiles": [
+        {
+          "from": "../../target/WatchList-spring-boot.jar",
+          "to": "./server/server.jar"
+        }
+      ]
+    }
   },
   "scripts": {
     "start": "electron .",
@@ -19,5 +28,8 @@
   },
   "engines": {
     "node": "16.13.0"
+  },
+  "dependencies": {
+    "tree-kill": "1.2.2"
   }
 }
