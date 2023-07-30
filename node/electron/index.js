@@ -29,11 +29,11 @@ const startLoading = () => {
   loadingWindow = new BrowserWindow({
     show: true,
     frame: false,
-    width: 500,
-    height: 280,
+    width: 900,
+    height: 576,
   });
 
-  return loadingWindow.loadFile('./loading.html');
+  return loadingWindow.loadFile('./loading/loading.html');
 };
 
 const startBrowser = () => {
