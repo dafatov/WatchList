@@ -5,15 +5,30 @@
   "type": "commonjs",
   "private": true,
   "build": {
+    "appId": "ru.demetrious.watch-list.electron",
     "artifactName": "WatchList.${ext}",
+    "productName": "WatchList",
     "win": {
       "target": "nsis",
+      "icon": "../../resources/icons/watch-list.png",
       "extraFiles": [
         {
           "from": "../../target/WatchList-spring-boot.jar",
           "to": "./server/server.jar"
         }
+      ],
+      "extraResources": [
+        {
+          "from": "../../resources/icons/watch-list.png",
+          "to": "./icons/watch-list.png"
+        }
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true
     }
   },
   "scripts": {

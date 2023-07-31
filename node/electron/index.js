@@ -3,6 +3,7 @@ const {spawn} = require('child_process');
 const treeKill = require('tree-kill');
 
 const url = 'http://localhost:8080/';
+const icon = './resources/icons/watch-list.png';
 
 let loadingWindow;
 let mainWindow;
@@ -29,6 +30,8 @@ const startLoading = () => {
   loadingWindow = new BrowserWindow({
     show: true,
     frame: false,
+    title: 'Loading',
+    icon,
     width: 900,
     height: 576,
   });
@@ -42,6 +45,7 @@ const startBrowser = () => {
       mainWindow = new BrowserWindow({
         show: false,
         title: 'WatchList',
+        icon,
         fullscreen: true,
         autoHideMenuBar: true,
         webPreferences: {
@@ -58,5 +62,7 @@ const startBrowser = () => {
 
       return mainWindow.loadURL(url);
     })
+    .then(() => setInterval(() => fetch(url)
+      .catch(() => app.quit()), 250))
     .catch(() => setTimeout(() => startBrowser(), 250));
 };
