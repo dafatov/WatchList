@@ -1,11 +1,12 @@
+// eslint-disable-next-line filenames/no-index
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css';
+import {render} from 'react-dom';
+import {App} from './app/App';
+import './i18n';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <App/>
+  </React.StrictMode>,
+  document.getElementById('root'),
 );
