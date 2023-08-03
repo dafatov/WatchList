@@ -1,15 +1,15 @@
 {
   "name": "ru.demetrious.watch-list.electron",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A local browser to only one url",
   "type": "commonjs",
   "private": true,
   "build": {
     "appId": "ru.demetrious.watch-list.electron",
-    "artifactName": "WatchList.${ext}",
+    "artifactName": "${productName}-${version}.${ext}",
     "productName": "WatchList",
     "win": {
-      "target": "nsis",
+      "target": "nsis-web",
       "icon": "../../resources/icons/watch-list.png",
       "extraFiles": [
         {
@@ -22,29 +22,41 @@
           "from": "../../resources/icons/watch-list.png",
           "to": "./icons/watch-list.png"
         }
+      ],
+      "publish": [
+        "github"
       ]
     },
-    "nsis": {
+    "nsisWeb": {
       "oneClick": false,
-      "perMachine": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": true
+      "deleteAppDataOnUninstall": true,
+      "differentialPackage": true,
+      "allowElevation": true,
+      "unicode": true
     }
   },
   "scripts": {
     "start": "electron .",
-    "package": "electron-builder"
+    "package": "electron-builder --publish always"
   },
   "author": "DemetriouS",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dafatov/WatchList.git"
+  },
   "devDependencies": {
-    "electron": "25.3.1",
+    "electron": "25.3.2",
     "electron-builder": "24.6.3"
   },
   "engines": {
     "node": "16.13.0"
   },
   "dependencies": {
+    "electron-log": "4.4.8",
+    "electron-updater": "6.1.1",
     "tree-kill": "1.2.2"
   }
 }

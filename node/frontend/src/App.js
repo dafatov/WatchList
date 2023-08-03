@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
-import logo from './logo.svg';
+import oPackage from '../package.json';
 import './App.css';
+import logo from './logo.svg';
 
 function App() {
   const [r, setR] = useState(null);
@@ -20,7 +21,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Edit <code>src/App.js</code> and save to reload - {oPackage.version}.
         </p>
         <a
           className="App-link"

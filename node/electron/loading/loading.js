@@ -219,3 +219,13 @@ particlesJS('particleCanvas-White', {
   },
   retina_detect: true,
 });
+
+window.electronAPI.setProgress((_event, percent) => {
+    const progress = document.getElementById('progress-loading');
+
+    console.log(percent);
+    progress.setAttribute('value', percent ?? '0');
+    progress.style.visibility = percent
+      ? 'visible'
+      : 'hidden';
+  });

@@ -1,6 +1,9 @@
 const {app, BrowserWindow} = require('electron');
 const {spawn} = require('child_process');
 const treeKill = require('tree-kill');
+const {autoUpdater} = require('electron-updater');
+const log = require('electron-log');
+const path = require('path');
 
 const url = 'http://localhost:8080/';
 const icon = './resources/icons/watch-list.png';
@@ -9,22 +12,66 @@ let loadingWindow;
 let mainWindow;
 let serverProcess;
 
+const initUpdater = () => {
+  autoUpdater.autoDownload = false;
+  autoUpdater.disableWebInstaller = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.autoRunAppAfterInstall = false;
+
+  log.transports.file.level = 'debug';
+  autoUpdater.logger = log;
+};
+
+const initApp = () => {
+  app.on('ready', () => {
+    startLoading().then(() => autoUpdate())
+      .then(() => {
+        serverProcess = spawn('java', ['-jar', './server/server.jar']);
+      }).then(() => startBrowser());
+  });
+
+  app.on('window-all-closed', app.quit);
+
+  app.on('will-quit', () => serverProcess?.pid && treeKill(serverProcess.pid));
+};
+
 (() => {
   if (!app.requestSingleInstanceLock()) {
     app.quit();
     return;
   }
 
-  app.on('ready', () => {
-    startLoading().then(() => {
-      serverProcess = spawn('java', ['-jar', './server/server.jar']);
-    }).then(() => startBrowser());
+  initUpdater();
+  initApp();
+})();
+
+const autoUpdate = () => new Promise(resolve => {
+  autoUpdater.on('update-available', () => {
+    log.info('update-available');
+    loadingWindow.webContents.send('setProgress', 0);
+    return autoUpdater.downloadUpdate();
   });
 
-  app.on('window-all-closed', app.quit);
+  autoUpdater.on('update-not-available', () => {
+    log.info('update-not-available');
+    loadingWindow.webContents.send('setProgress');
+    return resolve();
+  });
 
-  app.on('will-quit', () => treeKill(serverProcess?.pid));
-})();
+  autoUpdater.on('download-progress', ({percent}) => {
+    log.info(`update-progress: ${percent}`);
+    loadingWindow.webContents.send('setProgress', Math.round(percent));
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    log.info('update-downloaded');
+    return autoUpdater.quitAndInstall(true, true);
+  });
+
+  autoUpdater.on('error', error => log.error(error));
+
+  return autoUpdater.checkForUpdates();
+});
 
 const startLoading = () => {
   loadingWindow = new BrowserWindow({
@@ -34,6 +81,9 @@ const startLoading = () => {
     icon,
     width: 900,
     height: 576,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
   });
 
   return loadingWindow.loadFile('./loading/loading.html');
@@ -46,7 +96,8 @@ const startBrowser = () => {
         show: false,
         title: 'WatchList',
         icon,
-        fullscreen: true,
+        width: 900,
+        height: 576,
         autoHideMenuBar: true,
         webPreferences: {
           nodeIntegration: true,
