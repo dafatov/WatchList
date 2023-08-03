@@ -56,7 +56,6 @@
   },
   "dependencies": {
     "electron-log": "4.4.8",
-    "electron-updater": "6.1.1",
-    "tree-kill": "1.2.2"
+    "electron-updater": "6.1.1"
   }
 }

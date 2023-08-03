@@ -1,16 +1,14 @@
 const {app, BrowserWindow} = require('electron');
 const {spawn} = require('child_process');
-const treeKill = require('tree-kill');
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
 
-const url = 'http://localhost:8080/';
+const url = 'http://localhost:8080';
 const icon = './resources/icons/watch-list.png';
 
 let loadingWindow;
 let mainWindow;
-let serverProcess;
 
 const initUpdater = () => {
   autoUpdater.autoDownload = false;
@@ -26,13 +24,11 @@ const initApp = () => {
   app.on('ready', () => {
     startLoading().then(() => autoUpdate())
       .then(() => {
-        serverProcess = spawn('java', ['-jar', './server/server.jar']);
+        spawn('java', ['-jar', './server/server.jar']);
       }).then(() => startBrowser());
   });
 
   app.on('window-all-closed', app.quit);
-
-  app.on('will-quit', () => serverProcess?.pid && treeKill(serverProcess.pid));
 };
 
 (() => {
@@ -59,7 +55,7 @@ const autoUpdate = () => new Promise(resolve => {
   });
 
   autoUpdater.on('download-progress', ({percent}) => {
-    log.info(`update-progress: ${percent}`);
+    log.info(`download-progress: ${percent}`);
     loadingWindow.webContents.send('setProgress', Math.round(percent));
   });
 
@@ -113,7 +109,7 @@ const startBrowser = () => {
 
       return mainWindow.loadURL(url);
     })
-    .then(() => setInterval(() => fetch(url)
+    .then(() => setInterval(() => fetch(`${url}/health`)
       .catch(() => app.quit()), 250))
     .catch(() => setTimeout(() => startBrowser(), 250));
 };
