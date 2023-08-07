@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist;
+package ru.demetrious.watchlist.runner;
 
 import java.awt.AWTException;
 import java.awt.Desktop;
@@ -14,19 +14,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!local")
 @Slf4j
-public class SystemTray {
-    @EventListener(ApplicationReadyEvent.class)
-    public void addSystemTray() {
+public class SystemTrayExecutor implements ApplicationRunner {
+    @Override
+    public void run(ApplicationArguments args) {
         System.setProperty("java.awt.headless", "false");
+        addSystemTray();
+    }
 
+    // ===================================================================================================================
+    // = Implementation
+    // ===================================================================================================================
+
+    private void addSystemTray() {
         if (java.awt.SystemTray.isSupported()) {
             try {
                 Image image = ImageIO.read(new File("./resources/icons/watch-list.png"));
@@ -60,10 +67,6 @@ public class SystemTray {
             log.warn("System tray does not supported");
         }
     }
-
-    // ===================================================================================================================
-    // = Implementation
-    // ===================================================================================================================
 
     private void openHomePage() {
         if (Desktop.isDesktopSupported()) {

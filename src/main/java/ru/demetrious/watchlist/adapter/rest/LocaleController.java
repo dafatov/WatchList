@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist;
+package ru.demetrious.watchlist.adapter.rest;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.demetrious.watchlist.service.LocaleService;
 
 @RestController
 @RequestMapping("api/locale")
@@ -21,7 +22,7 @@ public class LocaleController {
         log.info("GET: lng={}, ns={}", lng, ns);
         try {
             return ResponseEntity.ok(localeService.getLocale(lng, ns));
-        } catch (IllegalKeyClassException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e));
         }
     }

@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist;
+package ru.demetrious.watchlist.service;
 
 import java.util.Locale;
 import java.util.Map;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toMap;
-import static ru.demetrious.watchlist.LocaleResourceEnum.getClassNameByNs;
+import static ru.demetrious.watchlist.domain.enums.LocaleResourceEnum.getClassNameByNs;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class LocaleService {
-    public Map<String, Object> getLocale(String lng, String ns) throws IllegalKeyClassException {
+    public Map<String, Object> getLocale(String lng, String ns) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle(getClassNameByNs(ns), new Locale(lng));
 
         return resourceBundle.keySet().stream()
@@ -26,22 +26,14 @@ public class LocaleService {
     // = Implementation
     // ===================================================================================================================
 
-    private Object parseMapValue(String key, Object value) throws IllegalKeyClassException {
+    private Object parseMapValue(String key, Object value) {
         if (value instanceof String) {
             return value;
         } else if (value instanceof Object[][]) {
             return stream(((Object[][]) value))
-                .collect(toMap(entry -> entry[0], entry -> {
-                    Object innerKey = entry[0];
-
-                    if (!(innerKey instanceof String)) {
-                        throw new IllegalKeyClassException("Key in locale object must be type of string");
-                    }
-
-                    return parseMapValue((String) innerKey, entry[1]);
-                }));
+                .collect(toMap(entry -> entry[0], entry -> parseMapValue((String) entry[0], entry[1])));
         } else {
-            log.error("Unknown type of {}", value);
+            log.error("Forbidden type of \"{}\": {}", value, value.getClass().getName());
             return key;
         }
     }

@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist;
+package ru.demetrious.watchlist.adapter.rest;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.demetrious.watchlist.domain.model.Client;
+import ru.demetrious.watchlist.repository.ClientRepository;
 
 @RestController
 @RequestMapping("/api/clients")

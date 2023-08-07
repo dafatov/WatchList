@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist;
+package ru.demetrious.watchlist.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

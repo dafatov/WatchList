@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist;
+package ru.demetrious.watchlist.domain.enums;
 
 import java.util.Arrays;
 import lombok.Getter;
