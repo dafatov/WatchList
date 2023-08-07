@@ -1,6 +1,6 @@
-import {memo} from 'react';
 import {Route, Switch} from 'react-router-dom';
 import {Landing} from '../pages/landing/Landing';
+import {memo} from 'react';
 
 export const AppView = memo(() => {
   return (
