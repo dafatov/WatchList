@@ -4,7 +4,7 @@ import java.util.ListResourceBundle;
 
 import static ru.demetrious.watchlist.utils.LocaleUtils.wrap;
 
-public class Web extends ListResourceBundle {
+public class Common extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
         return wrap();

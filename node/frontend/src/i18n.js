@@ -19,7 +19,7 @@ i18next
       escapeValue: false,
     },
     load: 'currentOnly',
-    ns: ['web'],
+    ns: ['web', 'common'],
     saveMissing: false,
     supportedLngs: ['en', 'ru'],
   });

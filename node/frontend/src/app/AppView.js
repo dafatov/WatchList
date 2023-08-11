@@ -1,11 +1,13 @@
 import {Route, Switch} from 'react-router-dom';
-import {Landing} from '../pages/landing/Landing';
+import {Animes} from '../pages/animes/Animes';
+import {NotFound} from '../pages/notFound/NotFound';
 import {memo} from 'react';
 
 export const AppView = memo(() => {
   return (
     <Switch>
-      <Route path="/" component={Landing} exact/>
+      <Route path="/" component={Animes} exact/>
+      <Route path="/" component={NotFound}/>
     </Switch>
   );
 });
