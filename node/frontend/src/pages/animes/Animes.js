@@ -1,11 +1,13 @@
-import {AddOutlined, CancelOutlined, DeleteOutline, EditOutlined, OpenInNew, Save} from '@mui/icons-material';
-import {Chip, CircularProgress, IconButton, Link, MenuItem, TextField, Typography} from '@mui/material';
+import {CircularProgress, Typography} from '@mui/material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
-import {ConfirmDeleteAnimeModal} from './confirmDeleteAnimeModal/ConfirmDeleteAnimeModal';
-import {EditSupplementEpisodesModal} from './editSupplementEpisodesModal/EditSupplementEpisodesModal';
+import {AnimesController} from '../../components/animes/AnimesController';
 import MUIDataTable from 'mui-datatables';
+import {PathLink} from '../../components/pathLink/PathLink';
+import {Select} from '../../components/select/Select';
+import {SupplementsController} from '../../components/supplements/SupplementsController';
 import {TableFooter} from '../../components/tableFooter/TableFooter';
-import {Tooltip} from '../../components/tooltip/Tooltip';
+import {TextField} from '../../components/textField/TextField';
+import {UrlLink} from '../../components/urlLink/UrlLink';
 import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
 import {getUnitPrefix} from '../../utils/convert';
@@ -22,11 +24,6 @@ export const Animes = memo(() => {
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
   const [editable, setEditable] = useState(null);
-  const [deletable, setDeletable] = useState(null);
-  const [openSupplementEpisodesModal, setOpenSupplementEpisodesModal] = useState(false);
-  const [openConfirmDeleteAnimeModal, setOpenConfirmDeleteAnimeModal] = useState(false);
-  const [editableSupplementId, setEditableSupplementId] = useState(null);
-  const [editableSupplementName, setEditableSupplementName] = useState('');
 
   useEffect(() => {
     setIsLoading(isPendingAnimes || isPendingDictionaries);
@@ -124,46 +121,28 @@ export const Animes = memo(() => {
       .catch(() => showError(t('web:page.animes.table.path.error')));
   }, [showError]);
 
-  const handleChangeEditable = useCallback(fieldName => event => {
-    setEditable({
-      ...editable,
-      [fieldName]: event.target.value,
-    });
+  const handleLinkEditable = useCallback((name, url) => {
+    setEditable({...editable, name, url});
   }, [editable, setEditable]);
 
-  const handleDeleteSupplement = useCallback(id => {
-    setEditable({
-      ...editable,
-      supplements: editable.supplements.filter(supplement => supplement.id !== id),
-    });
+  const handlePathEditable = useCallback(path => {
+    setEditable({...editable, path});
   }, [editable, setEditable]);
 
-  const handleAddSupplement = useCallback(() => {
-    if (!dictionaries.supplements.includes(editableSupplementName) || editable.supplements.find(supplement => supplement.name === editableSupplementName)) {
-      return;
-    }
+  const handleSizeEditable = useCallback(size => {
+    setEditable({...editable, size});
+  }, [editable, setEditable]);
 
-    setEditable({
-      ...editable,
-      supplements: [
-        ...editable.supplements, {
-          id: editableSupplementName,
-          name: editableSupplementName,
-          episodes: [],
-          isPattern: true,
-        },
-      ],
-    });
-  }, [editable, setEditable, editableSupplementName, dictionaries?.supplements]);
+  const handleStatusEditable = useCallback(status => {
+    setEditable({...editable, status});
+  }, [editable, setEditable]);
 
-  const handleSupplementEpisodesModal = useCallback((supplement, id) => {
-    setEditable({
-      ...editable,
-      supplements: [
-        ...(editable.supplements.filter(supplement => supplement.id !== id)),
-        supplement,
-      ],
-    });
+  const handleEpisodesEditable = useCallback(episodes => {
+    setEditable({...editable, episodes});
+  }, [editable, setEditable]);
+
+  const handleSupplementsEditable = useCallback(supplements => {
+    setEditable({...editable, supplements});
   }, [editable, setEditable]);
 
   const getRenderStatus = useCallback(status => t(`web:page.animes.table.status.enum.${status}`), []);
@@ -180,6 +159,30 @@ export const Animes = memo(() => {
     });
   }, []);
 
+  const getOnRenderSupplementTooltip = useCallback(episodes => supplement => {
+    if ((supplement.episodes?.length ?? 0) === 0) {
+      return t('common:count.nothing');
+    }
+
+    if (supplement.episodes.length === episodes) {
+      return t('common:count.all');
+    }
+
+    return supplement.episodes.join(', ');
+  }, []);
+
+  const isEditable = useCallback(id => editable?.id === id, [editable]);
+
+  const getFields = useCallback(dataIndex => {
+    const anime = prepareShowAnimes()[dataIndex];
+
+    if (isEditable(anime.id)) {
+      return editable;
+    }
+
+    return anime;
+  }, [isEditable, prepareShowAnimes, editable]);
+
   const columns = useMemo(() => [
     {
       name: 'name',
@@ -187,28 +190,20 @@ export const Animes = memo(() => {
       options: {
         filter: false,
         customBodyRenderLite: dataIndex => {
-          const {id, name, url} = prepareShowAnimes()[dataIndex];
+          const {id, name, url} = getFields(dataIndex);
 
           return (
-            <>
-              {editable?.id === id
-                ? <>
-                  <TextField
-                    value={editable.name ?? ''}
-                    onChange={handleChangeEditable('name')}
-                  />
-                  <TextField
-                    value={editable.url ?? ''}
-                    onChange={handleChangeEditable('url')}
-                  />
-                </>
-                : <Link href={url}>{name}</Link>
-              }
-            </>
+            <UrlLink
+              editable={isEditable(id)}
+              name={name}
+              url={url}
+              onBlur={handleLinkEditable}
+            />
           );
         },
       },
-    }, {
+    },
+    {
       name: 'size',
       label: t('web:page.animes.table.size.title'),
       options: {
@@ -221,21 +216,21 @@ export const Animes = memo(() => {
           render: value => getRenderSize(value),
         },
         customBodyRenderLite: dataIndex => {
-          const {id, size} = prepareShowAnimes()[dataIndex];
+          const {id, size} = getFields(dataIndex);
 
           return (
-            <>
-              {editable?.id === id
-                ? <TextField
-                  value={editable.size ?? ''}
-                  onChange={handleChangeEditable('size')}
-                />
-                : getRenderSize(size)}
-            </>
+            <TextField
+              editable={isEditable(id)}
+              type="number"
+              value={size}
+              onRender={getRenderSize}
+              onBlur={handleSizeEditable}
+            />
           );
         },
       },
-    }, {
+    },
+    {
       name: 'status',
       label: t('web:page.animes.table.status.title'),
       options: {
@@ -249,56 +244,49 @@ export const Animes = memo(() => {
           render: value => getRenderStatus(value),
         },
         customBodyRenderLite: dataIndex => {
-          const {id, status} = prepareShowAnimes()[dataIndex];
+          const {id, status} = getFields(dataIndex);
 
           return (
-            <>
-              {editable?.id === id
-                ? <TextField
-                  select
-                  value={editable.status ?? ''}
-                  onChange={handleChangeEditable('status')}
-                >
-                  {dictionaries?.statuses.map(option => (
-                    <MenuItem key={option} value={option}>
-                      {getRenderStatus(option)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                : getRenderStatus(status)}
-            </>
+            <Select
+              editable={isEditable(id)}
+              value={status}
+              onBlur={handleStatusEditable}
+              options={dictionaries?.statuses}
+              onRender={getRenderStatus}
+            />
           );
         },
       },
-    }, {
+    },
+    {
       name: 'multipleViews',
       label: t('web:page.animes.table.multipleViews.title'),
       options: {
         filter: false,
         searchable: false,
       },
-    }, {
+    },
+    {
       name: 'episodes',
       label: t('web:page:animes.table.episodes.title'),
       options: {
         filter: false,
         searchable: false,
         customBodyRenderLite: dataIndex => {
-          const {id, episodes} = prepareShowAnimes()[dataIndex];
+          const {id, episodes} = getFields(dataIndex);
 
           return (
-            <>
-              {editable?.id === id
-                ? <TextField
-                  value={editable.episodes ?? ''}
-                  onChange={handleChangeEditable('episodes')}
-                />
-                : episodes}
-            </>
+            <TextField
+              editable={isEditable(id)}
+              type="number"
+              value={episodes ?? 0}
+              onBlur={handleEpisodesEditable}
+            />
           );
         },
       },
-    }, {
+    },
+    {
       name: 'supplements',
       label: t('web:page:animes.table.supplements.title'),
       options: {
@@ -314,100 +302,45 @@ export const Animes = memo(() => {
           renderValue: value => getRenderSupplementStatus(value),
         },
         customBodyRenderLite: dataIndex => {
-          const {id, supplements, episodes} = prepareShowAnimes()[dataIndex];
+          const {id, supplements, episodes} = getFields(dataIndex);
 
+          // eslint-disable-next-line no-console
+          console.log({episodes});
           return (
-            <>
-              {(editable?.id === id
-                ? editable.supplements
-                : supplements).map(supplement =>
-                <Tooltip
-                  key={supplement.id}
-                  title={supplement.episodes.length === episodes
-                    ? t('common:count.all')
-                    : supplement.episodes.length === 0
-                      ? t('common:count.nothing')
-                      : supplement.episodes.join(', ')}
-                >
-                  <Chip
-                    variant="outlined"
-                    color="primary"
-                    label={t(`web:page.animes.table.supplements.enum.${supplement.name}`)}
-                    onClick={() => {
-                      if (editable?.id !== id) {
-                        return;
-                      }
-
-                      setEditableSupplementId(supplement.id);
-                      setOpenSupplementEpisodesModal(true);
-                    }}
-                    onDelete={() => handleDeleteSupplement(supplement.id)}
-                    deleteIcon={editable?.id === id
-                      ? <DeleteOutline/>
-                      : <></>}
-                  />
-                </Tooltip>,
-              )}
-              {editable?.id === id
-                ? <Chip
-                  variant="outlined"
-                  color="primary"
-                  label={
-                    <TextField
-                      select
-                      value={editableSupplementName ?? ''}
-                      onChange={e => setEditableSupplementName(e.target.value)}
-                    >
-                      {dictionaries?.supplements.map(option => (
-                        <MenuItem
-                          key={option}
-                          value={option}
-                          disabled={!!editable.supplements.find(supplement => supplement.name === option)}
-                        >
-                          {getRenderSupplementStatus(option)}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  }
-                  onDelete={() => handleAddSupplement()}
-                  deleteIcon={<AddOutlined/>}
-                />
-                : <></>}
-            </>
+            <SupplementsController
+              editable={isEditable(id)}
+              supplements={supplements}
+              onRenderSupplementTooltip={getOnRenderSupplementTooltip(episodes)}
+              onRenderSupplementName={getRenderSupplementStatus}
+              options={dictionaries?.supplements}
+              episodes={parseInt(episodes ? episodes : '0')}
+              onBlur={handleSupplementsEditable}
+            />
           );
         },
       },
-    }, {
+    },
+    {
       name: 'path',
       label: t('web:page.animes.table.path.title'),
       options: {
         sort: false,
         searchable: false,
         customBodyRenderLite: dataIndex => {
-          const {id, path} = prepareShowAnimes()[dataIndex];
+          const {id, path} = getFields(dataIndex);
 
           return (
-            <>
-              {editable?.id === id
-                ? <TextField
-                  value={editable.path ?? ''}
-                  onChange={handleChangeEditable('path')}
-                />
-                : <Tooltip title={path ?? '-'}>
-                  <span>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenPath(id)}
-                    >
-                      <OpenInNew/>
-                    </IconButton>
-                  </span>
-                </Tooltip>}
-            </>
+            <PathLink
+              editable={isEditable(id)}
+              value={path}
+              onBlur={handlePathEditable}
+              onClick={() => handleOpenPath(id)}
+            />
           );
         },
       },
-    }, {
+    },
+    {
       name: '',
       label: '',
       options: {
@@ -415,72 +348,19 @@ export const Animes = memo(() => {
         filter: false,
         searchable: false,
         customBodyRenderLite: dataIndex => {
-          const anime = prepareShowAnimes()[dataIndex];
+          const anime = getFields(dataIndex);
 
           return (
-            <>
-              {editable?.id === anime.id
-                ? <>
-                  <Tooltip title={t('common:action.save')}>
-                    <span>
-                      <IconButton
-                        color="primary"
-                        onClick={handleSaveAnime}
-                      >
-                        <Save/>
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                  <Tooltip title={t('common:action.cancel')}>
-                    <span>
-                      <IconButton
-                        color="primary"
-                        onClick={handleCancelAnime}
-                      >
-                        <CancelOutlined/>
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                </>
-                : <>
-                  <Tooltip title={t('common:action.edit')}>
-                    <span>
-                      <IconButton
-                        color="primary"
-                        disabled={!!editable}
-                        onClick={() => handleEditAnime(anime)}
-                      >
-                        <EditOutlined/>
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                  <Tooltip title={t('common:action.delete')}>
-                    <span>
-                      <IconButton
-                        color="primary"
-                        disabled={!!editable}
-                        onClick={() => {
-                          setDeletable(anime);
-                          setOpenConfirmDeleteAnimeModal(true);
-                        }}
-                      >
-                        <DeleteOutline/>
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                </>}
-            </>
+            <AnimesController
+              editable={isEditable(anime.id)}
+              anime={anime}
+              onSave={handleSaveAnime}
+              onCancel={handleCancelAnime}
+              onEdit={() => handleEditAnime(anime)}
+              onDelete={handleDeleteAnime}
+            />
           );
         },
-      },
-    }, {
-      name: 'isPattern',
-      label: '',
-      options: {
-        sort: false,
-        filter: false,
-        searchable: false,
-        display: 'excluded',
       },
     },
   ], [
@@ -488,21 +368,20 @@ export const Animes = memo(() => {
     editable,
     handleEditAnime,
     handleSaveAnime,
-    handleChangeEditable,
-    handleDeleteSupplement,
     getRenderStatus,
     getRenderSize,
-    setOpenSupplementEpisodesModal,
-    setEditableSupplementId,
-    editableSupplementName,
-    setEditableSupplementName,
-    handleAddSupplement,
     handleCancelAnime,
     handleDeleteAnime,
     handleOpenPath,
-    setDeletable,
-    setOpenConfirmDeleteAnimeModal,
-    prepareShowAnimes,
+    handlePathEditable,
+    getRenderSupplementStatus,
+    handleEpisodesEditable,
+    handleStatusEditable,
+    handleSizeEditable,
+    handleLinkEditable,
+    handleSupplementsEditable,
+    isEditable,
+    getFields,
   ]);
 
   const options = useMemo(() => ({
@@ -513,9 +392,9 @@ export const Animes = memo(() => {
     },
     customSort: (data, columnIndex, order) => {
       const orderValue = 2 * (order === 'asc') - 1;
+      const preparedShowAnimes = prepareShowAnimes();
 
       return data.sort((a, b) => {
-        const preparedShowAnimes = prepareShowAnimes();
         const getIsPattern = anime => preparedShowAnimes[anime.index].isPattern;
 
         if (getIsPattern(a) || getIsPattern(b)) {
@@ -531,20 +410,17 @@ export const Animes = memo(() => {
       });
     },
     // eslint-disable-next-line max-params
-    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage, textLabels) => {
-      return (
-        <TableFooter
-          count={count}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          changeRowsPerPage={changeRowsPerPage}
-          changePage={changePage}
-          textLabels={textLabels}
-          disabled={!!editable}
-          onSubmit={handleAddAnime}
-        />
-      );
-    },
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage, textLabels) =>
+      <TableFooter
+        count={count}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        changeRowsPerPage={changeRowsPerPage}
+        changePage={changePage}
+        textLabels={textLabels}
+        disabled={!!editable}
+        onSubmit={handleAddAnime}
+      />,
   }), [editable, handleAddAnime, prepareShowAnimes]);
 
   if (isLoading) {
@@ -556,27 +432,11 @@ export const Animes = memo(() => {
   }
 
   return (
-    <>
-      <MUIDataTable
-        columns={columns}
-        data={prepareShowAnimes()}
-        options={options}
-      />
-      <EditSupplementEpisodesModal
-        open={openSupplementEpisodesModal}
-        setOpen={setOpenSupplementEpisodesModal}
-        supplements={editable?.supplements}
-        id={editableSupplementId}
-        episodes={editable?.episodes}
-        onSubmit={handleSupplementEpisodesModal}
-      />
-      <ConfirmDeleteAnimeModal
-        open={openConfirmDeleteAnimeModal}
-        setOpen={setOpenConfirmDeleteAnimeModal}
-        anime={deletable}
-        onSubmit={handleDeleteAnime}
-      />
-    </>
+    <MUIDataTable
+      columns={columns}
+      data={prepareShowAnimes()}
+      options={options}
+    />
   );
 });
 

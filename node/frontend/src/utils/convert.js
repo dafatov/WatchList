@@ -1,8 +1,9 @@
 export const getUnitPrefix = value => {
   const divider = 1024;
-  const prefix = ['', 'k', 'M', 'G'];
+  const prefix = ['', 'Ki', 'Mi', 'Gi', 'Ti'];
   let index = 0;
 
+  value = parseInt(value);
   // eslint-disable-next-line no-loops/no-loops
   while (value / divider >= 1) {
     value = value / divider;

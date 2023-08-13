@@ -16,12 +16,13 @@ public class Common_ru extends ListResourceBundle {
                 pair("notAvailable", "Данные недоступны")
             )),
             pair("unit", wrap(
-                pair("information", "б"),
+                pair("information", "Б"),
                 pair("prefix", wrap(
                     pair("", ""),
-                    pair("k", "Ки"),
-                    pair("M", "Ми"),
-                    pair("G", "Ги")
+                    pair("Ki", "Ки"),
+                    pair("Mi", "Ми"),
+                    pair("Gi", "Ги"),
+                    pair("Ti", "Ти")
                 ))
             )),
             pair("value", "{{value}} {{prefix}}{{unit}}"),
