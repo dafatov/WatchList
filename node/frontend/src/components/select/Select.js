@@ -1,18 +1,24 @@
 import {MenuItem, TextField} from '@mui/material';
-import {memo, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useState} from 'react';
 
 export const Select = memo(({
   editable,
   value: valueProp,
-  onBlur,
+  onChange,
   options,
   onRender,
+  ...props
 }) => {
-  const [value, setValue] = useState(valueProp ?? options?.[0] ?? '');
+  const [value, setValue] = useState(valueProp);
 
   useEffect(() => {
-    setValue(valueProp ?? options?.[0] ?? '');
+    setValue(valueProp);
   }, [editable, valueProp, setValue]);
+
+  const handleChange = useCallback(event => {
+    setValue(event.target.value);
+    onChange(event);
+  }, [setValue, onChange]);
 
   return (
     <>
@@ -20,8 +26,8 @@ export const Select = memo(({
         ? <TextField
           select
           value={value}
-          onBlur={() => onBlur(value)}
-          onChange={event => setValue(event.target.value)}
+          onChange={handleChange}
+          {...props}
         >
           {options.map(option =>
             <MenuItem key={option} value={option}>

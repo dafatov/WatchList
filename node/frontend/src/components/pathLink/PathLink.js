@@ -1,27 +1,32 @@
-import {IconButton, TextField as MuiTextField} from '@mui/material';
-import {memo, useEffect, useState} from 'react';
+import {IconButton, TextField} from '@mui/material';
+import {memo, useCallback, useEffect, useState} from 'react';
 import {OpenInNew} from '@mui/icons-material';
 import {Tooltip} from '../tooltip/Tooltip';
 
 export const PathLink = memo(({
   editable,
   value: valueProp,
-  onBlur,
+  onChange,
   onClick,
 }) => {
-  const [value, setValue] = useState(valueProp ?? '');
+  const [value, setValue] = useState(valueProp);
 
   useEffect(() => {
-    setValue(valueProp ?? '');
+    setValue(valueProp);
   }, [editable, valueProp, setValue]);
+
+  const handleChange = useCallback(event => {
+    setValue(event.target.value);
+    onChange(event);
+  }, [setValue, onChange]);
 
   return (
     <>
       {editable
-        ? <MuiTextField
+        ? <TextField
+          name="path"
           value={value}
-          onBlur={() => onBlur(value)}
-          onChange={event => setValue(event.target.value)}
+          onChange={handleChange}
         />
         : <Tooltip title={value}>
           <IconButton

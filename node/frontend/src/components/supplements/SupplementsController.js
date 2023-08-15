@@ -4,8 +4,8 @@ import {EditSupplementEpisodesModal} from './editSupplementEpisodesModal/EditSup
 import {Supplements} from './supplements/Supplements';
 
 /**
- * @type {React.NamedExoticComponent<{readonly onRenderSupplementTooltip?: Function, readonly onRenderSupplementName?: Function, readonly editable?: boolean,
- *   readonly options?: [string], readonly supplements?: [{id: *, name: string}], readonly editableOptionsCount?: number}>}
+ * @type {React.NamedExoticComponent<{readonly supplements?: [{id: *, name: string}], readonly setFieldTouched?: *, readonly editable?: *, readonly
+ *   setFieldValue?: *, readonly onRenderSupplementTooltip?: *, readonly onRenderSupplementName?: *, readonly options?: *, readonly episodes?: *}>}
  */
 export const SupplementsController = memo(({
   editable,
@@ -14,79 +14,73 @@ export const SupplementsController = memo(({
   onRenderSupplementName,
   options,
   episodes,
-  onBlur,
+  setFieldValue,
+  setFieldTouched,
 }) => {
-  const [supplements, setSupplements] = useState(supplementsProp ?? []);
+  const [supplements, setSupplements] = useState(supplementsProp);
   const [open, setOpen] = useState(false);
-  const [editableSupplementId, setEditableSupplementId] = useState(null);
+  const [index, setIndex] = useState(null);
 
   useEffect(() => {
-    setSupplements(supplementsProp ?? []);
+    setSupplements(supplementsProp);
   }, [editable, supplementsProp, setSupplements]);
 
-  const handleEditSupplement = useCallback(id => {
-    if (!editable) {
-      return;
-    }
+  const handleChange = useCallback(event => {
+    setSupplements(event.target.value);
+    setFieldValue('supplements', event.target.value);
+    setFieldTouched('supplements', true, false);
+  }, [setSupplements, setFieldValue, setFieldTouched]);
 
-    setEditableSupplementId(id);
-    setOpen(true);
-  }, [editable, setOpen, setEditableSupplementId]);
-
-  const handleDeleteSupplement = useCallback(id => {
-    setSupplements(supplements => supplements.filter(supplement => supplement.id !== id));
-  }, [setSupplements]);
-
-  const handleSubmitModal = useCallback(({supplement, id}) => {
-    setSupplements(supplements => [
-      ...(supplements.filter(supplement => supplement.id !== id)),
-      supplement,
-    ]);
-  }, [setSupplements]);
+  const handleEpisodesSubmit = useCallback(values => {
+    setFieldValue(`supplements.${index}.episodes`, values);
+    setFieldTouched(`supplements.${index}.episodes`, true, false);
+  }, [setFieldValue, setFieldTouched, index]);
 
   return (
     <>
       {editable
-        ? <Select
-          multiple
-          value={supplements}
-          onBlur={() => onBlur(supplements)}
-          onChange={event => setSupplements(event.target.value)}
-          renderValue={selectedSupplements =>
-            <Supplements
-              editable={editable}
-              supplements={selectedSupplements}
-              onRenderSupplementTooltip={onRenderSupplementTooltip}
-              onRenderSupplementName={onRenderSupplementName}
-              onEdit={handleEditSupplement}
-              onDelete={handleDeleteSupplement}
-            />}
-        >
-          {options.sort().map(option =>
-            <MenuItem
-              key={option}
-              value={supplements.find(supplement => supplement.name === option) ?? {
-                id: option,
-                name: option,
-                isPattern: true,
-              }}
-            >
-              {onRenderSupplementName(option)}
-            </MenuItem>)}
-        </Select>
+        ? <>
+          <Select
+            name="supplements"
+            multiple
+            value={supplements}
+            onChange={handleChange}
+            renderValue={selectedSupplements =>
+              <Supplements
+                supplements={selectedSupplements}
+                onRenderSupplementTooltip={onRenderSupplementTooltip}
+                onRenderSupplementName={onRenderSupplementName}
+                onEdit={index => {
+                  setIndex(index);
+                  setOpen(true);
+                }}
+              />}
+          >
+            {options.sort().map(option =>
+              <MenuItem
+                key={option}
+                value={supplements.find(supplement => supplement.name === option) ?? {
+                  id: option,
+                  name: option,
+                  isPattern: true,
+                }}
+              >
+                {onRenderSupplementName(option)}
+              </MenuItem>)}
+          </Select>
+          <EditSupplementEpisodesModal
+            open={open}
+            setOpen={setOpen}
+            onSubmit={handleEpisodesSubmit}
+            episodes={episodes}
+            initialValues={supplements[index]?.episodes ?? []}
+          />
+        </>
         : <Supplements
           supplements={supplements}
           onRenderSupplementTooltip={onRenderSupplementTooltip}
           onRenderSupplementName={onRenderSupplementName}
         />}
-      <EditSupplementEpisodesModal
-        open={open}
-        setOpen={setOpen}
-        supplements={supplements}
-        id={editableSupplementId}
-        episodes={episodes}
-        onSubmit={handleSubmitModal}
-      />
     </>
   );
 });

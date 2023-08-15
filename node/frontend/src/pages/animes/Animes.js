@@ -12,6 +12,7 @@ import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
 import {getUnitPrefix} from '../../utils/convert';
 import {throwHttpError} from '../../utils/reponse';
+import {useFormik} from 'formik';
 import {useSnackBar} from '../../utils/snackBar';
 import {useTranslation} from 'react-i18next';
 
@@ -23,7 +24,23 @@ export const Animes = memo(() => {
   const [isPendingDictionaries, setIsPendingDictionaries] = useState(true);
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
-  const [editable, setEditable] = useState(null);
+  const [editableId, setEditableId] = useState(null);
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      url: '',
+      size: '0',
+      status: 'PLANNING',
+      episodes: '1',
+      supplements: [],
+      path: '',
+      isPattern: true,
+    },
+    onSubmit: values => {
+      handleSaveAnime(values);
+      formik.resetForm();
+    },
+  });
 
   useEffect(() => {
     setIsLoading(isPendingAnimes || isPendingDictionaries);
@@ -50,45 +67,47 @@ export const Animes = memo(() => {
       });
   }, [setDictionaries, setIsPendingDictionaries]);
 
-  const prepareSaveEditable = useCallback(() => {
-    return {
-      ...editable,
-      id: editable.isPattern
+  const prepareSaveEditable = useCallback(anime => ({
+    ...anime,
+    id: anime.isPattern
+      ? null
+      : anime.id,
+    supplements: anime.supplements.map(supplement => ({
+      ...supplement,
+      id: supplement.isPattern
         ? null
-        : editable.id,
-      supplements: editable.supplements.map(supplement => supplement.isPattern
-        ? {...supplement, id: null}
-        : supplement),
-    };
-  }, [editable]);
+        : supplement.id,
+    })),
+  }), []);
 
-  const prepareShowAnimes = useCallback(() => animes.concat(editable?.isPattern
-    ? editable
-    : []), [animes, editable]);
+  const prepareShowAnimes = useCallback(() => animes.concat(editableId === 'id'
+    ? {id: editableId, ...formik.values}
+    : []), [animes, formik.values, editableId]);
 
   const handleEditAnime = useCallback(anime => {
-    setEditable(anime);
-  }, [setEditable]);
+    formik.setValues(anime);
+    setEditableId(anime.id);
+  }, [setEditableId, formik.setValues]);
 
-  const handleSaveAnime = useCallback(() => {
+  const handleSaveAnime = useCallback(values => {
     fetch('http://localhost:8080/api/animes/save', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(prepareSaveEditable()),
+      body: JSON.stringify(prepareSaveEditable(values)),
     }).then(throwHttpError)
       .then(response => response.json())
       .then(animes => {
         setAnimes(animes);
-        setEditable(null);
+        setEditableId(null);
         showSuccess(t('web:page.animes.table.save.success'));
       }).catch(() => showError(t('web:page.animes.table.save.error')));
-  }, [editable, setEditable, prepareSaveEditable, setAnimes, setEditable, showSuccess, showError]);
+  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError]);
 
   const handleCancelAnime = useCallback(() => {
-    setEditable(null);
-  }, [setEditable]);
+    setEditableId(null);
+  }, [setEditableId]);
 
   const handleDeleteAnime = useCallback(id => {
     fetch('http://localhost:8080/api/animes', {
@@ -103,16 +122,12 @@ export const Animes = memo(() => {
         setAnimes(animes);
         showSuccess(t('web:page.animes.table.delete.success'));
       }).catch(() => showError(t('web:page.animes.table.delete.error')));
-  }, [editable, setAnimes, setEditable, showSuccess, showError]);
+  }, [setAnimes, showSuccess, showError]);
 
   const handleAddAnime = useCallback(() => {
-    setEditable({
-      id: '',
-      multipleViews: 0,
-      isPattern: true,
-      supplements: [],
-    });
-  }, [setEditable]);
+    setEditableId('id');
+    formik.resetForm();
+  }, [setEditableId, formik.resetForm]);
 
   const handleOpenPath = useCallback(id => {
     fetch('http://localhost:8080/api/animes/open?' + new URLSearchParams({id}), {
@@ -120,30 +135,6 @@ export const Animes = memo(() => {
     }).then(throwHttpError)
       .catch(() => showError(t('web:page.animes.table.path.error')));
   }, [showError]);
-
-  const handleLinkEditable = useCallback((name, url) => {
-    setEditable({...editable, name, url});
-  }, [editable, setEditable]);
-
-  const handlePathEditable = useCallback(path => {
-    setEditable({...editable, path});
-  }, [editable, setEditable]);
-
-  const handleSizeEditable = useCallback(size => {
-    setEditable({...editable, size});
-  }, [editable, setEditable]);
-
-  const handleStatusEditable = useCallback(status => {
-    setEditable({...editable, status});
-  }, [editable, setEditable]);
-
-  const handleEpisodesEditable = useCallback(episodes => {
-    setEditable({...editable, episodes});
-  }, [editable, setEditable]);
-
-  const handleSupplementsEditable = useCallback(supplements => {
-    setEditable({...editable, supplements});
-  }, [editable, setEditable]);
 
   const getRenderStatus = useCallback(status => t(`web:page.animes.table.status.enum.${status}`), []);
 
@@ -171,17 +162,17 @@ export const Animes = memo(() => {
     return supplement.episodes.join(', ');
   }, []);
 
-  const isEditable = useCallback(id => editable?.id === id, [editable]);
+  const isEditable = useCallback(id => editableId === id, [editableId]);
 
   const getFields = useCallback(dataIndex => {
     const anime = prepareShowAnimes()[dataIndex];
 
     if (isEditable(anime.id)) {
-      return editable;
+      return {id: anime.id, ...formik.values};
     }
 
     return anime;
-  }, [isEditable, prepareShowAnimes, editable]);
+  }, [isEditable, prepareShowAnimes, formik.values]);
 
   const columns = useMemo(() => [
     {
@@ -197,7 +188,7 @@ export const Animes = memo(() => {
               editable={isEditable(id)}
               name={name}
               url={url}
-              onBlur={handleLinkEditable}
+              onChange={formik.handleChange}
             />
           );
         },
@@ -220,11 +211,11 @@ export const Animes = memo(() => {
 
           return (
             <TextField
+              name="size"
               editable={isEditable(id)}
-              type="number"
               value={size}
+              onChange={formik.handleChange}
               onRender={getRenderSize}
-              onBlur={handleSizeEditable}
             />
           );
         },
@@ -248,9 +239,10 @@ export const Animes = memo(() => {
 
           return (
             <Select
+              name="status"
               editable={isEditable(id)}
               value={status}
-              onBlur={handleStatusEditable}
+              onChange={formik.handleChange}
               options={dictionaries?.statuses}
               onRender={getRenderStatus}
             />
@@ -277,10 +269,10 @@ export const Animes = memo(() => {
 
           return (
             <TextField
+              name="episodes"
               editable={isEditable(id)}
-              type="number"
-              value={episodes ?? 0}
-              onBlur={handleEpisodesEditable}
+              value={episodes}
+              onChange={formik.handleChange}
             />
           );
         },
@@ -304,17 +296,18 @@ export const Animes = memo(() => {
         customBodyRenderLite: dataIndex => {
           const {id, supplements, episodes} = getFields(dataIndex);
 
-          // eslint-disable-next-line no-console
-          console.log({episodes});
           return (
             <SupplementsController
               editable={isEditable(id)}
               supplements={supplements}
-              onRenderSupplementTooltip={getOnRenderSupplementTooltip(episodes)}
+              onRenderSupplementTooltip={getOnRenderSupplementTooltip(parseInt(episodes))}
               onRenderSupplementName={getRenderSupplementStatus}
               options={dictionaries?.supplements}
-              episodes={parseInt(episodes ? episodes : '0')}
-              onBlur={handleSupplementsEditable}
+              episodes={parseInt(episodes
+                ? episodes
+                : '0')}
+              setFieldValue={formik.setFieldValue}
+              setFieldTouched={formik.setFieldTouched}
             />
           );
         },
@@ -333,7 +326,7 @@ export const Animes = memo(() => {
             <PathLink
               editable={isEditable(id)}
               value={path}
-              onBlur={handlePathEditable}
+              onChange={formik.handleChange}
               onClick={() => handleOpenPath(id)}
             />
           );
@@ -354,7 +347,7 @@ export const Animes = memo(() => {
             <AnimesController
               editable={isEditable(anime.id)}
               anime={anime}
-              onSave={handleSaveAnime}
+              onSave={formik.handleSubmit}
               onCancel={handleCancelAnime}
               onEdit={() => handleEditAnime(anime)}
               onDelete={handleDeleteAnime}
@@ -365,7 +358,6 @@ export const Animes = memo(() => {
     },
   ], [
     dictionaries,
-    editable,
     handleEditAnime,
     handleSaveAnime,
     getRenderStatus,
@@ -373,15 +365,10 @@ export const Animes = memo(() => {
     handleCancelAnime,
     handleDeleteAnime,
     handleOpenPath,
-    handlePathEditable,
     getRenderSupplementStatus,
-    handleEpisodesEditable,
-    handleStatusEditable,
-    handleSizeEditable,
-    handleLinkEditable,
-    handleSupplementsEditable,
     isEditable,
     getFields,
+    formik,
   ]);
 
   const options = useMemo(() => ({
@@ -418,10 +405,10 @@ export const Animes = memo(() => {
         changeRowsPerPage={changeRowsPerPage}
         changePage={changePage}
         textLabels={textLabels}
-        disabled={!!editable}
+        disabled={!!editableId}
         onSubmit={handleAddAnime}
       />,
-  }), [editable, handleAddAnime, prepareShowAnimes]);
+  }), [editableId, handleAddAnime, prepareShowAnimes]);
 
   if (isLoading) {
     return <CircularProgress/>;

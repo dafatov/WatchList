@@ -1,36 +1,49 @@
-import {Link as MuiLink, TextField} from '@mui/material';
-import {useEffect, useState} from 'react';
+import {Link, TextField} from '@mui/material';
+import {useCallback, useEffect, useState} from 'react';
 
 export const UrlLink = (({
   editable,
   name: nameProp,
   url: urlProp,
-  onBlur,
+  onChange,
 }) => {
-  const [name, setName] = useState(nameProp ?? '');
-  const [url, setUrl] = useState(urlProp ?? '');
+  const [name, setName] = useState(nameProp);
+  const [url, setUrl] = useState(urlProp);
 
   useEffect(() => {
-    setName(nameProp ?? '');
-    setUrl(urlProp ?? '');
-  }, [editable, nameProp, urlProp, setName, setUrl]);
+    setName(nameProp);
+  }, [editable, nameProp, setName]);
+
+  useEffect(() => {
+    setUrl(urlProp);
+  }, [editable, urlProp, setUrl]);
+
+  const handleNameChange = useCallback(event => {
+    setName(event.target.value);
+    onChange(event);
+  }, [setName, onChange]);
+
+  const handleUrlChange = useCallback(event => {
+    setUrl(event.target.value);
+    onChange(event);
+  }, [setUrl, onChange]);
 
   return (
     <>
       {editable
         ? <>
           <TextField
+            name="name"
             value={name}
-            onBlur={() => onBlur(name, url)}
-            onChange={event => setName(event.target.value)}
+            onChange={handleNameChange}
           />
           <TextField
+            name="url"
             value={url}
-            onBlur={() => onBlur(name, url)}
-            onChange={event => setUrl(event.target.value)}
+            onChange={handleUrlChange}
           />
         </>
-        : <MuiLink href={url}>{name}</MuiLink>
+        : <Link target="_blank" href={url}>{name}</Link>
       }
     </>
   );
