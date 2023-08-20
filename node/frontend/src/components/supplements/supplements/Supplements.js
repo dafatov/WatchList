@@ -11,25 +11,26 @@ export const Supplements = memo(({
   onRenderSupplementTooltip,
   onRenderSupplementName,
   onEdit,
-}) => {
-  return (
-    <>
-      {supplements.map((supplement, index) =>
-        <Tooltip
-          key={supplement.id}
-          title={onRenderSupplementTooltip(supplement)}
-        >
-          <Chip
-            variant="outlined"
-            color="primary"
-            label={onRenderSupplementName?.(supplement.name) ?? supplement.name}
-            onClick={() => onEdit?.(index)}
-            onMouseDown={event => event.stopPropagation()}
-          />
-        </Tooltip>,
-      )}
-    </>
-  );
-});
+  formik,
+}) => (
+  <>
+    {supplements.map((supplement, index) =>
+      <Tooltip
+        key={supplement.id}
+        title={onRenderSupplementTooltip(supplement)}
+      >
+        <Chip
+          variant="outlined"
+          color={formik?.errors.supplements?.[index]?.episodes
+            ? 'error'
+            : 'primary'}
+          label={onRenderSupplementName?.(supplement.name) ?? supplement.name}
+          onClick={() => onEdit?.(index)}
+          onMouseDown={event => event.stopPropagation()}
+        />
+      </Tooltip>,
+    )}
+  </>
+));
 
 Supplements.displayName = 'Supplements';

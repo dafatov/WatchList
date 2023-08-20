@@ -6,7 +6,7 @@ export const defaultOptions = {
   jumpToPage: true,
   onDownload: (buildHead, buildBody, columns, data) => '\uFEFF' + buildHead(columns) + buildBody(data),
   print: false,
-  rowsPerPageOptions: [10, 25, 100],
+  rowsPerPageOptions: [10, 25, 100, {value: 10000, label: 'Все'}],
   selectableRows: 'none',
   textLabels: {
     body: {

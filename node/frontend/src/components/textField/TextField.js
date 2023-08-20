@@ -5,7 +5,10 @@ export const TextField = memo(({
   editable,
   value: valueProp,
   onRender,
-  onChange,
+  onBlur,
+  formik,
+  name,
+  type,
   ...props
 }) => {
   const [value, setValue] = useState(valueProp);
@@ -15,16 +18,27 @@ export const TextField = memo(({
   }, [editable, valueProp, setValue]);
 
   const handleValue = useCallback(event => {
-    setValue(event.target.value);
-    onChange(event);
-  }, [setValue, onChange]);
+    if (!type || type === 'number' && event.target.value.match(/^0$|^[1-9]*$/)) {
+      setValue(event.target.value);
+      formik.handleChange(event);
+    }
+  }, [setValue, formik.handleChange, type]);
+
+  const handleBlur = useCallback(event => {
+    formik.handleBlur(event);
+    onBlur?.(event);
+  }, [formik.handleBlur, onBlur]);
 
   return (
     <>
       {editable
         ? <MuiTextField
+          name={name}
           value={value}
           onChange={handleValue}
+          onBlur={handleBlur}
+          error={formik.touched[name] && !!formik.errors[name]}
+          label={formik.touched[name] && formik.errors[name] && <>{formik.errors[name]}</>}
           {...props}
         />
         : onRender?.(value) ?? value}

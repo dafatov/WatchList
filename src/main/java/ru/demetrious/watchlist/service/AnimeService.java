@@ -3,6 +3,8 @@ package ru.demetrious.watchlist.service;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,7 +25,8 @@ public class AnimeService {
         return animeRepository.findAll();
     }
 
-    public List<Anime> addAnimes(List<Anime> animeList) {
+    public List<Anime> setAnimes(List<Anime> animeList) {
+        animeRepository.deleteAll();
         return animeRepository.saveAll(animeList);
     }
 
@@ -31,12 +34,20 @@ public class AnimeService {
         return animeRepository.deleteByIdIsIn(uuidList);
     }
 
-    public void openAnime(UUID id) throws IOException {
+    public void openAnimeFolder(UUID id) throws IOException {
         Optional<Anime> anime = animeRepository.findById(id);
 
         System.setProperty("java.awt.headless", "false");
 
         Desktop.getDesktop().open(new File(anime.orElseThrow().getPath()));
+    }
+
+    public void openAnimeUrl(UUID id) throws IOException {
+        Optional<Anime> anime = animeRepository.findById(id);
+
+        System.setProperty("java.awt.headless", "false");
+
+        Desktop.getDesktop().browse(URI.create(anime.orElseThrow().getUrl()));
     }
 
     public Anime saveAnime(Anime anime) {

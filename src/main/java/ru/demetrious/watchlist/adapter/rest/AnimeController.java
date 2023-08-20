@@ -32,9 +32,9 @@ public class AnimeController {
     }
 
     @PostMapping
-    public List<Anime> addAnimes(@RequestBody List<Anime> animeList) {
-        List<Anime> animeListSaved = animeService.addAnimes(animeList);
-        log.info("addAnimes: {}", animeListSaved);
+    public List<Anime> setAnimes(@RequestBody List<Anime> animeList) {
+        List<Anime> animeListSaved = animeService.setAnimes(animeList);
+        log.info("setAnimes: {}", animeListSaved);
         return getAnimes();
     }
 
@@ -45,13 +45,25 @@ public class AnimeController {
         return getAnimes();
     }
 
-    @PostMapping("/open")
-    public ResponseEntity<String> openAnime(@RequestParam UUID id) {
+    @PostMapping("/open/folder")
+    public ResponseEntity<String> openAnimeFolder(@RequestParam UUID id) {
         try {
-            animeService.openAnime(id);
-            log.info("openAnime: {}", id);
+            animeService.openAnimeFolder(id);
+            log.info("openAnimeFolder: {}", id);
         } catch (Exception e) {
-            log.error("Can't open Anime: {}", String.valueOf(e));
+            log.error("Can't open Anime folder: {}", String.valueOf(e));
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/open/url")
+    public ResponseEntity<String> openAnimeUrl(@RequestParam UUID id) {
+        try {
+            animeService.openAnimeUrl(id);
+            log.info("openAnimeUrl: {}", id);
+        } catch (Exception e) {
+            log.error("Can't open Anime url: {}", String.valueOf(e));
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
         return ResponseEntity.ok().build();

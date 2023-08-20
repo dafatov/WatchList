@@ -1,50 +1,63 @@
+import {AddOutlined, FileDownloadOutlined, FileUploadOutlined, ImportExportOutlined} from '@mui/icons-material';
 import {IconButton, TableFooter as MuiTableFooter, TableCell, TableRow} from '@mui/material';
-import {AddOutlined} from '@mui/icons-material';
 import MuiTablePagination from '@mui/material/TablePagination';
+import {SplitIconButton} from '../splitIconButton/SplitIconButton';
 import {memo} from 'react';
 
 export const TableFooter = memo(({
   count,
-  textLabels,
+  options,
   rowsPerPage,
   page,
   changePage,
   changeRowsPerPage,
-  onSubmit,
+  onAdd,
+  onUpload,
+  onDownload,
   disabled,
-}) => {
-  return (
-    <MuiTableFooter>
-      <TableRow>
-        <TableCell colSpan={1000} style={{display: 'grid'}}>
+}) => (
+  <MuiTableFooter>
+    <TableRow>
+      <TableCell colSpan={1000} style={{display: 'grid'}}>
+        <div style={{display: 'flex'}}>
           <IconButton
-            style={{border: '1px solid', borderRadius: '12px'}}
+            style={{border: '1px solid', borderRadius: '12px 0 0 12px', flexGrow: 1}}
             color="primary"
             disabled={disabled}
-            onClick={onSubmit}
+            onClick={onAdd}
           >
             <AddOutlined/>
           </IconButton>
-          <MuiTablePagination
-            component="div"
-            count={count}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, page) => changePage(page)}
-            labelRowsPerPage={textLabels.rowsPerPage}
-            labelDisplayedRows={({ from, to, count }) => `${from}-${to} ${textLabels.displayRows} ${count}`}
-            backIconButtonProps={{
-              'aria-label': textLabels.previous,
-            }}
-            nextIconButtonProps={{
-              'aria-label': textLabels.next,
-            }}
-            onRowsPerPageChange={event => changeRowsPerPage(event.target.value)}
+          <SplitIconButton
+            disabled={disabled}
+            mainIcon={<ImportExportOutlined/>}
+            topIcon={<FileUploadOutlined/>}
+            bottomIcon={<FileDownloadOutlined/>}
+            onTopClick={onUpload}
+            onBottomClick={onDownload}
           />
-        </TableCell>
-      </TableRow>
-    </MuiTableFooter>
-  );
-});
+        </div>
+        <MuiTablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, page) => changePage(page)}
+          rowsPerPageOptions={options.rowsPerPageOptions}
+          labelRowsPerPage={options.textLabels.pagination.rowsPerPage}
+          labelDisplayedRows={({from, to, count}) =>
+            `${from}-${to} ${options.textLabels.pagination.displayRows} ${count}`}
+          backIconButtonProps={{
+            'aria-label': options.textLabels.pagination.previous,
+          }}
+          nextIconButtonProps={{
+            'aria-label': options.textLabels.pagination.next,
+          }}
+          onRowsPerPageChange={event => changeRowsPerPage(event.target.value)}
+        />
+      </TableCell>
+    </TableRow>
+  </MuiTableFooter>
+));
 
 TableFooter.displayName = 'TableFooter';

@@ -4,10 +4,10 @@ import {memo, useCallback, useEffect, useState} from 'react';
 export const Select = memo(({
   editable,
   value: valueProp,
-  onChange,
+  formik,
+  name,
   options,
   onRender,
-  ...props
 }) => {
   const [value, setValue] = useState(valueProp);
 
@@ -17,17 +17,20 @@ export const Select = memo(({
 
   const handleChange = useCallback(event => {
     setValue(event.target.value);
-    onChange(event);
-  }, [setValue, onChange]);
+    formik.handleChange(event);
+  }, [setValue, formik.handleChange]);
 
   return (
     <>
       {editable
         ? <TextField
+          name={name}
           select
           value={value}
           onChange={handleChange}
-          {...props}
+          onBlur={formik.handleBlur}
+          error={formik.touched[name] && !!formik.errors[name]}
+          label={formik.touched[name] && formik.errors[name] && <>{formik.errors[name]}</>}
         >
           {options.map(option =>
             <MenuItem key={option} value={option}>

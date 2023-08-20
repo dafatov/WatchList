@@ -1,7 +1,7 @@
 import {Checkbox, FormControlLabel, FormGroup} from '@mui/material';
 import {memo, useCallback, useEffect, useState} from 'react';
-import {pull, union} from 'lodash';
 import {Dialog} from '../../modal/Dialog';
+import {union} from 'lodash';
 import {useTranslation} from 'react-i18next';
 
 /**
@@ -23,11 +23,9 @@ export const EditSupplementEpisodesModal = memo(({
   }, [initialValues, setValues]);
 
   const handleChange = useCallback((index, isChecked) => {
-    const newValues = isChecked
+    setValues(values => isChecked
       ? union(values, [index + 1])
-      : pull(values, index + 1);
-
-    setValues(newValues);
+      : values.filter(value => value !== index + 1));
   }, [setValues, values]);
 
   const handleSubmit = useCallback(() => {

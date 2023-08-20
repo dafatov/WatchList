@@ -22,7 +22,7 @@ export const AnimesController = memo(({
   return (
     <>
       {editable
-        ? <>
+        ? <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <IconButton
             title={t('common:action.save')}
             onClick={onSave}
@@ -35,8 +35,8 @@ export const AnimesController = memo(({
           >
             <CancelOutlined/>
           </IconButton>
-        </>
-        : <>
+        </div>
+        : <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <IconButton
             title={t('common:action.edit')}
             disabled={!!editable}
@@ -51,7 +51,7 @@ export const AnimesController = memo(({
           >
             <DeleteOutline/>
           </IconButton>
-        </>}
+        </div>}
       <ConfirmDeleteAnimeModal
         open={open}
         setOpen={setOpen}

@@ -6,8 +6,9 @@ import {Tooltip} from '../tooltip/Tooltip';
 export const PathLink = memo(({
   editable,
   value: valueProp,
-  onChange,
-  onClick,
+  formik,
+  name,
+  onClick
 }) => {
   const [value, setValue] = useState(valueProp);
 
@@ -17,16 +18,19 @@ export const PathLink = memo(({
 
   const handleChange = useCallback(event => {
     setValue(event.target.value);
-    onChange(event);
-  }, [setValue, onChange]);
+    formik.handleChange(event);
+  }, [setValue, formik.handleChange]);
 
   return (
     <>
       {editable
         ? <TextField
-          name="path"
+          name={name}
           value={value}
           onChange={handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched[name] && !!formik.errors[name]}
+          label={formik.touched[name] && formik.errors[name] && <>{formik.errors[name]}</>}
         />
         : <Tooltip title={value}>
           <IconButton

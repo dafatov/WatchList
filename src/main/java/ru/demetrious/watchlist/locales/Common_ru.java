@@ -35,6 +35,12 @@ public class Common_ru extends ListResourceBundle {
                 pair("delete", "Удалить"),
                 pair("save", "Сохранить"),
                 pair("edit", "Изменить")
+            )),
+            pair("validation", wrap(
+                pair("required", "Обязательное"),
+                pair("url", "Должно быть ссылкой"),
+                pair("positive", "Должно быть положительным"),
+                pair("greaterZero", "Должно быть не меньше нуля")
             ))
         );
     }

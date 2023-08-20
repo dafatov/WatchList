@@ -14,8 +14,7 @@ export const SupplementsController = memo(({
   onRenderSupplementName,
   options,
   episodes,
-  setFieldValue,
-  setFieldTouched,
+  formik,
 }) => {
   const [supplements, setSupplements] = useState(supplementsProp);
   const [open, setOpen] = useState(false);
@@ -27,14 +26,14 @@ export const SupplementsController = memo(({
 
   const handleChange = useCallback(event => {
     setSupplements(event.target.value);
-    setFieldValue('supplements', event.target.value);
-    setFieldTouched('supplements', true, false);
-  }, [setSupplements, setFieldValue, setFieldTouched]);
+    formik.setFieldValue('supplements', event.target.value);
+    formik.setFieldTouched('supplements', true, false);
+  }, [setSupplements, formik.setFieldValue, formik.setFieldTouched]);
 
   const handleEpisodesSubmit = useCallback(values => {
-    setFieldValue(`supplements.${index}.episodes`, values);
-    setFieldTouched(`supplements.${index}.episodes`, true, false);
-  }, [setFieldValue, setFieldTouched, index]);
+    formik.setFieldValue(`supplements.${index}.episodes`, values);
+    formik.setFieldTouched(`supplements.${index}.episodes`, true, false);
+  }, [formik.setFieldValue, formik.setFieldTouched, index]);
 
   return (
     <>
@@ -50,6 +49,7 @@ export const SupplementsController = memo(({
                 supplements={selectedSupplements}
                 onRenderSupplementTooltip={onRenderSupplementTooltip}
                 onRenderSupplementName={onRenderSupplementName}
+                formik={formik}
                 onEdit={index => {
                   setIndex(index);
                   setOpen(true);

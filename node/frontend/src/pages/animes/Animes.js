@@ -1,4 +1,5 @@
-import {CircularProgress, Typography} from '@mui/material';
+import * as Yup from 'yup';
+import {CircularProgress, InputAdornment, Typography} from '@mui/material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {AnimesController} from '../../components/animes/AnimesController';
 import MUIDataTable from 'mui-datatables';
@@ -26,16 +27,39 @@ export const Animes = memo(() => {
   const [dictionaries, setDictionaries] = useState(null);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
+    validateOnMount: true,
     initialValues: {
       name: '',
       url: '',
       size: '0',
       status: 'PLANNING',
+      multipleViews: '0',
       episodes: '1',
       supplements: [],
       path: '',
       isPattern: true,
     },
+    validationSchema: Yup.object({
+      name: Yup.string().required(t('common:validation.required')),
+      url: Yup.string().required(t('common:validation.required'))
+        .url(t('common:validation.url')),
+      size: Yup.number().required(t('common:validation.required'))
+        .positive(t('common:validation.positive')),
+      status: Yup.string().required(t('common:validation.required')),
+      multipleViews: Yup.number().required(t('common:validation.required'))
+        .min(0, t('common:validation.greaterZero'))
+        .default(0),
+      episodes: Yup.number().required(t('common:validation.required'))
+        .positive(t('common:validation.positive')),
+      supplements: Yup.array(Yup.object({
+        episodes: Yup.array(Yup.number()
+          .positive(t('common:validation.positive')),
+        ).required(t('common:validation.required'))
+          .min(1, t('common:validation.noEmpty')),
+        name: Yup.string().required(t('common:validation.required')),
+      })),
+      path: Yup.string().required(t('common:validation.required')),
+    }),
     onSubmit: values => {
       handleSaveAnime(values);
       formik.resetForm();
@@ -53,7 +77,7 @@ export const Animes = memo(() => {
       .then(data => {
         setAnimes(data);
         setIsPendingAnimes(false);
-      });
+      }).catch(() => showError(t('web:page.animes.error')));
   }, [setAnimes, setIsPendingAnimes]);
 
   useEffect(() => {
@@ -64,8 +88,15 @@ export const Animes = memo(() => {
       .then(data => {
         setDictionaries(data);
         setIsPendingDictionaries(false);
-      });
+      }).catch(() => showError(t('web:page.animes.error')));
   }, [setDictionaries, setIsPendingDictionaries]);
+
+  const handleEpisodesBlur = useCallback(() => {
+    formik.setFieldValue('supplements', formik.values.supplements.map(supplement => ({
+      ...supplement,
+      episodes: supplement.episodes?.filter(episode => episode <= formik.values.episodes),
+    })));
+  }, [formik.values.episodes, formik.setFieldValue, formik.values.supplements]);
 
   const prepareSaveEditable = useCallback(anime => ({
     ...anime,
@@ -130,11 +161,48 @@ export const Animes = memo(() => {
   }, [setEditableId, formik.resetForm]);
 
   const handleOpenPath = useCallback(id => {
-    fetch('http://localhost:8080/api/animes/open?' + new URLSearchParams({id}), {
+    fetch('http://localhost:8080/api/animes/open/folder?' + new URLSearchParams({id}), {
       method: 'POST',
     }).then(throwHttpError)
       .catch(() => showError(t('web:page.animes.table.path.error')));
   }, [showError]);
+
+  const handleOpenUrl = useCallback(id => {
+    fetch('http://localhost:8080/api/animes/open/url?' + new URLSearchParams({id}), {
+      method: 'POST',
+    }).then(throwHttpError)
+      .catch(() => showError(t('web:page.animes.table.url.error')));
+  }, [showError]);
+
+  const handleUpload = useCallback(() => {
+    const link = document.createElement('input');
+    link.type = 'file';
+    link.accept = 'application/json';
+    link.addEventListener('change', event => new Response(event.target.files[0]).json()
+      .then(json => fetch('http://localhost:8080/api/animes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(json),
+      })).then(response => response.json())
+      .then(animes => {
+        setAnimes(animes);
+        showSuccess(t('web:page.animes.table.export.success'));
+      }).catch(() => showError(t('web:page.animes.table.export.error'))));
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+  }, []);
+
+  const handleDownload = useCallback(() => {
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(new Blob([JSON.stringify(animes, null, 2)], {type: 'application/json'}));
+    link.setAttribute('download', 'animes.json');
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+  }, [animes]);
 
   const getRenderStatus = useCallback(status => t(`web:page.animes.table.status.enum.${status}`), []);
 
@@ -188,7 +256,8 @@ export const Animes = memo(() => {
               editable={isEditable(id)}
               name={name}
               url={url}
-              onChange={formik.handleChange}
+              formik={formik}
+              onClick={() => handleOpenUrl(id)}
             />
           );
         },
@@ -212,9 +281,13 @@ export const Animes = memo(() => {
           return (
             <TextField
               name="size"
+              type="number"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">{t('common:unit.information')}</InputAdornment>
+              }}
               editable={isEditable(id)}
               value={size}
-              onChange={formik.handleChange}
+              formik={formik}
               onRender={getRenderSize}
             />
           );
@@ -242,7 +315,7 @@ export const Animes = memo(() => {
               name="status"
               editable={isEditable(id)}
               value={status}
-              onChange={formik.handleChange}
+              formik={formik}
               options={dictionaries?.statuses}
               onRender={getRenderStatus}
             />
@@ -270,9 +343,11 @@ export const Animes = memo(() => {
           return (
             <TextField
               name="episodes"
+              type="number"
               editable={isEditable(id)}
               value={episodes}
-              onChange={formik.handleChange}
+              onBlur={handleEpisodesBlur}
+              formik={formik}
             />
           );
         },
@@ -306,8 +381,7 @@ export const Animes = memo(() => {
               episodes={parseInt(episodes
                 ? episodes
                 : '0')}
-              setFieldValue={formik.setFieldValue}
-              setFieldTouched={formik.setFieldTouched}
+              formik={formik}
             />
           );
         },
@@ -324,9 +398,10 @@ export const Animes = memo(() => {
 
           return (
             <PathLink
+              name="path"
               editable={isEditable(id)}
               value={path}
-              onChange={formik.handleChange}
+              formik={formik}
               onClick={() => handleOpenPath(id)}
             />
           );
@@ -397,16 +472,18 @@ export const Animes = memo(() => {
       });
     },
     // eslint-disable-next-line max-params
-    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage, textLabels) =>
+    customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) =>
       <TableFooter
         count={count}
         page={page}
         rowsPerPage={rowsPerPage}
         changeRowsPerPage={changeRowsPerPage}
         changePage={changePage}
-        textLabels={textLabels}
+        options={options}
         disabled={!!editableId}
-        onSubmit={handleAddAnime}
+        onAdd={handleAddAnime}
+        onUpload={handleUpload}
+        onDownload={handleDownload}
       />,
   }), [editableId, handleAddAnime, prepareShowAnimes]);
 
