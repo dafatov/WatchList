@@ -13,13 +13,13 @@ export const EditSupplementEpisodesModal = memo(({
   setOpen,
   episodes,
   onSubmit,
-  initialValues,
+  initialValues = [],
 }) => {
   const {t} = useTranslation();
-  const [values, setValues] = useState(initialValues ?? []);
+  const [values, setValues] = useState(initialValues);
 
   useEffect(() => {
-    setValues(initialValues ?? []);
+    setValues(initialValues);
   }, [initialValues, setValues]);
 
   const handleChange = useCallback((index, isChecked) => {
@@ -27,6 +27,17 @@ export const EditSupplementEpisodesModal = memo(({
       ? union(values, [index + 1])
       : values.filter(value => value !== index + 1));
   }, [setValues, values]);
+
+  const handleChangeAll = useCallback(() => {
+    setValues(values => values.length === episodes
+      ? []
+      : Array(episodes).fill(null)
+        .map((_, index) => index + 1));
+  }, [episodes]);
+
+  const handleClose = useCallback(() => {
+    setValues(initialValues);
+  }, [setValues, initialValues]);
 
   const handleSubmit = useCallback(() => {
     setOpen(false);
@@ -37,12 +48,23 @@ export const EditSupplementEpisodesModal = memo(({
     <Dialog
       open={open}
       setOpen={setOpen}
+      onClose={handleClose}
       onSubmit={handleSubmit}
       title={t('web:page.animes.modal.supplementEpisodesModal.title')}
-      submitTitle={t('common:action.add')}
+      submitTitle={t('common:action.apply')}
     >
       <FormGroup>
-        {Array(episodes).fill()
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={() => handleChangeAll()}
+              indeterminate={values.length > 0 && values.length < episodes}
+              checked={values.length === episodes}
+            />
+          }
+          label={t('common:action.selectAll')}
+        />
+        {Array(episodes).fill(null)
           .map((_, index) =>
             <FormControlLabel
               key={index}

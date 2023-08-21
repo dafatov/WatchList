@@ -73,7 +73,7 @@ export const SupplementsController = memo(({
             setOpen={setOpen}
             onSubmit={handleEpisodesSubmit}
             episodes={episodes}
-            initialValues={supplements[index]?.episodes ?? []}
+            initialValues={supplements[index]?.episodes}
           />
         </>
         : <Supplements

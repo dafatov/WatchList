@@ -6,6 +6,7 @@ export const Dialog = memo(({
   children,
   open,
   setOpen,
+  onClose,
   onSubmit,
   title,
   submitTitle,
@@ -14,6 +15,7 @@ export const Dialog = memo(({
 
   const handleClose = useCallback(() => {
     setOpen(false);
+    onClose?.();
   }, [setOpen]);
 
   const handleSubmit = useCallback(() => {

@@ -12,6 +12,7 @@ import {UrlLink} from '../../components/urlLink/UrlLink';
 import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
 import {getUnitPrefix} from '../../utils/convert';
+import {pack} from '../../utils/number';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
 import {useSnackBar} from '../../utils/snackBar';
@@ -236,8 +237,8 @@ export const Animes = memo(() => {
       return t('common:count.all');
     }
 
-    return supplement.episodes.join(', ');
-  }, []);
+    return pack(supplement.episodes);
+  }, [pack]);
 
   const isEditable = useCallback(id => editableId === id, [editableId]);
 

@@ -34,7 +34,8 @@ public class Common_ru extends ListResourceBundle {
                 pair("cancel", "Отменить"),
                 pair("delete", "Удалить"),
                 pair("save", "Сохранить"),
-                pair("edit", "Изменить")
+                pair("edit", "Изменить"),
+                pair("apply", "Применить")
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),
