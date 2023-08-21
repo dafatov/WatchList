@@ -39,7 +39,7 @@ export const SplitIconButton = memo(({
           <IconButton
             color="primary"
             style={{
-              paddingTop: 0,
+              paddingTop: 1,
               paddingBottom: 0,
               border: '1px solid',
               borderLeft: 0,

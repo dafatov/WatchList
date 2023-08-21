@@ -4,7 +4,7 @@ import {ConfirmDeleteAnimeModal} from './confirmDeleteAnimeModal/ConfirmDeleteAn
 import {IconButton} from '../iconButton/IconButton';
 import {useTranslation} from 'react-i18next';
 
-export const AnimesController = memo(({
+export const AnimeController = memo(({
   editable,
   anime,
   onSave,
@@ -62,4 +62,4 @@ export const AnimesController = memo(({
   );
 });
 
-AnimesController.displayName = 'AnimesController';
+AnimeController.displayName = 'AnimeController';

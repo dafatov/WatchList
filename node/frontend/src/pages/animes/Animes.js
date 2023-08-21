@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import {CircularProgress, InputAdornment, Typography} from '@mui/material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
-import {AnimesController} from '../../components/animes/AnimesController';
+import {AnimeController} from '../../components/animes/AnimeController';
 import MUIDataTable from 'mui-datatables';
 import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
@@ -174,6 +174,15 @@ export const Animes = memo(() => {
       .catch(() => showError(t('web:page.animes.table.url.error')));
   }, [showError]);
 
+  const handleCopyName = useCallback(id => {
+    fetch('http://localhost:8080/api/animes/copy/name?' + new URLSearchParams({id}), {
+      method: 'POST',
+    }).then(throwHttpError)
+      .then(response => response.text())
+      .then(name => showSuccess(t('common:result.copy', {name})))
+      .catch(() => showError(t('web:page.animes.table.name.error')));
+  }, [showSuccess, showError]);
+
   const handleUpload = useCallback(() => {
     const link = document.createElement('input');
     link.type = 'file';
@@ -258,6 +267,7 @@ export const Animes = memo(() => {
               url={url}
               formik={formik}
               onClick={() => handleOpenUrl(id)}
+              onCopyName={() => handleCopyName(id)}
             />
           );
         },
@@ -419,7 +429,7 @@ export const Animes = memo(() => {
           const anime = getFields(dataIndex);
 
           return (
-            <AnimesController
+            <AnimeController
               editable={isEditable(anime.id)}
               anime={anime}
               onSave={formik.handleSubmit}

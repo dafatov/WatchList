@@ -41,6 +41,9 @@ public class Common_ru extends ListResourceBundle {
                 pair("url", "Должно быть ссылкой"),
                 pair("positive", "Должно быть положительным"),
                 pair("greaterZero", "Должно быть не меньше нуля")
+            )),
+            pair("result", wrap(
+                pair("copy", "Успешно скопировано: {{name}}")
             ))
         );
     }

@@ -35,6 +35,7 @@ export const PathLink = memo(({
         : <Tooltip title={value}>
           <IconButton
             color="primary"
+            disabled={!value}
             onClick={() => onClick()}
           >
             <OpenInNew/>

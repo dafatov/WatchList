@@ -1,10 +1,11 @@
 package ru.demetrious.watchlist.service;
 
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +54,16 @@ public class AnimeService {
     public Anime saveAnime(Anime anime) {
         validateAnime(anime);
         return animeRepository.save(anime);
+    }
+
+    public String copyAnimeName(UUID id) {
+        Optional<Anime> anime = animeRepository.findById(id);
+        String name = anime.orElseThrow().getName();
+
+        System.setProperty("java.awt.headless", "false");
+
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(name), null);
+        return name;
     }
 
     // ===================================================================================================================

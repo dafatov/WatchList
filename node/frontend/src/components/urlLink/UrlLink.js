@@ -1,6 +1,9 @@
-import {TextField, Typography} from '@mui/material';
+import {Button, Divider, TextField} from '@mui/material';
 import {useCallback, useEffect, useState} from 'react';
+import {ContentCopyOutlined} from '@mui/icons-material';
+import {IconButton} from '../iconButton/IconButton';
 import {Tooltip} from '../tooltip/Tooltip';
+import {useTranslation} from 'react-i18next';
 
 export const UrlLink = (({
   editable,
@@ -8,7 +11,10 @@ export const UrlLink = (({
   url: urlProp,
   formik,
   onClick,
+  onCopyName,
 }) => {
+  const {t} = useTranslation();
+  const [isHovered, setIsHovered] = useState(false);
   const [name, setName] = useState(nameProp);
   const [url, setUrl] = useState(urlProp);
 
@@ -51,15 +57,35 @@ export const UrlLink = (({
             label={formik.touched.url && formik.errors.url && <>{formik.errors.url}</>}
           />
         </div>
-        : <Tooltip title={url}>
-          <Typography
-            color="primary"
-            style={{cursor: 'pointer'}}
-            onClick={onClick}
-          >
-            {name}
-          </Typography>
-        </Tooltip>
+        : <div
+          onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={() => setIsHovered(true)}
+          style={{display: 'flex', flexDirection: 'row'}}
+        >
+          <Tooltip title={url}>
+            <Button
+              variant="text"
+              color="primary"
+              disabled={!url}
+              onClick={onClick}
+              style={{textAlign: 'justify'}}
+            >
+              {name}
+            </Button>
+          </Tooltip>
+          {isHovered
+            ? <>
+              <Divider flexItem orientation="vertical"/>
+              <IconButton
+                title={t('common:action.copyToClipboard')}
+                disabled={!name}
+                onClick={() => onCopyName?.()}
+              >
+                <ContentCopyOutlined/>
+              </IconButton>
+            </>
+            : <></>}
+        </div>
       }
     </>
   );

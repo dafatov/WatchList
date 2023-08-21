@@ -75,4 +75,17 @@ public class AnimeController {
         log.info("saveAnime: {}", animeSaved);
         return getAnimes();
     }
+
+    @PostMapping("/copy/name")
+    public ResponseEntity<String> copyAnimeName(@RequestParam UUID id) {
+        try {
+            String animeName = animeService.copyAnimeName(id);
+
+            log.info("copyAnimeName: {}", id);
+            return ResponseEntity.ok(animeName);
+        } catch (Exception e) {
+            log.error("Can't copy Anime name: {}", String.valueOf(e));
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 }
