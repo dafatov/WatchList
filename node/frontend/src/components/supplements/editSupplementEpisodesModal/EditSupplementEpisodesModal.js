@@ -1,4 +1,4 @@
-import {Checkbox, FormControlLabel, FormGroup} from '@mui/material';
+import {Checkbox, Divider, FormControlLabel, FormGroup} from '@mui/material';
 import {memo, useCallback, useEffect, useState} from 'react';
 import {Dialog} from '../../modal/Dialog';
 import {union} from 'lodash';
@@ -11,7 +11,7 @@ import {useTranslation} from 'react-i18next';
 export const EditSupplementEpisodesModal = memo(({
   open,
   setOpen,
-  episodes,
+  episodes = 0,
   onSubmit,
   initialValues = [],
 }) => {
@@ -64,6 +64,7 @@ export const EditSupplementEpisodesModal = memo(({
           }
           label={t('common:action.selectAll')}
         />
+        <Divider/>
         {Array(episodes).fill(null)
           .map((_, index) =>
             <FormControlLabel

@@ -18,7 +18,7 @@ export const TextField = memo(({
   }, [editable, valueProp, setValue]);
 
   const handleValue = useCallback(event => {
-    if (!type || type === 'number' && event.target.value.match(/^0$|^[1-9][0-9]*$/)) {
+    if (!type || type === 'number' && event.target.value.match(/^$|^0$|^[1-9][0-9]*$/)) {
       setValue(event.target.value);
       formik.handleChange(event);
     }

@@ -2,6 +2,8 @@ import {MenuItem, Select} from '@mui/material';
 import {memo, useCallback, useEffect, useState} from 'react';
 import {EditSupplementEpisodesModal} from './editSupplementEpisodesModal/EditSupplementEpisodesModal';
 import {Supplements} from './supplements/Supplements';
+import {pack} from '../../utils/number';
+import {useTranslation} from 'react-i18next';
 
 /**
  * @type {React.NamedExoticComponent<{readonly supplements?: [{id: *, name: string}], readonly setFieldTouched?: *, readonly editable?: *, readonly
@@ -10,15 +12,16 @@ import {Supplements} from './supplements/Supplements';
 export const SupplementsController = memo(({
   editable,
   supplements: supplementsProp,
-  onRenderSupplementTooltip,
   onRenderSupplementName,
   options,
   episodes,
   formik,
 }) => {
+  const {t} = useTranslation();
   const [supplements, setSupplements] = useState(supplementsProp);
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     setSupplements(supplementsProp);
@@ -35,6 +38,20 @@ export const SupplementsController = memo(({
     formik.setFieldTouched(`supplements.${index}.episodes`, true, false);
   }, [formik.setFieldValue, formik.setFieldTouched, index]);
 
+  const getSupplementTooltip = useCallback(supplement => {
+    if ((supplement.episodes?.length ?? 0) === 0) {
+      return t('common:count.nothing');
+    }
+
+    if (supplement.episodes.length === episodes) {
+      return t('common:count.all');
+    }
+
+    return isExpanded
+      ? supplement.episodes.join(', ')
+      : pack(supplement.episodes);
+  }, [pack, episodes, isExpanded]);
+
   return (
     <>
       {editable
@@ -47,10 +64,10 @@ export const SupplementsController = memo(({
             renderValue={selectedSupplements =>
               <Supplements
                 supplements={selectedSupplements}
-                onRenderSupplementTooltip={onRenderSupplementTooltip}
+                onRenderSupplementTooltip={getSupplementTooltip}
                 onRenderSupplementName={onRenderSupplementName}
                 formik={formik}
-                onEdit={index => {
+                onClick={index => {
                   setIndex(index);
                   setOpen(true);
                 }}
@@ -78,8 +95,9 @@ export const SupplementsController = memo(({
         </>
         : <Supplements
           supplements={supplements}
-          onRenderSupplementTooltip={onRenderSupplementTooltip}
+          onRenderSupplementTooltip={getSupplementTooltip}
           onRenderSupplementName={onRenderSupplementName}
+          onClick={() => setIsExpanded(isExpanded => !isExpanded)}
         />}
     </>
   );

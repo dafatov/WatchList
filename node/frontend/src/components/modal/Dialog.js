@@ -16,7 +16,7 @@ export const Dialog = memo(({
   const handleClose = useCallback(() => {
     setOpen(false);
     onClose?.();
-  }, [setOpen]);
+  }, [onClose, setOpen]);
 
   const handleSubmit = useCallback(() => {
     setOpen(false);

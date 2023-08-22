@@ -51,6 +51,7 @@ export const UrlLink = (({
           <TextField
             name="url"
             value={url}
+            style={{marginTop: '12px'}}
             onChange={handleUrlChange}
             onBlur={formik.handleBlur}
             error={formik.touched.url && !!formik.errors.url}

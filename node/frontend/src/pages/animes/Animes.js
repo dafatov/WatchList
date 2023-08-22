@@ -12,7 +12,6 @@ import {UrlLink} from '../../components/urlLink/UrlLink';
 import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
 import {getUnitPrefix} from '../../utils/convert';
-import {pack} from '../../utils/number';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
 import {useSnackBar} from '../../utils/snackBar';
@@ -228,18 +227,6 @@ export const Animes = memo(() => {
     });
   }, []);
 
-  const getOnRenderSupplementTooltip = useCallback(episodes => supplement => {
-    if ((supplement.episodes?.length ?? 0) === 0) {
-      return t('common:count.nothing');
-    }
-
-    if (supplement.episodes.length === episodes) {
-      return t('common:count.all');
-    }
-
-    return pack(supplement.episodes);
-  }, [pack]);
-
   const isEditable = useCallback(id => editableId === id, [editableId]);
 
   const getFields = useCallback(dataIndex => {
@@ -386,7 +373,6 @@ export const Animes = memo(() => {
             <SupplementsController
               editable={isEditable(id)}
               supplements={supplements}
-              onRenderSupplementTooltip={getOnRenderSupplementTooltip(parseInt(episodes))}
               onRenderSupplementName={getRenderSupplementStatus}
               options={dictionaries?.supplements}
               episodes={parseInt(episodes

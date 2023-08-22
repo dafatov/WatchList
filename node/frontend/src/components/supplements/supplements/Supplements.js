@@ -10,7 +10,7 @@ export const Supplements = memo(({
   supplements,
   onRenderSupplementTooltip,
   onRenderSupplementName,
-  onEdit,
+  onClick,
   formik,
 }) => (
   <>
@@ -25,7 +25,7 @@ export const Supplements = memo(({
             ? 'error'
             : 'primary'}
           label={onRenderSupplementName?.(supplement.name) ?? supplement.name}
-          onClick={() => onEdit?.(index)}
+          onClick={() => onClick?.(index)}
           onMouseDown={event => event.stopPropagation()}
         />
       </Tooltip>,
