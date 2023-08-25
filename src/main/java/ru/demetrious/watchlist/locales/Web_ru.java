@@ -19,7 +19,8 @@ public class Web_ru extends ListResourceBundle {
                 pair("animes", wrap(
                     pair("table", wrap(
                         pair("name", wrap(
-                            pair("title", "Наименование")
+                            pair("title", "Наименование"),
+                            pair("info", "Количество: {{info.count}}({{info.remained}})\nКандидатов: {{info.candidates}}")
                         )),
                         pair("size", wrap(
                             pair("title", "Размер")
@@ -56,6 +57,19 @@ public class Web_ru extends ListResourceBundle {
                         pair("confirmDeleteAnimeModal", wrap(
                             pair("title", "Вы действительно хотите удалить?"),
                             pair("text", "Данное действие удалит аниме \"{{anime.name}}\" и НЕОБРАТИМО")
+                        )),
+                        pair("supplementEpisodesModal", wrap(
+                            pair("title", "Выбрать эпизоды")
+                        ))
+                    )),
+                    pair("snackBar", wrap(
+                        pair("sort", wrap(
+                            pair("warning", wrap(
+                                pair("undefined", "Не найдено аниме \"{{anime.name}}\" в списке индексов")
+                            ))
+                        )),
+                        pair("save", wrap(
+                            pair("success", "Успешно сохранено")
                         ))
                     ))
                 ))

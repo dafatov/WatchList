@@ -13,13 +13,13 @@ export const EditSupplementEpisodesModal = memo(({
   setOpen,
   episodes = 0,
   onSubmit,
-  initialValues = [],
+  initialValues,
 }) => {
   const {t} = useTranslation();
-  const [values, setValues] = useState(initialValues);
+  const [values, setValues] = useState(initialValues ?? []);
 
   useEffect(() => {
-    setValues(initialValues);
+    setValues(initialValues ?? []);
   }, [initialValues, setValues]);
 
   const handleChange = useCallback((index, isChecked) => {
@@ -36,7 +36,7 @@ export const EditSupplementEpisodesModal = memo(({
   }, [episodes]);
 
   const handleClose = useCallback(() => {
-    setValues(initialValues);
+    setValues(initialValues ?? []);
   }, [setValues, initialValues]);
 
   const handleSubmit = useCallback(() => {

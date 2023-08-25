@@ -1,7 +1,9 @@
 import * as Yup from 'yup';
-import {CircularProgress, InputAdornment, Typography} from '@mui/material';
+import {CircularProgress, Divider, InputAdornment, Typography} from '@mui/material';
+import {InfoOutlined, ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {AnimeController} from '../../components/animes/AnimeController';
+import {IconButton} from '../../components/iconButton/IconButton';
 import MUIDataTable from 'mui-datatables';
 import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
@@ -14,17 +16,21 @@ import difference from 'lodash/difference';
 import {getUnitPrefix} from '../../utils/convert';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
+import {useLocalStorage} from '../../utils/localStorage';
 import {useSnackBar} from '../../utils/snackBar';
 import {useTranslation} from 'react-i18next';
 
 export const Animes = memo(() => {
   const {t} = useTranslation();
-  const {showError, showSuccess} = useSnackBar();
+  const {showError, showSuccess, showWarning} = useSnackBar();
   const [isLoading, setIsLoading] = useState(true);
   const [isPendingAnimes, setIsPendingAnimes] = useState(true);
   const [isPendingDictionaries, setIsPendingDictionaries] = useState(true);
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
+  const [indexes, setIndexes] = useLocalStorage('sortIndexes');
+  const [filterList, setFilterList] = useState(['WATCHING']);
+  const [info, setInfo] = useState(null);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
     validateOnMount: true,
@@ -91,6 +97,32 @@ export const Animes = memo(() => {
       }).catch(() => showError(t('web:page.animes.error')));
   }, [setDictionaries, setIsPendingDictionaries]);
 
+  const handleShuffleAnimes = useCallback(() => {
+    fetch('http://localhost:8080/api/animes/shuffle')
+      .then(throwHttpError)
+      .then(response => response.json())
+      .then(data => {
+        setIndexes(data);
+        setFilterList(['PLANNING']);
+      }).catch(() => showError(t('web:page.animes.shuffle.error')));
+  }, [setIndexes]);
+
+  const handleGetInfo = useCallback(() => {
+    if (!info) {
+      fetch('http://localhost:8080/api/animes/info')
+        .then(throwHttpError)
+        .then(response => response.json())
+        .then(data => {
+          setInfo(data);
+        }).catch(() => showError(t('web:page.animes.info.error')));
+    }
+  }, [setInfo, info]);
+
+  const handleUnshuffleAnimes = useCallback(() => {
+    setIndexes(null);
+    setFilterList(['WATCHING']);
+  }, [setIndexes]);
+
   const handleEpisodesBlur = useCallback(() => {
     formik.setFieldValue('supplements', formik.values.supplements.map(supplement => ({
       ...supplement,
@@ -132,9 +164,10 @@ export const Animes = memo(() => {
       .then(animes => {
         setAnimes(animes);
         setEditableId(null);
-        showSuccess(t('web:page.animes.table.save.success'));
+        setInfo(null);
+        showSuccess(t('web:page.animes.snackBar.table.save.success'));
       }).catch(() => showError(t('web:page.animes.table.save.error')));
-  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError]);
+  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError, setInfo]);
 
   const handleCancelAnime = useCallback(() => {
     setEditableId(null);
@@ -245,6 +278,26 @@ export const Animes = memo(() => {
       label: t('web:page.animes.table.name.title'),
       options: {
         filter: false,
+        sort: !indexes,
+        customHeadLabelRender: column =>
+          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+            <div style={indexes
+              ? {paddingRight: '8px'}
+              : {}}>{column.label}</div>
+            {indexes
+              ? <>
+                <Divider flexItem orientation="vertical"/>
+                <IconButton
+                  title={info
+                    ? t('web:page.animes.table.name.info', {info})
+                    : <CircularProgress size="24px" color="secondary"/>}
+                  onMouseEnter={handleGetInfo}
+                >
+                  <InfoOutlined/>
+                </IconButton>
+              </>
+              : <></>}
+          </div>,
         customBodyRenderLite: dataIndex => {
           const {id, name, url} = getFields(dataIndex);
 
@@ -267,6 +320,7 @@ export const Animes = memo(() => {
       options: {
         filter: false,
         searchable: false,
+        sort: !indexes,
         filterOptions: {
           renderValue: value => getRenderSize(value),
         },
@@ -281,7 +335,7 @@ export const Animes = memo(() => {
               name="size"
               type="number"
               InputProps={{
-                endAdornment: <InputAdornment position="end">{t('common:unit.information')}</InputAdornment>
+                endAdornment: <InputAdornment position="end">{t('common:unit.information')}</InputAdornment>,
               }}
               editable={isEditable(id)}
               value={size}
@@ -298,6 +352,8 @@ export const Animes = memo(() => {
       options: {
         sort: false,
         searchable: false,
+        filter: !indexes,
+        filterList,
         filterOptions: {
           names: dictionaries?.statuses,
           renderValue: value => getRenderStatus(value),
@@ -327,6 +383,7 @@ export const Animes = memo(() => {
       options: {
         filter: false,
         searchable: false,
+        sort: !indexes,
       },
     },
     {
@@ -335,6 +392,7 @@ export const Animes = memo(() => {
       options: {
         filter: false,
         searchable: false,
+        sort: !indexes,
         customBodyRenderLite: dataIndex => {
           const {id, episodes} = getFields(dataIndex);
 
@@ -412,6 +470,20 @@ export const Animes = memo(() => {
         sort: false,
         filter: false,
         searchable: false,
+        customHeadLabelRender: () =>
+          <IconButton
+            title={indexes
+              ? t('common:action.shuffle.off')
+              : t('common:action.shuffle.on')}
+            disabled={!!editableId}
+            onClick={() => indexes
+              ? handleUnshuffleAnimes()
+              : handleShuffleAnimes()}
+          >
+            {indexes
+              ? <ShuffleOnOutlined/>
+              : <ShuffleOutlined/>}
+          </IconButton>,
         customBodyRenderLite: dataIndex => {
           const anime = getFields(dataIndex);
 
@@ -441,6 +513,13 @@ export const Animes = memo(() => {
     isEditable,
     getFields,
     formik,
+    indexes,
+    editableId,
+    handleShuffleAnimes,
+    handleUnshuffleAnimes,
+    info,
+    handleGetInfo,
+    filterList,
   ]);
 
   const options = useMemo(() => ({
@@ -449,12 +528,32 @@ export const Animes = memo(() => {
       name: 'name',
       direction: 'asc',
     },
+    onFilterChange: (columnName, filterLists, _, filterListIndex) => {
+      if (columnName === 'status') {
+        setFilterList(filterLists[filterListIndex]);
+      }
+    },
     customSort: (data, columnIndex, order) => {
       const orderValue = 2 * (order === 'asc') - 1;
       const preparedShowAnimes = prepareShowAnimes();
 
+      const getAnime = data => preparedShowAnimes[data.index];
+      const getIsPattern = data => getAnime(data).isPattern;
+      const getSortIndex = data => {
+        const anime = getAnime(data);
+        const index = indexes[anime.id];
+
+        if (!index && anime.status === 'PLANNING') {
+          showWarning(t('web:page.animes.snackBar.sort.warning.undefined', {anime}));
+        }
+
+        return index;
+      };
+
       return data.sort((a, b) => {
-        const getIsPattern = anime => preparedShowAnimes[anime.index].isPattern;
+        if (indexes) {
+          return getSortIndex(a) - getSortIndex(b);
+        }
 
         if (getIsPattern(a) || getIsPattern(b)) {
           return getIsPattern(a) - getIsPattern(b);
@@ -477,12 +576,12 @@ export const Animes = memo(() => {
         changeRowsPerPage={changeRowsPerPage}
         changePage={changePage}
         options={options}
-        disabled={!!editableId}
+        disabled={!!editableId || !!indexes}
         onAdd={handleAddAnime}
         onUpload={handleUpload}
         onDownload={handleDownload}
       />,
-  }), [editableId, handleAddAnime, prepareShowAnimes]);
+  }), [editableId, handleAddAnime, prepareShowAnimes, indexes, showWarning, setFilterList]);
 
   if (isLoading) {
     return <CircularProgress/>;

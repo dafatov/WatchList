@@ -1,5 +1,6 @@
 package ru.demetrious.watchlist.service;
 
+import com.manoelcampos.randomorg.RandomOrgClient;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -7,12 +8,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.demetrious.watchlist.adapter.rest.dto.InfoRsDto;
+import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.repository.AnimeRepository;
 
@@ -20,7 +24,11 @@ import ru.demetrious.watchlist.repository.AnimeRepository;
 @RequiredArgsConstructor
 @Slf4j
 public class AnimeService {
+    private static final int MAX_WATCHING = 7;
+    private static final int[] CANDIDATES_COUNT = {3, 5, 7, 11, 13, 17, 19};
+
     private final AnimeRepository animeRepository;
+    private final RandomOrgClient randomOrgClient;
 
     public List<Anime> getAnimes() {
         return animeRepository.findAll();
@@ -52,7 +60,6 @@ public class AnimeService {
     }
 
     public Anime saveAnime(Anime anime) {
-        validateAnime(anime);
         return animeRepository.save(anime);
     }
 
@@ -66,17 +73,30 @@ public class AnimeService {
         return name;
     }
 
-    // ===================================================================================================================
-    // = Implementation
-    // ===================================================================================================================
+    public Map<UUID, Integer> getShuffleIndexes() {
+        List<Anime> animeList = animeRepository.findAll().stream()
+            .filter(anime -> WatchStatusEnum.PLANNING.equals(anime.getStatus()))
+            .toList();
+        int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(animeList.size(), 1, animeList.size());
 
-    private void validateAnime(Anime anime) {
-        anime.setSupplements(anime.getSupplements().stream()
-            .peek(animeSupplement -> animeSupplement
-                .setEpisodes(animeSupplement.getEpisodes().stream()
-                    .filter(episode -> episode <= anime.getEpisodes())
-                    .collect(Collectors.toSet())))
-            .filter(animeSupplement -> !animeSupplement.getEpisodes().isEmpty())
-            .collect(Collectors.toSet()));
+        return animeList.stream()
+            .collect(Collectors.toMap(
+                Anime::getId,
+                anime -> nonDuplicatedIntegers[animeList.indexOf(anime)]
+            ));
+    }
+
+    public InfoRsDto getInfo() {
+        List<Anime> animeList = animeRepository.findAll();
+        int count = animeList.stream()
+            .filter(anime -> WatchStatusEnum.WATCHING.equals(anime.getStatus()))
+            .toList()
+            .size();
+        int remained = MAX_WATCHING - count;
+
+        return new InfoRsDto()
+            .setCount(count)
+            .setRemained(remained)
+            .setCandidates(CANDIDATES_COUNT[remained - 1]);
     }
 }

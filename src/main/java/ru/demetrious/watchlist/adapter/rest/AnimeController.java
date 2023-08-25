@@ -1,6 +1,7 @@
 package ru.demetrious.watchlist.adapter.rest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.demetrious.watchlist.adapter.rest.dto.InfoRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.service.AnimeService;
 
@@ -27,6 +29,7 @@ public class AnimeController {
     @GetMapping
     public List<Anime> getAnimes() {
         List<Anime> animeList = animeService.getAnimes();
+
         log.info("getAnimes: {}", animeList);
         return animeList;
     }
@@ -34,6 +37,7 @@ public class AnimeController {
     @PostMapping
     public List<Anime> setAnimes(@RequestBody List<Anime> animeList) {
         List<Anime> animeListSaved = animeService.setAnimes(animeList);
+
         log.info("setAnimes: {}", animeListSaved);
         return getAnimes();
     }
@@ -41,6 +45,7 @@ public class AnimeController {
     @DeleteMapping
     public List<Anime> deleteAnimes(@RequestBody List<UUID> uuidList) {
         List<Anime> animeListDeleted = animeService.deleteAnimes(uuidList);
+
         log.info("deleteAnimes: {}", animeListDeleted);
         return getAnimes();
     }
@@ -72,6 +77,7 @@ public class AnimeController {
     @PostMapping("/save")
     public List<Anime> saveAnime(@RequestBody Anime anime) {
         Anime animeSaved = animeService.saveAnime(anime);
+
         log.info("saveAnime: {}", animeSaved);
         return getAnimes();
     }
@@ -87,5 +93,21 @@ public class AnimeController {
             log.error("Can't copy Anime name: {}", String.valueOf(e));
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/shuffle")
+    public Map<UUID, Integer> getShuffleIndexes() {
+        Map<UUID, Integer> shuffleIndexes = animeService.getShuffleIndexes();
+
+        log.info("getShuffleIndexes: {}", shuffleIndexes);
+        return shuffleIndexes;
+    }
+
+    @GetMapping("/info")
+    public InfoRsDto getInfo() {
+        InfoRsDto info = animeService.getInfo();
+
+        log.info("getInfo: {}", info);
+        return info;
     }
 }

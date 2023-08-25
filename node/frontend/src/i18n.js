@@ -11,6 +11,7 @@ i18next
   .init({
     backend: {
       loadPath: 'http://localhost:8080/api/locale/get/{{lng}}/{{ns}}',
+      addPath: 'http://localhost:8080/api/locale/add/{{lng}}/{{ns}}',
     },
     debug: process.env.REACT_APP_LOGGING === 'DEBUG',
     defaultNS: 'web',
@@ -20,6 +21,6 @@ i18next
     },
     load: 'currentOnly',
     ns: ['web', 'common'],
-    saveMissing: false,
+    saveMissing: true,
     supportedLngs: ['en', 'ru'],
   });

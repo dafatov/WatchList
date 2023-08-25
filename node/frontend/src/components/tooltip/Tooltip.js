@@ -11,5 +11,6 @@ export const Tooltip = styled(({children, className, ...props}) => (
     fontSize: theme.typography.pxToRem(13),
     border: '1px solid',
     borderColor: theme.palette.secondary.main,
+    whiteSpace: 'pre-line',
   }
 }));

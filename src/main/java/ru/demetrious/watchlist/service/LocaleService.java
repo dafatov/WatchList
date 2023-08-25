@@ -16,7 +16,7 @@ import static ru.demetrious.watchlist.domain.enums.LocaleResourceEnum.getClassNa
 @Slf4j
 public class LocaleService {
     public Map<String, Object> getLocale(String lng, String ns) {
-        ResourceBundle resourceBundle = ResourceBundle.getBundle(getClassNameByNs(ns), new Locale(lng));
+        ResourceBundle resourceBundle = ResourceBundle.getBundle(getClassNameByNs(ns), Locale.of(lng));
 
         return resourceBundle.keySet().stream()
             .collect(toMap(key -> key, key -> parseMapValue(key, resourceBundle.getObject(key))));
