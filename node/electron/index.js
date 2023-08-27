@@ -1,5 +1,5 @@
 const {app, BrowserWindow} = require('electron');
-const {spawn} = require('child_process');
+const {exec} = require('child_process');
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
@@ -23,9 +23,9 @@ const initUpdater = () => {
 const initApp = () => {
   app.on('ready', () => {
     startLoading().then(() => autoUpdate())
-      .then(() => {
-        spawn('java', ['-jar', './server/server.jar']);
-      }).then(() => startBrowser());
+      .then(() => exec('java -jar ./server/server.jar')
+        .stdout.on('data', data => log.info(data)))
+      .then(() => startBrowser());
   });
 
   app.on('window-all-closed', app.quit);

@@ -70,6 +70,9 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("save", wrap(
                             pair("success", "Успешно сохранено")
+                        )),
+                        pair("export", wrap(
+                            pair("success", "Успешно экспортировано")
                         ))
                     ))
                 ))

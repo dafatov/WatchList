@@ -3,10 +3,9 @@ export const defaultOptions = {
   enableNestedDataAccess: '.',
   filterArrayFullMatch: false,
   fixedHeader: false,
-  jumpToPage: true,
   onDownload: (buildHead, buildBody, columns, data) => '\uFEFF' + buildHead(columns) + buildBody(data),
   print: false,
-  rowsPerPageOptions: [10, 25, 100, {value: 10000, label: 'Все'}],
+  rowsPerPageOptions: [10, 25, 100],
   selectableRows: 'none',
   textLabels: {
     body: {

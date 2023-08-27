@@ -39,7 +39,7 @@ public class AnimeController {
         List<Anime> animeListSaved = animeService.setAnimes(animeList);
 
         log.info("setAnimes: {}", animeListSaved);
-        return getAnimes();
+        return animeService.getAnimes();
     }
 
     @DeleteMapping
@@ -47,7 +47,7 @@ public class AnimeController {
         List<Anime> animeListDeleted = animeService.deleteAnimes(uuidList);
 
         log.info("deleteAnimes: {}", animeListDeleted);
-        return getAnimes();
+        return animeService.getAnimes();
     }
 
     @PostMapping("/open/folder")
@@ -79,7 +79,7 @@ public class AnimeController {
         Anime animeSaved = animeService.saveAnime(anime);
 
         log.info("saveAnime: {}", animeSaved);
-        return getAnimes();
+        return animeService.getAnimes();
     }
 
     @PostMapping("/copy/name")

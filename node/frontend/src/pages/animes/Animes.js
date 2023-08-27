@@ -230,7 +230,7 @@ export const Animes = memo(() => {
       })).then(response => response.json())
       .then(animes => {
         setAnimes(animes);
-        showSuccess(t('web:page.animes.table.export.success'));
+        showSuccess(t('web:page.animes.snackBar.export.success'));
       }).catch(() => showError(t('web:page.animes.table.export.error'))));
     document.body.appendChild(link);
     link.click();
