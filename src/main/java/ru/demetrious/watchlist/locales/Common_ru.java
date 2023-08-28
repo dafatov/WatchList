@@ -41,7 +41,10 @@ public class Common_ru extends ListResourceBundle {
                     pair("on", "Включить перемешивание"),
                     pair("off", "Выключить перемешивание")
                 )),
-                pair("selectAll", "Выбрать всех")
+                pair("selectAll", "Выбрать всех"),
+                pair("generate", "Сгенерировать"),
+                pair("stop", "Остановить"),
+                pair("reset", "Сбросить")
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),

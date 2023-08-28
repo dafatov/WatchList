@@ -96,11 +96,16 @@ public class AnimeController {
     }
 
     @GetMapping("/shuffle")
-    public Map<UUID, Integer> getShuffleIndexes() {
-        Map<UUID, Integer> shuffleIndexes = animeService.getShuffleIndexes();
+    public ResponseEntity<?> getShuffleIndexes() {
+        try {
+            Map<UUID, Integer> shuffleIndexes = animeService.getShuffleIndexes();
 
-        log.info("getShuffleIndexes: {}", shuffleIndexes);
-        return shuffleIndexes;
+            log.info("getShuffleIndexes: {}", shuffleIndexes);
+            return ResponseEntity.ok(shuffleIndexes);
+        } catch (Exception e) {
+            log.error("Can't shuffle indexes: {}", String.valueOf(e));
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
     @GetMapping("/info")

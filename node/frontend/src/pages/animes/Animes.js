@@ -3,6 +3,7 @@ import {CircularProgress, Divider, InputAdornment, Typography} from '@mui/materi
 import {InfoOutlined, ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {AnimeController} from '../../components/animes/AnimeController';
+import {Generate} from '../../components/generate/Generate';
 import {IconButton} from '../../components/iconButton/IconButton';
 import MUIDataTable from 'mui-datatables';
 import {PathLink} from '../../components/pathLink/PathLink';
@@ -68,7 +69,6 @@ export const Animes = memo(() => {
     }),
     onSubmit: values => {
       handleSaveAnime(values);
-      formik.resetForm();
     },
   });
 
@@ -165,9 +165,10 @@ export const Animes = memo(() => {
         setAnimes(animes);
         setEditableId(null);
         setInfo(null);
+        formik.resetForm();
         showSuccess(t('web:page.animes.snackBar.table.save.success'));
       }).catch(() => showError(t('web:page.animes.table.save.error')));
-  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError, setInfo]);
+  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError, setInfo, formik.resetForm]);
 
   const handleCancelAnime = useCallback(() => {
     setEditableId(null);
@@ -470,20 +471,29 @@ export const Animes = memo(() => {
         sort: false,
         filter: false,
         searchable: false,
-        customHeadLabelRender: () =>
-          <IconButton
-            title={indexes
-              ? t('common:action.shuffle.off')
-              : t('common:action.shuffle.on')}
-            disabled={!!editableId}
-            onClick={() => indexes
-              ? handleUnshuffleAnimes()
-              : handleShuffleAnimes()}
-          >
+        customHeadLabelRender: () => (
+          <>
             {indexes
-              ? <ShuffleOnOutlined/>
-              : <ShuffleOutlined/>}
-          </IconButton>,
+              ? <IconButton
+                title={t('common:action.shuffle.off')}
+                disabled={!!editableId}
+                onClick={() => handleUnshuffleAnimes()}
+              >
+                <ShuffleOnOutlined/>
+              </IconButton>
+              : <IconButton
+                title={t('common:action.shuffle.on')}
+                disabled={!!editableId}
+                onClick={() => handleShuffleAnimes()}
+              >
+                <ShuffleOutlined/>
+              </IconButton>}
+            <Generate
+              disabled={!!indexes}
+              getRenderSize={getRenderSize}
+            />
+          </>
+        ),
         customBodyRenderLite: dataIndex => {
           const anime = getFields(dataIndex);
 

@@ -4,9 +4,7 @@ import com.manoelcampos.randomorg.RandomOrgClient;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,13 +12,16 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.InfoRsDto;
-import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.repository.AnimeRepository;
+import ru.demetrious.watchlist.utils.AnimeUtils;
 
-@Component
+import static ru.demetrious.watchlist.utils.AnimeUtils.getPath;
+import static ru.demetrious.watchlist.utils.AnimeUtils.getURI;
+
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class AnimeService {
@@ -48,7 +49,7 @@ public class AnimeService {
 
         System.setProperty("java.awt.headless", "false");
 
-        Desktop.getDesktop().open(new File(anime.orElseThrow().getPath()));
+        Desktop.getDesktop().open(getPath(anime.orElseThrow()).toFile());
     }
 
     public void openAnimeUrl(UUID id) throws IOException {
@@ -56,7 +57,7 @@ public class AnimeService {
 
         System.setProperty("java.awt.headless", "false");
 
-        Desktop.getDesktop().browse(URI.create(anime.orElseThrow().getUrl()));
+        Desktop.getDesktop().browse(getURI(anime.orElseThrow()));
     }
 
     public Anime saveAnime(Anime anime) {
@@ -75,8 +76,13 @@ public class AnimeService {
 
     public Map<UUID, Integer> getShuffleIndexes() {
         List<Anime> animeList = animeRepository.findAll().stream()
-            .filter(anime -> WatchStatusEnum.PLANNING.equals(anime.getStatus()))
+            .filter(AnimeUtils::isPlanning)
             .toList();
+
+        if (animeList.size() < 2) {
+            throw new IllegalStateException("No at least 2 anime in status isPlanning");
+        }
+
         int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(animeList.size(), 1, animeList.size());
 
         return animeList.stream()
@@ -89,7 +95,7 @@ public class AnimeService {
     public InfoRsDto getInfo() {
         List<Anime> animeList = animeRepository.findAll();
         int count = animeList.stream()
-            .filter(anime -> WatchStatusEnum.WATCHING.equals(anime.getStatus()))
+            .filter(AnimeUtils::isWatching)
             .toList()
             .size();
         int remained = MAX_WATCHING - count;

@@ -51,6 +51,11 @@ public class Web_ru extends ListResourceBundle {
                         pair("path", wrap(
                             pair("title", "Путь"),
                             pair("error", "Не удалось открыть папку")
+                        )),
+                        pair("action", wrap(
+                            pair("generate", wrap(
+                                pair("info", "Процент: {{progress.percent}}\nСкопированные: {{progress.completed}}")
+                            ))
                         ))
                     )),
                     pair("modal", wrap(
