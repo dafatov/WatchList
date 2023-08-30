@@ -8,6 +8,7 @@ import {IconButton} from '../../components/iconButton/IconButton';
 import MUIDataTable from 'mui-datatables';
 import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
+import {SettingsController} from '../../components/settings/SettingsController';
 import {SupplementsController} from '../../components/supplements/SupplementsController';
 import {TableFooter} from '../../components/tableFooter/TableFooter';
 import {TextField} from '../../components/textField/TextField';
@@ -30,7 +31,11 @@ export const Animes = memo(() => {
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
-  const [filterList, setFilterList] = useState(['WATCHING']);
+  const [filterList, setFilterList] = useState([
+    indexes
+      ? 'PLANNING'
+      : 'WATCHING',
+  ]);
   const [info, setInfo] = useState(null);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
@@ -236,7 +241,7 @@ export const Animes = memo(() => {
     document.body.appendChild(link);
     link.click();
     link.parentNode.removeChild(link);
-  }, []);
+  }, [setAnimes, showSuccess, showError]);
 
   const handleDownload = useCallback(() => {
     const link = document.createElement('a');
@@ -492,6 +497,7 @@ export const Animes = memo(() => {
               disabled={!!indexes}
               getRenderSize={getRenderSize}
             />
+            <SettingsController/>
           </>
         ),
         customBodyRenderLite: dataIndex => {

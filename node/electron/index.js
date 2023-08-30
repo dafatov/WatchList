@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const {exec} = require('child_process');
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
@@ -78,7 +78,7 @@ const startLoading = () => {
     width: 900,
     height: 576,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preloadLoading.js'),
     },
   });
 
@@ -97,10 +97,17 @@ const startBrowser = () => {
         autoHideMenuBar: true,
         webPreferences: {
           nodeIntegration: true,
+          preload: path.join(__dirname, 'preloadMain.js'),
         },
       });
 
       mainWindow.once('ready-to-show', () => {
+        ipcMain.on('select-dir-in', event => {
+          dialog.showOpenDialog(mainWindow, {
+            properties: ['openDirectory'],
+          }).then(({filePaths}) => event.reply('select-dir-out', filePaths));
+        });
+
         loadingWindow.hide();
         mainWindow.show();
       });

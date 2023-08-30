@@ -94,14 +94,14 @@ public final class FileManager {
     public FileManagerProgressRsDto getProgress() {
         FileManagerProgressRsDto progressRsDto = new FileManagerProgressRsDto()
             .setStatus(getStatus());
+        List<Path> pathList = completedFileSet.get();
 
-        if (!isNotRunnable()) {
+        if (!isNotRunnable() || pathList.size() < 1) {
             return progressRsDto;
         }
 
         long current = currentSize.get();
         long all = allSize.get();
-        List<Path> pathList = completedFileSet.get();
         Path commonPath = normalizePaths(pathList);
 
         return progressRsDto

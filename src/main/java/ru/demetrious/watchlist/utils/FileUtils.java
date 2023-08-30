@@ -33,13 +33,13 @@ public class FileUtils {
     }
 
     public static Path normalizePaths(List<Path> pathList) {
-        return switch (pathList.size()) {
-            case 0 -> null;
-            case 1 -> pathList.get(0).getRoot();
-            default -> FindCommonPathElements.findForFilePaths(pathList, IOCase.INSENSITIVE)
-                .map(PathElements::toPath)
-                .orElse(pathList.get(0).getRoot());
-        };
+        if (pathList.size() == 1) {
+            return pathList.get(0).getRoot();
+        }
+
+        return FindCommonPathElements.findForFilePaths(pathList, IOCase.INSENSITIVE)
+            .map(PathElements::toPath)
+            .orElse(pathList.get(0).getRoot());
     }
 
     // ===================================================================================================================

@@ -15,12 +15,12 @@ import ru.demetrious.watchlist.utils.AnimeUtils;
 @RequiredArgsConstructor
 @Slf4j
 public class FileService {
-    private static final Path TARGET_FOLDER = Path.of("\\\\Router\\Universe\\Torrents\\Main\\New Folder\\.Test");
-
     private final FileManager fileManager;
     private final AnimeService animeService;
+    private final ConfigService configService;
 
     public void generate() {
+        Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
         List<Path> pathList = animeService.getAnimes().stream()
             .filter(AnimeUtils::isWatching)
             .map(AnimeUtils::getPath)
@@ -32,12 +32,12 @@ public class FileService {
 
         executorService.submit(() -> {
             try {
-                List<Path> removablePathList = fileManager.getSubPathList(TARGET_FOLDER).stream()
+                List<Path> removablePathList = fileManager.getSubPathList(targetFolder).stream()
                     .filter(targetPath -> pathList.stream().noneMatch(path -> path.getFileName().equals(targetPath.getFileName())))
                     .toList();
 
                 fileManager.deleteDirectories(removablePathList);
-                fileManager.copyDirectories(pathList, TARGET_FOLDER);
+                fileManager.copyDirectories(pathList, targetFolder);
             } catch (Exception e) {
                 log.error("Can't generate cause: {}", String.valueOf(e));
                 e.printStackTrace();

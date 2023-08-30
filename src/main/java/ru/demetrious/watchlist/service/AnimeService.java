@@ -26,7 +26,7 @@ import static ru.demetrious.watchlist.utils.AnimeUtils.getURI;
 @Slf4j
 public class AnimeService {
     private static final int MAX_WATCHING = 7;
-    private static final int[] CANDIDATES_COUNT = {3, 5, 7, 11, 13, 17, 19};
+    private static final int[] CANDIDATES_COUNT = {0, 3, 5, 7, 11, 13, 17, 19};
 
     private final AnimeRepository animeRepository;
     private final RandomOrgClient randomOrgClient;
@@ -103,6 +103,6 @@ public class AnimeService {
         return new InfoRsDto()
             .setCount(count)
             .setRemained(remained)
-            .setCandidates(CANDIDATES_COUNT[remained - 1]);
+            .setCandidates(CANDIDATES_COUNT[remained]);
     }
 }
