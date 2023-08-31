@@ -4,12 +4,12 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#FFFF50',
+      main: '#3bb2d0',
       success: '#50ff50',
       failure: '#ff5050',
     },
     secondary: {
-      main: '#0000af',
+      main: '#1b5f70',
     },
   },
 });

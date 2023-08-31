@@ -3,6 +3,7 @@ package ru.demetrious.watchlist.domain.enums;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.demetrious.watchlist.locales.Common;
 import ru.demetrious.watchlist.locales.Web;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
@@ -10,7 +11,8 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 @RequiredArgsConstructor
 @Getter
 public enum LocaleResourceEnum {
-    WEB("web", Web.class.getName());
+    WEB("web", Web.class.getName()),
+    COMMON("common", Common.class.getName());
 
     private final String ns;
     private final String className;

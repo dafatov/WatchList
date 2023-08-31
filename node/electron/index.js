@@ -1,5 +1,5 @@
-const {app, BrowserWindow} = require('electron');
-const {spawn} = require('child_process');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
+const {exec} = require('child_process');
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
@@ -17,15 +17,19 @@ const initUpdater = () => {
   autoUpdater.autoRunAppAfterInstall = false;
 
   log.transports.file.level = 'debug';
+  log.transports.file.resolvePath = () => path.join(app.getPath('exe'), '../logs/main.log');
   autoUpdater.logger = log;
 };
 
 const initApp = () => {
+  app.setPath('userData', path.join(app.getPath('exe'), '../userData'));
+  app.setPath('sessionData', path.join(app.getPath('exe'), '../sessionData'));
+
   app.on('ready', () => {
     startLoading().then(() => autoUpdate())
-      .then(() => {
-        spawn('java', ['-jar', './server/server.jar']);
-      }).then(() => startBrowser());
+      .then(() => exec('java -jar ./server/server.jar')
+        .stdout.on('data', data => log.info(data)))
+      .then(() => startBrowser());
   });
 
   app.on('window-all-closed', app.quit);
@@ -78,7 +82,7 @@ const startLoading = () => {
     width: 900,
     height: 576,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preloadLoading.js'),
     },
   });
 
@@ -97,10 +101,18 @@ const startBrowser = () => {
         autoHideMenuBar: true,
         webPreferences: {
           nodeIntegration: true,
+          preload: path.join(__dirname, 'preloadMain.js'),
         },
       });
 
       mainWindow.once('ready-to-show', () => {
+        ipcMain.on('select-dir-in', event => {
+          dialog.showOpenDialog(mainWindow, {
+            properties: ['openDirectory'],
+          }).then(({filePaths}) => filePaths.length > 0
+            && event.reply('select-dir-out', filePaths));
+        });
+
         loadingWindow.hide();
         mainWindow.show();
       });

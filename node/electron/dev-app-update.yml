@@ -1,4 +1,4 @@
 owner: dafatov
 repo: WatchList
 provider: github
-updaterCacheDirName: ru.demetrious.watch-list.electron-updater
+updaterCacheDirName: WatchListUpdater
