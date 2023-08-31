@@ -20,27 +20,22 @@ public class FileService {
     private final ConfigService configService;
 
     public void generate() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
         List<Path> pathList = animeService.getAnimes().stream()
             .filter(AnimeUtils::isWatching)
             .map(AnimeUtils::getPath)
             .toList();
-
-        fileManager.checkIsRunnable(pathList);
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        List<Path> removablePathList = fileManager.getSubPathList(targetFolder).stream()
+            .filter(targetPath -> pathList.stream().noneMatch(path -> path.getFileName().equals(targetPath.getFileName())))
+            .toList();
 
         executorService.submit(() -> {
             try {
-                Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
-                List<Path> removablePathList = fileManager.getSubPathList(targetFolder).stream()
-                    .filter(targetPath -> pathList.stream().noneMatch(path -> path.getFileName().equals(targetPath.getFileName())))
-                    .toList();
-
                 fileManager.deleteDirectories(removablePathList);
                 fileManager.copyDirectories(pathList, targetFolder);
             } catch (Exception e) {
-                log.error("Can't generate cause: {}", String.valueOf(e));
-                e.printStackTrace();
+                log.error("Can't generate:", e);
             }
 
             executorService.shutdown();

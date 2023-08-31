@@ -56,7 +56,7 @@ public class AnimeController {
             animeService.openAnimeFolder(id);
             log.info("openAnimeFolder: {}", id);
         } catch (Exception e) {
-            log.error("Can't open Anime folder: {}", String.valueOf(e));
+            log.error("Can't open Anime folder", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
         return ResponseEntity.ok().build();
@@ -68,7 +68,7 @@ public class AnimeController {
             animeService.openAnimeUrl(id);
             log.info("openAnimeUrl: {}", id);
         } catch (Exception e) {
-            log.error("Can't open Anime url: {}", String.valueOf(e));
+            log.error("Can't open Anime url:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
         return ResponseEntity.ok().build();
@@ -90,7 +90,7 @@ public class AnimeController {
             log.info("copyAnimeName: {}", id);
             return ResponseEntity.ok(animeName);
         } catch (Exception e) {
-            log.error("Can't copy Anime name: {}", String.valueOf(e));
+            log.error("Can't copy Anime name:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
@@ -103,7 +103,7 @@ public class AnimeController {
             log.info("getShuffleIndexes: {}", shuffleIndexes);
             return ResponseEntity.ok(shuffleIndexes);
         } catch (Exception e) {
-            log.error("Can't shuffle indexes: {}", String.valueOf(e));
+            log.error("Can't shuffle indexes:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
