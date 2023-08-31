@@ -17,10 +17,14 @@ const initUpdater = () => {
   autoUpdater.autoRunAppAfterInstall = false;
 
   log.transports.file.level = 'debug';
+  log.transports.file.resolvePath = () => path.join(app.getPath('exe'), '../logs/main.log');
   autoUpdater.logger = log;
 };
 
 const initApp = () => {
+  app.setPath('userData', path.join(app.getPath('exe'), '../userData'));
+  app.setPath('sessionData', path.join(app.getPath('exe'), '../sessionData'));
+
   app.on('ready', () => {
     startLoading().then(() => autoUpdate())
       .then(() => exec('java -jar ./server/server.jar')
