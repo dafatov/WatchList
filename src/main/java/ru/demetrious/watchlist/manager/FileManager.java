@@ -10,16 +10,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
 
 import static java.lang.Math.ceilDivExact;
+import static java.lang.Math.floorDivExact;
 import static java.lang.Math.toIntExact;
+import static java.lang.System.*;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
+import static org.apache.commons.lang3.tuple.Pair.*;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.COMPLETED;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.IDLE;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.INTERRUPTED;
@@ -41,6 +45,8 @@ public final class FileManager {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final AtomicBoolean isCompleted = new AtomicBoolean(false);
     private final AtomicBoolean isInterrupted = new AtomicBoolean(false);
+
+    private Pair<Long, Long> previousCurrentSize = of(0L, 0L);
 
     public void copyDirectories(List<Path> sources, Path target) throws IllegalStateException {
         checkIsRunnable(sources);
@@ -100,14 +106,22 @@ public final class FileManager {
             return progressRsDto;
         }
 
+        long currentTimeMillis = currentTimeMillis();
         long current = currentSize.get();
         long all = allSize.get();
+        long speed = floorDivExact(
+            current - previousCurrentSize.getLeft(),
+            ceilDivExact(currentTimeMillis - previousCurrentSize.getRight(), 1000)
+        );
         List<Path> pathList = completedFileSet.get();
         Optional<Path> commonPath = normalizePaths(pathList);
+
+        previousCurrentSize = Pair.of(current, currentTimeMillis);
 
         return progressRsDto
             .setAllSize(all)
             .setCurrentSize(current)
+            .setSpeed(speed)
             .setPercent(toIntExact(ceilDivExact(100 * current, all)))
             .setCommonPath(commonPath
                 .map(Path::toString)

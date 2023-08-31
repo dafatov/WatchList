@@ -18,18 +18,18 @@ export const EditSettingsModal = memo(({
   }, [initialValues, setValues]);
 
   useEffect(() => {
+    const updateTargetFolder = event => {
+      if (event.data.type === 'select-dir-out') {
+        setValues(values => ({
+          ...values,
+          'default-setting.file-service.target-folder': event.data.data[0],
+        }));
+      }
+    };
+
     window.addEventListener('message', updateTargetFolder);
 
     return () => window.removeEventListener('message', updateTargetFolder);
-  });
-
-  const updateTargetFolder = useCallback(event => {
-    if (event.data.type === 'select-dir-out') {
-      setValues(values => ({
-        ...values,
-        'default-setting.file-service.target-folder': event.data.data[0],
-      }));
-    }
   }, [setValues]);
 
   const handlePickFolder = useCallback(() => {

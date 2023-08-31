@@ -17,7 +17,7 @@ export const FileProgressTooltip = memo(({
 
   const progressTitle = useMemo(() => {
     if (isDetailed) {
-      return `${getRenderSize(progress.currentSize)}/${getRenderSize(progress.allSize)}`;
+      return `${getRenderSize(progress.currentSize)}/${getRenderSize(progress.allSize)} (${getRenderSize(progress.speed)}/с)`;
     }
 
     return `${progress.percent}%`;

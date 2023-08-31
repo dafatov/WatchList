@@ -7,7 +7,7 @@ export const Tooltip = styled(({children, className, ...props}) => (
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
-    maxWidth: 220,
+    maxWidth: 400,
     fontSize: theme.typography.pxToRem(13),
     border: '1px solid',
     borderColor: theme.palette.secondary.main,

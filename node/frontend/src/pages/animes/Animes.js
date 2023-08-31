@@ -15,7 +15,7 @@ import {UrlLink} from '../../components/urlLink/UrlLink';
 import classNames from 'classnames';
 import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
-import {getCustomSort} from '../../utils/animes';
+import {getCustomSort} from '../../utils/sort';
 import {getUnitPrefix} from '../../utils/convert';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';

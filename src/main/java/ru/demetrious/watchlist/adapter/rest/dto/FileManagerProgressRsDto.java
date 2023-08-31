@@ -11,6 +11,7 @@ public class FileManagerProgressRsDto {
     private FileManagerStatusEnum status;
     private Long allSize;
     private Long currentSize;
+    private Long speed;
     private Integer percent;
     private List<String> completed;
     private String commonPath;
