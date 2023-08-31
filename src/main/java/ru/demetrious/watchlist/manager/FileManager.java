@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -46,7 +47,6 @@ public final class FileManager {
 
         allSize.set(sources.stream().reduce(0L, (accumulator, source) -> accumulator + sizeOfDirectory(source.toFile()), Long::sum));
         isRunning.compareAndSet(false, true);
-        isCompleted.compareAndSet(true, false);
         try {
             for (Path source : sources) {
                 if (isInterrupted.get()) {
@@ -62,6 +62,7 @@ public final class FileManager {
                 );
             }
         } catch (IOException e) {
+            isInterrupted.set(true);
             throw new IllegalStateException(e);
         } finally {
             isRunning.compareAndSet(true, false);
@@ -94,24 +95,25 @@ public final class FileManager {
     public FileManagerProgressRsDto getProgress() {
         FileManagerProgressRsDto progressRsDto = new FileManagerProgressRsDto()
             .setStatus(getStatus());
-        List<Path> pathList = completedFileSet.get();
 
-        if (!isNotRunnable() || pathList.size() < 1) {
+        if (!isNotRunnable()) {
             return progressRsDto;
         }
 
         long current = currentSize.get();
         long all = allSize.get();
-        Path commonPath = normalizePaths(pathList);
+        List<Path> pathList = completedFileSet.get();
+        Optional<Path> commonPath = normalizePaths(pathList);
 
         return progressRsDto
             .setAllSize(all)
             .setCurrentSize(current)
             .setPercent(toIntExact(ceilDivExact(100 * current, all)))
-            .setCommonPath(commonPath.toString())
-            .setCompleted(pathList.stream()
-                .map(commonPath::relativize)
+            .setCommonPath(commonPath
                 .map(Path::toString)
+                .orElse(null))
+            .setCompleted(pathList.stream()
+                .map(path -> mapPath(path, commonPath))
                 .collect(Collectors.toList()));
     }
 
@@ -167,5 +169,9 @@ public final class FileManager {
         }
 
         return IDLE;
+    }
+
+    private String mapPath(Path path, Optional<Path> commonPath) {
+        return "\\".concat(commonPath.orElseThrow().relativize(path).toString());
     }
 }

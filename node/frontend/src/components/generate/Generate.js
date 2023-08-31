@@ -1,8 +1,9 @@
-import {Badge, CircularProgress, IconButton as MuiIconButton} from '@mui/material';
 import {BrowserUpdatedOutlined, CancelPresentationOutlined, ResetTvOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {FileProgressTooltip} from '../fileProgressTooltip/FileProgressTooltip';
 import {IconButton} from '../iconButton/IconButton';
+import {LoadingIconButton} from '../loadingIconButton/LoadingIconButton';
+import {IconButton as MuiIconButton} from '@mui/material';
 import {throwHttpError} from '../../utils/reponse';
 import {useInterval} from '../../utils/useInterval';
 import {useSnackBar} from '../../utils/snackBar';
@@ -51,6 +52,14 @@ export const Generate = memo(({
     }
   }, [progress.status]);
 
+  const color = useMemo(() => {
+    if (progress.status === 'COMPLETED') {
+      return 'success';
+    }
+
+    return 'error';
+  }, [progress.status]);
+
   const updateProgress = useCallback(() => {
     fetch('http://localhost:8080/api/files/progress')
       .then(throwHttpError)
@@ -58,7 +67,7 @@ export const Generate = memo(({
       .then(progress => {
         setProgress(progress);
       }).catch(() => showError(t('web:page.animes.snackBar.generateFolder.error')));
-  }, [setProgress]);
+  }, [setProgress, showError]);
 
   const handleGenerate = useCallback(() => {
     setLocalDisabled(true);
@@ -66,13 +75,12 @@ export const Generate = memo(({
       .then(throwHttpError)
       .then(() => {
         setDelay(1000);
-        updateProgress();
       })
       .catch(() => {
         setLocalDisabled(false);
         showError(t('web:page.animes.snackBar.generateFolder.error'));
       });
-  }, [setDelay, updateProgress, setLocalDisabled]);
+  }, [setDelay, setLocalDisabled, showError]);
 
   const handleReset = useCallback(() => {
     fetch('http://localhost:8080/api/files/reset', {method: 'POST'})
@@ -80,7 +88,7 @@ export const Generate = memo(({
       .then(() => {
         updateProgress();
       }).catch(() => showError(t('web:page.animes.generate.progress.error')));
-  }, [updateProgress]);
+  }, [updateProgress, showError]);
 
   const handleStop = useCallback(() => {
     fetch('http://localhost:8080/api/files/stop', {method: 'POST'})
@@ -88,7 +96,7 @@ export const Generate = memo(({
       .then(() => {
         updateProgress();
       }).catch(() => showError(t('web:page.animes.generate.progress.error')));
-  }, [updateProgress]);
+  }, [updateProgress, showError]);
 
   return (
     <>
@@ -102,31 +110,17 @@ export const Generate = memo(({
         </IconButton>
         : <FileProgressTooltip title={title} progress={progress} getRenderSize={getRenderSize}>
           {progress.status === 'RUNNING'
-            ? <Badge
-              overlap="circular"
-              badgeContent={
-                <CircularProgress
-                  color="primary"
-                  size={20}
-                  thickness={20}
-                  variant="determinate"
-                  value={progress.percent}
-                />
-              }>
-              <MuiIconButton
-                color="primary"
-                disabled={disabled || localDisabled}
-                onClick={handleStop}
-              >
-                <ResetTvOutlined/>
-              </MuiIconButton>
-            </Badge>
+            ? <LoadingIconButton
+              disabled={disabled || localDisabled}
+              value={progress.percent}
+              onClick={handleStop}
+            >
+              <ResetTvOutlined/>
+            </LoadingIconButton>
             : <></>}
           {progress.status === 'COMPLETED' || progress.status === 'INTERRUPTED'
             ? <MuiIconButton
-              color={progress.status === 'COMPLETED'
-                ? 'success'
-                : 'error'}
+              color={color}
               disabled={disabled || localDisabled}
               onClick={handleReset}
             >
@@ -138,4 +132,4 @@ export const Generate = memo(({
   );
 });
 
-Generate.displayName = 'Generator';
+Generate.displayName = 'Generate';

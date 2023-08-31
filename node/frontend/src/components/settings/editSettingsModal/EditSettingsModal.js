@@ -17,19 +17,26 @@ export const EditSettingsModal = memo(({
     setValues(initialValues ?? {});
   }, [initialValues, setValues]);
 
+  useEffect(() => {
+    window.addEventListener('message', updateTargetFolder);
+
+    return () => window.removeEventListener('message', updateTargetFolder);
+  });
+
+  const updateTargetFolder = useCallback(event => {
+    if (event.data.type === 'select-dir-out') {
+      setValues(values => ({
+        ...values,
+        'default-setting.file-service.target-folder': event.data.data[0],
+      }));
+    }
+  }, [setValues]);
+
   const handlePickFolder = useCallback(() => {
     window.postMessage({
       type: 'select-dir-in',
     });
-    window.addEventListener('message', event => {
-      if (event.data.type === 'select-dir-out') {
-        setValues(values => ({
-          ...values,
-          'default-setting.file-service.target-folder': event.data.data[0],
-        }));
-      }
-    });
-  }, [setValues]);
+  }, []);
 
   const handleClose = useCallback(() => {
     setValues(initialValues ?? {});

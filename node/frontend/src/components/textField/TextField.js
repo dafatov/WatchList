@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {TextField as MuiTextField} from '@mui/material';
 
 export const TextField = memo(({
@@ -16,6 +16,10 @@ export const TextField = memo(({
   useEffect(() => {
     setValue(valueProp);
   }, [editable, valueProp, setValue]);
+
+  const error = useMemo(() => {
+    return formik.touched[name] && formik.errors[name];
+  }, [formik.touched[name], formik.errors[name]]);
 
   const handleValue = useCallback(event => {
     if (!type || type === 'number' && event.target.value.match(/^$|^0$|^[1-9][0-9]*$/)) {
@@ -37,8 +41,8 @@ export const TextField = memo(({
           value={value}
           onChange={handleValue}
           onBlur={handleBlur}
-          error={formik.touched[name] && !!formik.errors[name]}
-          label={formik.touched[name] && formik.errors[name] && <>{formik.errors[name]}</>}
+          error={!!error}
+          label={error}
           {...props}
         />
         : onRender?.(value) ?? value}

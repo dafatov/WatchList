@@ -1,5 +1,5 @@
 import {IconButton, TextField} from '@mui/material';
-import {memo, useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {OpenInNew} from '@mui/icons-material';
 import {Tooltip} from '../tooltip/Tooltip';
 
@@ -16,6 +16,10 @@ export const PathLink = memo(({
     setValue(valueProp);
   }, [editable, valueProp, setValue]);
 
+  const error = useMemo(() => {
+    return formik.touched[name] && formik.errors[name];
+  }, [formik.touched[name], formik.errors[name]]);
+
   const handleChange = useCallback(event => {
     setValue(event.target.value);
     formik.handleChange(event);
@@ -29,8 +33,8 @@ export const PathLink = memo(({
           value={value}
           onChange={handleChange}
           onBlur={formik.handleBlur}
-          error={formik.touched[name] && !!formik.errors[name]}
-          label={formik.touched[name] && formik.errors[name] && <>{formik.errors[name]}</>}
+          error={!!error}
+          label={error}
         />
         : <Tooltip title={value}>
           <IconButton

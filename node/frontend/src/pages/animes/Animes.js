@@ -1,28 +1,31 @@
 import * as Yup from 'yup';
 import {CircularProgress, Divider, InputAdornment, Typography} from '@mui/material';
-import {InfoOutlined, ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
+import {ActionsController} from '../../components/actions/ActionsController';
 import {AnimeController} from '../../components/animes/AnimeController';
-import {Generate} from '../../components/generate/Generate';
 import {IconButton} from '../../components/iconButton/IconButton';
+import {InfoOutlined} from '@mui/icons-material';
 import MUIDataTable from 'mui-datatables';
 import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
-import {SettingsController} from '../../components/settings/SettingsController';
 import {SupplementsController} from '../../components/supplements/SupplementsController';
 import {TableFooter} from '../../components/tableFooter/TableFooter';
 import {TextField} from '../../components/textField/TextField';
 import {UrlLink} from '../../components/urlLink/UrlLink';
+import classNames from 'classnames';
 import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
+import {getCustomSort} from '../../utils/animes';
 import {getUnitPrefix} from '../../utils/convert';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
 import {useLocalStorage} from '../../utils/localStorage';
 import {useSnackBar} from '../../utils/snackBar';
+import {useStyles} from './animesStyles';
 import {useTranslation} from 'react-i18next';
 
 export const Animes = memo(() => {
+  const classes = useStyles();
   const {t} = useTranslation();
   const {showError, showSuccess, showWarning} = useSnackBar();
   const [isLoading, setIsLoading] = useState(true);
@@ -31,11 +34,7 @@ export const Animes = memo(() => {
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
-  const [filterList, setFilterList] = useState([
-    indexes
-      ? 'PLANNING'
-      : 'WATCHING',
-  ]);
+  const [filterList, setFilterList] = useState(['PLANNING']);
   const [info, setInfo] = useState(null);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
@@ -102,31 +101,26 @@ export const Animes = memo(() => {
       }).catch(() => showError(t('web:page.animes.error')));
   }, [setDictionaries, setIsPendingDictionaries]);
 
-  const handleShuffleAnimes = useCallback(() => {
-    fetch('http://localhost:8080/api/animes/shuffle')
+  useEffect(() => {
+    setFilterList([
+      indexes
+        ? 'PLANNING'
+        : 'WATCHING',
+    ]);
+  }, [indexes]);
+
+  const handleGetInfo = useCallback(() => {
+    if (info) {
+      return;
+    }
+
+    fetch('http://localhost:8080/api/animes/info')
       .then(throwHttpError)
       .then(response => response.json())
       .then(data => {
-        setIndexes(data);
-        setFilterList(['PLANNING']);
-      }).catch(() => showError(t('web:page.animes.shuffle.error')));
-  }, [setIndexes]);
-
-  const handleGetInfo = useCallback(() => {
-    if (!info) {
-      fetch('http://localhost:8080/api/animes/info')
-        .then(throwHttpError)
-        .then(response => response.json())
-        .then(data => {
-          setInfo(data);
-        }).catch(() => showError(t('web:page.animes.info.error')));
-    }
+        setInfo(data);
+      }).catch(() => showError(t('web:page.animes.info.error')));
   }, [setInfo, info]);
-
-  const handleUnshuffleAnimes = useCallback(() => {
-    setIndexes(null);
-    setFilterList(['WATCHING']);
-  }, [setIndexes]);
 
   const handleEpisodesBlur = useCallback(() => {
     formik.setFieldValue('supplements', formik.values.supplements.map(supplement => ({
@@ -286,10 +280,8 @@ export const Animes = memo(() => {
         filter: false,
         sort: !indexes,
         customHeadLabelRender: column =>
-          <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-            <div style={indexes
-              ? {paddingRight: '8px'}
-              : {}}>{column.label}</div>
+          <div className={classes.nameHeaderContainer}>
+            <div className={classNames({[classes.nameHeaderTitle]: indexes})}>{column.label}</div>
             {indexes
               ? <>
                 <Divider flexItem orientation="vertical"/>
@@ -439,9 +431,7 @@ export const Animes = memo(() => {
               supplements={supplements}
               onRenderSupplementName={getRenderSupplementStatus}
               options={dictionaries?.supplements}
-              episodes={parseInt(episodes
-                ? episodes
-                : '0')}
+              episodes={parseInt(episodes || '0')}
               formik={formik}
             />
           );
@@ -477,28 +467,12 @@ export const Animes = memo(() => {
         filter: false,
         searchable: false,
         customHeadLabelRender: () => (
-          <>
-            {indexes
-              ? <IconButton
-                title={t('common:action.shuffle.off')}
-                disabled={!!editableId}
-                onClick={() => handleUnshuffleAnimes()}
-              >
-                <ShuffleOnOutlined/>
-              </IconButton>
-              : <IconButton
-                title={t('common:action.shuffle.on')}
-                disabled={!!editableId}
-                onClick={() => handleShuffleAnimes()}
-              >
-                <ShuffleOutlined/>
-              </IconButton>}
-            <Generate
-              disabled={!!indexes}
-              getRenderSize={getRenderSize}
-            />
-            <SettingsController/>
-          </>
+          <ActionsController
+            indexes={indexes}
+            setIndexes={setIndexes}
+            editableId={editableId}
+            getRenderSize={getRenderSize}
+          />
         ),
         customBodyRenderLite: dataIndex => {
           const anime = getFields(dataIndex);
@@ -531,8 +505,6 @@ export const Animes = memo(() => {
     formik,
     indexes,
     editableId,
-    handleShuffleAnimes,
-    handleUnshuffleAnimes,
     info,
     handleGetInfo,
     filterList,
@@ -549,40 +521,8 @@ export const Animes = memo(() => {
         setFilterList(filterLists[filterListIndex]);
       }
     },
-    customSort: (data, columnIndex, order) => {
-      const orderValue = 2 * (order === 'asc') - 1;
-      const preparedShowAnimes = prepareShowAnimes();
-
-      const getAnime = data => preparedShowAnimes[data.index];
-      const getIsPattern = data => getAnime(data).isPattern;
-      const getSortIndex = data => {
-        const anime = getAnime(data);
-        const index = indexes[anime.id];
-
-        if (!index && anime.status === 'PLANNING') {
-          showWarning(t('web:page.animes.snackBar.sort.warning.undefined', {anime}));
-        }
-
-        return index;
-      };
-
-      return data.sort((a, b) => {
-        if (indexes) {
-          return getSortIndex(a) - getSortIndex(b);
-        }
-
-        if (getIsPattern(a) || getIsPattern(b)) {
-          return getIsPattern(a) - getIsPattern(b);
-        } else {
-          const aValue = a.data[columnIndex] ?? '';
-          const bValue = b.data[columnIndex] ?? '';
-
-          return orderValue * (typeof aValue?.localeCompare === 'function'
-            ? aValue.localeCompare(bValue)
-            : aValue - bValue);
-        }
-      });
-    },
+    customSort: getCustomSort(prepareShowAnimes, indexes, anime =>
+      showWarning(t('web:page.animes.snackBar.sort.warning.undefined', {anime}))),
     // eslint-disable-next-line max-params
     customFooter: (count, page, rowsPerPage, changeRowsPerPage, changePage) =>
       <TableFooter
@@ -597,7 +537,7 @@ export const Animes = memo(() => {
         onUpload={handleUpload}
         onDownload={handleDownload}
       />,
-  }), [editableId, handleAddAnime, prepareShowAnimes, indexes, showWarning, setFilterList]);
+  }), [editableId, handleAddAnime, prepareShowAnimes, indexes, showWarning, setFilterList, handleUpload, handleDownload]);
 
   if (isLoading) {
     return <CircularProgress/>;

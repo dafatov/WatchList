@@ -26,14 +26,14 @@ export const EditSupplementEpisodesModal = memo(({
     setValues(values => isChecked
       ? union(values, [index + 1])
       : values.filter(value => value !== index + 1));
-  }, [setValues, values]);
+  }, [setValues]);
 
   const handleChangeAll = useCallback(() => {
     setValues(values => values.length === episodes
       ? []
       : Array(episodes).fill(null)
         .map((_, index) => index + 1));
-  }, [episodes]);
+  }, [episodes, setValues]);
 
   const handleClose = useCallback(() => {
     setValues(initialValues ?? []);

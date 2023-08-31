@@ -2,6 +2,7 @@ import {CancelOutlined, DeleteOutline, EditOutlined, Save} from '@mui/icons-mate
 import {memo, useCallback, useState} from 'react';
 import {ConfirmDeleteAnimeModal} from './confirmDeleteAnimeModal/ConfirmDeleteAnimeModal';
 import {IconButton} from '../iconButton/IconButton';
+import {useStyles} from './animeControllerStyles';
 import {useTranslation} from 'react-i18next';
 
 export const AnimeController = memo(({
@@ -12,6 +13,7 @@ export const AnimeController = memo(({
   onEdit,
   onDelete,
 }) => {
+  const classes = useStyles();
   const {t} = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -22,7 +24,7 @@ export const AnimeController = memo(({
   return (
     <>
       {editable
-        ? <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+        ? <div className={classes.container}>
           <IconButton
             title={t('common:action.save')}
             onClick={onSave}
@@ -36,7 +38,7 @@ export const AnimeController = memo(({
             <CancelOutlined/>
           </IconButton>
         </div>
-        : <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+        : <div className={classes.container}>
           <IconButton
             title={t('common:action.edit')}
             disabled={!!editable}

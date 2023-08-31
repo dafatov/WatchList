@@ -20,7 +20,6 @@ public class FileService {
     private final ConfigService configService;
 
     public void generate() {
-        Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
         List<Path> pathList = animeService.getAnimes().stream()
             .filter(AnimeUtils::isWatching)
             .map(AnimeUtils::getPath)
@@ -32,6 +31,7 @@ public class FileService {
 
         executorService.submit(() -> {
             try {
+                Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
                 List<Path> removablePathList = fileManager.getSubPathList(targetFolder).stream()
                     .filter(targetPath -> pathList.stream().noneMatch(path -> path.getFileName().equals(targetPath.getFileName())))
                     .toList();

@@ -11,12 +11,15 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOCase;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static ru.demetrious.watchlist.manager.FileManager.BUFFER_SIZE;
 
@@ -32,14 +35,14 @@ public class FileUtils {
         }
     }
 
-    public static Path normalizePaths(List<Path> pathList) {
-        if (pathList.size() == 1) {
-            return pathList.get(0).getRoot();
-        }
-
-        return FindCommonPathElements.findForFilePaths(pathList, IOCase.INSENSITIVE)
-            .map(PathElements::toPath)
-            .orElse(pathList.get(0).getRoot());
+    public static Optional<Path> normalizePaths(List<Path> pathList) {
+        return switch (pathList.size()) {
+            case 0 -> empty();
+            case 1 -> of(pathList.get(0).getRoot());
+            default -> FindCommonPathElements.findForFilePaths(pathList, IOCase.INSENSITIVE)
+                .map(PathElements::toPath)
+                .or( () -> of(pathList.get(0).getRoot()));
+        };
     }
 
     // ===================================================================================================================
@@ -78,9 +81,11 @@ public class FileUtils {
                 outputStream.write(buffer, 0, length);
                 lengthConsumer.accept((long) length);
             }
-
+        } catch (IOException e) {
+            isInterrupted.set(true);
+            throw e;
+        } finally {
             if (isInterrupted.get()) {
-                outputStream.close();
                 forceDelete(target);
             }
         }

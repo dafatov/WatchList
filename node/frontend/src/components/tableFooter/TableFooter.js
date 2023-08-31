@@ -3,6 +3,7 @@ import {IconButton, MenuItem, TableFooter as MuiTableFooter, Select, TableCell, 
 import {memo, useCallback} from 'react';
 import MuiTablePagination from '@mui/material/TablePagination';
 import {SplitIconButton} from '../splitIconButton/SplitIconButton';
+import {useStyles} from './tableFooterStyles';
 
 export const TableFooter = memo(({
   count,
@@ -16,6 +17,8 @@ export const TableFooter = memo(({
   onDownload,
   disabled,
 }) => {
+  const classes = useStyles();
+
   const handleAdd = useCallback(event => {
     changePage(Math.ceil(count / rowsPerPage) - 1);
     onAdd(event);
@@ -25,13 +28,17 @@ export const TableFooter = memo(({
     changePage(event.target.value);
   }, [changePage]);
 
+  const getMenuTitle = useCallback(index => {
+    return `${index + 1} (${index * rowsPerPage + 1}-${Math.min(count, (index + 1) * rowsPerPage)})`;
+  }, [rowsPerPage, count]);
+
   return (
     <MuiTableFooter>
       <TableRow>
-        <TableCell colSpan={1000} style={{display: 'grid'}}>
-          <div style={{display: 'flex'}}>
+        <TableCell colSpan={1000} className={classes.tableCell}>
+          <div className={classes.actionContainer}>
             <IconButton
-              style={{border: '1px solid', borderRadius: '12px 0 0 12px', flexGrow: 1}}
+              className={classes.addButton}
               color="primary"
               disabled={disabled}
               onClick={handleAdd}
@@ -47,17 +54,17 @@ export const TableFooter = memo(({
               onBottomClick={onDownload}
             />
           </div>
-          <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'baseline'}}>
+          <div className={classes.paginationContainer}>
             <Select
               value={page}
               onChange={handlePageChange}
               size="small"
-              styles={{alignSelf: 'center'}}
+              className={classes.paginationSelect}
             >
               {Array(Math.ceil(count / rowsPerPage)).fill(null)
                 .map((_, index) =>
                   <MenuItem key={index} value={index}>
-                    {index + 1} ({index * rowsPerPage + 1}-{Math.min(count, (index + 1) * rowsPerPage)})
+                    {getMenuTitle(index)}
                   </MenuItem>,
                 )}
             </Select>

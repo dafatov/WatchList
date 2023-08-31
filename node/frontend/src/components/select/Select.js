@@ -1,5 +1,5 @@
 import {MenuItem, TextField} from '@mui/material';
-import {memo, useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 
 export const Select = memo(({
   editable,
@@ -20,6 +20,10 @@ export const Select = memo(({
     formik.handleChange(event);
   }, [setValue, formik.handleChange]);
 
+  const error = useMemo(() => {
+    return formik.touched[name] && formik.errors[name];
+  }, [formik.touched[name], formik.errors[name]]);
+
   return (
     <>
       {editable
@@ -29,8 +33,8 @@ export const Select = memo(({
           value={value}
           onChange={handleChange}
           onBlur={formik.handleBlur}
-          error={formik.touched[name] && !!formik.errors[name]}
-          label={formik.touched[name] && formik.errors[name] && <>{formik.errors[name]}</>}
+          error={!!error}
+          label={error}
         >
           {options.map(option =>
             <MenuItem key={option} value={option}>

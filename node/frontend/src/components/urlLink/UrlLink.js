@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {ContentCopyOutlined} from '@mui/icons-material';
 import {IconButton} from '../iconButton/IconButton';
 import {Tooltip} from '../tooltip/Tooltip';
+import {useStyles} from './urlLinkStyles';
 import {useTranslation} from 'react-i18next';
 
 export const UrlLink = (({
@@ -13,6 +14,7 @@ export const UrlLink = (({
   onClick,
   onCopyName,
 }) => {
+  const classes = useStyles();
   const {t} = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const [name, setName] = useState(nameProp);
@@ -25,6 +27,10 @@ export const UrlLink = (({
   useEffect(() => {
     setUrl(urlProp);
   }, [editable, urlProp, setUrl]);
+
+  const getError = useCallback(name => {
+    return formik.touched[name] && formik.errors[name];
+  }, [formik.touched, formik.errors]);
 
   const handleNameChange = useCallback(event => {
     setName(event.target.value);
@@ -39,29 +45,29 @@ export const UrlLink = (({
   return (
     <>
       {editable
-        ? <div style={{display: 'flex', flexDirection: 'column'}}>
+        ? <div className={classes.editableContainer}>
           <TextField
             name="name"
             value={name}
             onChange={handleNameChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.name && !!formik.errors.name}
-            label={formik.touched.name && formik.errors.name && <>{formik.errors.name}</>}
+            error={!!getError('name')}
+            label={getError('name')}
           />
           <TextField
             name="url"
             value={url}
-            style={{marginTop: '12px'}}
+            className={classes.url}
             onChange={handleUrlChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.url && !!formik.errors.url}
-            label={formik.touched.url && formik.errors.url && <>{formik.errors.url}</>}
+            error={!!getError('url')}
+            label={getError('url')}
           />
         </div>
         : <div
           onMouseLeave={() => setIsHovered(false)}
           onMouseEnter={() => setIsHovered(true)}
-          style={{display: 'flex', flexDirection: 'row'}}
+          className={classes.container}
         >
           <Tooltip title={url}>
             <Button
@@ -69,7 +75,7 @@ export const UrlLink = (({
               color="primary"
               disabled={!url}
               onClick={onClick}
-              style={{textAlign: 'justify'}}
+              className={classes.button}
             >
               {name}
             </Button>

@@ -105,7 +105,8 @@ const startBrowser = () => {
         ipcMain.on('select-dir-in', event => {
           dialog.showOpenDialog(mainWindow, {
             properties: ['openDirectory'],
-          }).then(({filePaths}) => event.reply('select-dir-out', filePaths));
+          }).then(({filePaths}) => filePaths.length > 0
+            && event.reply('select-dir-out', filePaths));
         });
 
         loadingWindow.hide();

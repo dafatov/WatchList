@@ -18,6 +18,8 @@ import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.repository.AnimeRepository;
 import ru.demetrious.watchlist.utils.AnimeUtils;
 
+import static java.lang.Math.max;
+import static java.lang.Math.toIntExact;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getPath;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getURI;
 
@@ -94,11 +96,10 @@ public class AnimeService {
 
     public InfoRsDto getInfo() {
         List<Anime> animeList = animeRepository.findAll();
-        int count = animeList.stream()
+        int count = toIntExact(animeList.stream()
             .filter(AnimeUtils::isWatching)
-            .toList()
-            .size();
-        int remained = MAX_WATCHING - count;
+            .count());
+        int remained = max(0, MAX_WATCHING - count);
 
         return new InfoRsDto()
             .setCount(count)
