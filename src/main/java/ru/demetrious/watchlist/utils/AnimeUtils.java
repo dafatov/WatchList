@@ -20,8 +20,4 @@ public class AnimeUtils {
     public static Boolean isWatching(Anime anime) {
         return WatchStatusEnum.WATCHING.equals(anime.getStatus());
     }
-
-    public static Boolean isPlanning(Anime anime) {
-        return WatchStatusEnum.PLANNING.equals(anime.getStatus());
-    }
 }

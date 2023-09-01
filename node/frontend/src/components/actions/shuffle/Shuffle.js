@@ -1,19 +1,25 @@
-import {ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
-import {memo, useCallback} from 'react';
+import {CancelOutlined, CheckCircleOutline, CircleOutlined, ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
+import {memo, useCallback, useState} from 'react';
 import {IconButton} from '../../iconButton/IconButton';
+import {IconButton as MuiIconButton} from '@mui/material';
+import classNames from 'classnames';
 import {throwHttpError} from '../../../utils/reponse';
 import {useSnackBar} from '../../../utils/snackBar';
+import {useStyles} from './shuffleStyles';
 import {useTranslation} from 'react-i18next';
 
 export const Shuffle = memo(({
   indexes,
   setIndexes,
+  setPicked,
   editableId,
   onStart,
   onStop,
 }) => {
+  const classes = useStyles();
   const {t} = useTranslation();
   const {showError} = useSnackBar();
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleShuffleAnimes = useCallback(() => {
     fetch('http://localhost:8080/api/animes/shuffle')
@@ -25,7 +31,18 @@ export const Shuffle = memo(({
       }).catch(() => showError(t('web:page.animes.shuffle.error')));
   }, [setIndexes, onStart]);
 
-  const handleUnshuffleAnimes = useCallback(() => {
+  const handlePickShuffleAnimes = useCallback(() => {
+    fetch('http://localhost:8080/api/animes/pick', {method: 'POST'})
+      .then(throwHttpError)
+      .then(response => response.json())
+      .then(data => {
+        setIndexes(null);
+        setPicked(data);
+        onStop?.();
+      }).catch(() => showError(t('web:page.animes.shuffle.error')));
+  }, []);
+
+  const handleCancelShuffleAnimes = useCallback(() => {
     setIndexes(null);
     onStop?.();
   }, [setIndexes, onStop]);
@@ -33,13 +50,33 @@ export const Shuffle = memo(({
   return (
     <>
       {indexes
-        ? <IconButton
-          title={t('common:action.shuffle.off')}
-          disabled={!!editableId}
-          onClick={() => handleUnshuffleAnimes()}
+        ? <div
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className={classNames({[classes.dialRoot]: isHovered})}
         >
-          <ShuffleOnOutlined/>
-        </IconButton>
+          <div className={classNames(classes.dialActions, {[classes.dialActionsHoveredTop]: isHovered})}>
+            <IconButton
+              title={t('common:action.shuffle.off')}
+              onClick={handlePickShuffleAnimes}
+            >
+              <CheckCircleOutline/>
+            </IconButton>
+          </div>
+          <MuiIconButton color="primary">
+            {isHovered
+              ? <CircleOutlined/>
+              : <ShuffleOnOutlined/>}
+          </MuiIconButton>
+          <div className={classNames(classes.dialActions, {[classes.dialActionsHoveredBottom]: isHovered})}>
+            <IconButton
+              title={t('common:action.shuffle.off')}
+              onClick={handleCancelShuffleAnimes}
+            >
+              <CancelOutlined/>
+            </IconButton>
+          </div>
+        </div>
         : <IconButton
           title={t('common:action.shuffle.on')}
           disabled={!!editableId}

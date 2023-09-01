@@ -5,17 +5,19 @@ import {IconButton as MuiIconButton} from '@mui/material';
 import {SettingsController} from '../settings/SettingsController';
 import {Shuffle} from './shuffle/Shuffle';
 import classNames from 'classnames';
+import {useLocalStorage} from '../../utils/localStorage';
 import {useStyles} from './actionsControllerStyles';
 
 export const ActionsController = memo(({
   indexes,
   setIndexes,
+  setPicked,
   editableId,
   getRenderSize,
 }) => {
   const classes = useStyles();
   const [isHovered, setIsHovered] = useState(false);
-  const [activeAction, setActiveAction] = useState(null);
+  const [activeAction, setActiveAction] = useLocalStorage('activeAction');
 
   const actions = useMemo(() => ({
     generate: <Generate
@@ -27,6 +29,7 @@ export const ActionsController = memo(({
     shuffle: <Shuffle
       indexes={indexes}
       setIndexes={setIndexes}
+      setPicked={setPicked}
       editableId={editableId}
       onStart={() => setActiveAction('shuffle')}
       onStop={() => setActiveAction(null)}

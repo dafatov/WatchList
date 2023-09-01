@@ -30,7 +30,8 @@ public class Web_ru extends ListResourceBundle {
                             pair("enum", wrap(
                                 pair(WatchStatusEnum.COMPLETED.name(), "Просмотрено"),
                                 pair(WatchStatusEnum.WATCHING.name(), "Смотрю"),
-                                pair(WatchStatusEnum.PLANNING.name(), "Запланировано")
+                                pair(WatchStatusEnum.PLANNING.name(), "Запланировано"),
+                                pair(WatchStatusEnum.CANDIDATE.name(), "Кандидат")
                             ))
                         )),
                         pair("multipleViews", wrap(

@@ -34,6 +34,7 @@ export const Animes = memo(() => {
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
+  const [picked, setPicked] = useLocalStorage('newWatchingList');
   const [filterList, setFilterList] = useState(['PLANNING']);
   const [info, setInfo] = useState(null);
   const [editableId, setEditableId] = useState(null);
@@ -88,7 +89,7 @@ export const Animes = memo(() => {
         setAnimes(data);
         setIsPendingAnimes(false);
       }).catch(() => showError(t('web:page.animes.error')));
-  }, [setAnimes, setIsPendingAnimes]);
+  }, [setAnimes, setIsPendingAnimes, picked]);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/dictionaries?' + new URLSearchParams({
@@ -107,7 +108,7 @@ export const Animes = memo(() => {
         ? 'PLANNING'
         : 'WATCHING',
     ]);
-  }, [indexes]);
+  }, [indexes, picked]);
 
   const handleGetInfo = useCallback(() => {
     if (info) {
@@ -304,6 +305,7 @@ export const Animes = memo(() => {
               editable={isEditable(id)}
               name={name}
               url={url}
+              isNew={(picked ?? []).includes(id)}
               formik={formik}
               onClick={() => handleOpenUrl(id)}
               onCopyName={() => handleCopyName(id)}
@@ -470,6 +472,7 @@ export const Animes = memo(() => {
           <ActionsController
             indexes={indexes}
             setIndexes={setIndexes}
+            setPicked={setPicked}
             editableId={editableId}
             getRenderSize={getRenderSize}
           />
