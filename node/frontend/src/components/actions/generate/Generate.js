@@ -1,16 +1,18 @@
 import {BrowserUpdatedOutlined, CancelPresentationOutlined, ResetTvOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
-import {FileProgressTooltip} from '../fileProgressTooltip/FileProgressTooltip';
-import {IconButton} from '../iconButton/IconButton';
-import {LoadingIconButton} from '../loadingIconButton/LoadingIconButton';
+import {FileProgressTooltip} from '../../fileProgressTooltip/FileProgressTooltip';
+import {IconButton} from '../../iconButton/IconButton';
+import {LoadingIconButton} from '../../loadingIconButton/LoadingIconButton';
 import {IconButton as MuiIconButton} from '@mui/material';
-import {throwHttpError} from '../../utils/reponse';
-import {useInterval} from '../../utils/useInterval';
-import {useSnackBar} from '../../utils/snackBar';
+import {throwHttpError} from '../../../utils/reponse';
+import {useInterval} from '../../../utils/useInterval';
+import {useSnackBar} from '../../../utils/snackBar';
 import {useTranslation} from 'react-i18next';
 
 export const Generate = memo(({
   disabled,
+  onStart,
+  onStop,
   getRenderSize,
 }) => {
   const {t} = useTranslation();
@@ -31,16 +33,19 @@ export const Generate = memo(({
       case 'COMPLETED':
         setDelay(null);
         setLocalDisabled(false);
+        onStart?.();
         return;
       case 'INTERRUPTED':
         setDelay(null);
         setLocalDisabled(false);
+        onStart?.();
         return;
       case 'RUNNING':
         setLocalDisabled(false);
+        onStart?.();
         break;
     }
-  }, [progress.status, setDelay, setLocalDisabled]);
+  }, [progress.status, setDelay, setLocalDisabled, onStart]);
 
   const title = useMemo(() => {
     switch (progress.status) {
@@ -87,8 +92,9 @@ export const Generate = memo(({
       .then(throwHttpError)
       .then(() => {
         updateProgress();
+        onStop?.();
       }).catch(() => showError(t('web:page.animes.generate.progress.error')));
-  }, [updateProgress, showError]);
+  }, [updateProgress, showError, onStop]);
 
   const handleStop = useCallback(() => {
     fetch('http://localhost:8080/api/files/stop', {method: 'POST'})

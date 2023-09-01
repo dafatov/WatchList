@@ -1,11 +1,11 @@
-import {ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
-import {memo, useCallback} from 'react';
-import {Generate} from '../generate/Generate';
-import {IconButton} from '../iconButton/IconButton';
+import {memo, useMemo, useState} from 'react';
+import {Generate} from './generate/Generate';
+import {MenuOutlined} from '@mui/icons-material';
+import {IconButton as MuiIconButton} from '@mui/material';
 import {SettingsController} from '../settings/SettingsController';
-import {throwHttpError} from '../../utils/reponse';
-import {useSnackBar} from '../../utils/snackBar';
-import {useTranslation} from 'react-i18next';
+import {Shuffle} from './shuffle/Shuffle';
+import classNames from 'classnames';
+import {useStyles} from './actionsControllerStyles';
 
 export const ActionsController = memo(({
   indexes,
@@ -13,45 +13,44 @@ export const ActionsController = memo(({
   editableId,
   getRenderSize,
 }) => {
-  const {t} = useTranslation();
-  const {showError} = useSnackBar();
+  const classes = useStyles();
+  const [isHovered, setIsHovered] = useState(false);
+  const [activeAction, setActiveAction] = useState(null);
 
-  const handleShuffleAnimes = useCallback(() => {
-    fetch('http://localhost:8080/api/animes/shuffle')
-      .then(throwHttpError)
-      .then(response => response.json())
-      .then(data => {
-        setIndexes(data);
-      }).catch(() => showError(t('web:page.animes.shuffle.error')));
-  }, [setIndexes]);
-
-  const handleUnshuffleAnimes = useCallback(() => {
-    setIndexes(null);
-  }, [setIndexes]);
+  const actions = useMemo(() => ({
+    generate: <Generate
+      disabled={!!indexes}
+      onStart={() => setActiveAction('generate')}
+      onStop={() => setActiveAction(null)}
+      getRenderSize={getRenderSize}
+    />,
+    shuffle: <Shuffle
+      indexes={indexes}
+      setIndexes={setIndexes}
+      editableId={editableId}
+      onStart={() => setActiveAction('shuffle')}
+      onStop={() => setActiveAction(null)}
+    />,
+  }), [indexes, setActiveAction, getRenderSize, setIndexes, editableId]);
 
   return (
-    <>
-      {indexes
-        ? <IconButton
-          title={t('common:action.shuffle.off')}
-          disabled={!!editableId}
-          onClick={() => handleUnshuffleAnimes()}
+    <div className={classes.root}>
+      {activeAction
+        ? <>{actions[activeAction]}</>
+        : <div
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className={classNames({[classes.dialRoot]: isHovered})}
         >
-          <ShuffleOnOutlined/>
-        </IconButton>
-        : <IconButton
-          title={t('common:action.shuffle.on')}
-          disabled={!!editableId}
-          onClick={() => handleShuffleAnimes()}
-        >
-          <ShuffleOutlined/>
-        </IconButton>}
-      <Generate
-        disabled={!!indexes}
-        getRenderSize={getRenderSize}
-      />
+          <MuiIconButton color="primary">
+            <MenuOutlined/>
+          </MuiIconButton>
+          <div className={classNames(classes.dialActions, {[classes.dialActionsHovered]: isHovered})}>
+            {Object.values(actions).sort()}
+          </div>
+        </div>}
       <SettingsController/>
-    </>
+    </div>
   );
 });
 
