@@ -108,6 +108,19 @@ public class AnimeController {
         }
     }
 
+    @PostMapping("/pick")
+    public ResponseEntity<?> pickCandidates() {
+        try {
+            List<UUID> pickedAnimeList = animeService.pickCandidates();
+
+            log.info("pickCandidates: {}", pickedAnimeList);
+            return ResponseEntity.ok(pickedAnimeList);
+        } catch (Exception e) {
+            log.error("Can't pick candidates:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/info")
     public InfoRsDto getInfo() {
         InfoRsDto info = animeService.getInfo();

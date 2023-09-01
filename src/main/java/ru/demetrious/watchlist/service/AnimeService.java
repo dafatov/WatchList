@@ -16,10 +16,12 @@ import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.InfoRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.repository.AnimeRepository;
-import ru.demetrious.watchlist.utils.AnimeUtils;
 
 import static java.lang.Math.max;
-import static java.lang.Math.toIntExact;
+import static org.apache.commons.lang3.ArrayUtils.contains;
+import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.CANDIDATE;
+import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.PLANNING;
+import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.WATCHING;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getPath;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getURI;
 
@@ -77,9 +79,7 @@ public class AnimeService {
     }
 
     public Map<UUID, Integer> getShuffleIndexes() {
-        List<Anime> animeList = animeRepository.findAll().stream()
-            .filter(AnimeUtils::isPlanning)
-            .toList();
+        List<Anime> animeList = animeRepository.findAllByStatus(PLANNING);
 
         if (animeList.size() < 2) {
             throw new IllegalStateException("No at least 2 anime in status isPlanning");
@@ -95,15 +95,30 @@ public class AnimeService {
     }
 
     public InfoRsDto getInfo() {
-        List<Anime> animeList = animeRepository.findAll();
-        int count = toIntExact(animeList.stream()
-            .filter(AnimeUtils::isWatching)
-            .count());
+        int count = animeRepository.countByStatus(WATCHING);
+        int candidatesNow = animeRepository.countByStatus(CANDIDATE);
         int remained = max(0, MAX_WATCHING - count);
 
         return new InfoRsDto()
             .setCount(count)
             .setRemained(remained)
-            .setCandidates(CANDIDATES_COUNT[remained]);
+            .setCandidates(CANDIDATES_COUNT[remained] - candidatesNow);
+    }
+
+    public List<UUID> pickCandidates() {
+        InfoRsDto info = getInfo();
+
+        if (info.getCandidates() != 0) {
+            throw new IllegalStateException("Must be a " + info.getCandidates() + " more candidates");
+        }
+
+        List<Anime> animeList = animeRepository.findAllByStatus(CANDIDATE);
+        int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(info.getRemained(), 0, animeList.size() - 1);
+
+        return animeList.stream()
+            .peek(anime -> anime.setStatus(contains(nonDuplicatedIntegers, animeList.indexOf(anime)) ? WATCHING : PLANNING))
+            .filter(anime -> contains(nonDuplicatedIntegers, animeList.indexOf(anime)))
+            .map(Anime::getId)
+            .toList();
     }
 }

@@ -1,6 +1,6 @@
-import {Button, Divider, TextField} from '@mui/material';
+import {Badge, Button, Divider, TextField} from '@mui/material';
+import {ContentCopyOutlined, FiberNewOutlined} from '@mui/icons-material';
 import {useCallback, useEffect, useState} from 'react';
-import {ContentCopyOutlined} from '@mui/icons-material';
 import {IconButton} from '../iconButton/IconButton';
 import {Tooltip} from '../tooltip/Tooltip';
 import {useStyles} from './urlLinkStyles';
@@ -10,6 +10,7 @@ export const UrlLink = (({
   editable,
   name: nameProp,
   url: urlProp,
+  isNew,
   formik,
   onClick,
   onCopyName,
@@ -70,15 +71,24 @@ export const UrlLink = (({
           className={classes.container}
         >
           <Tooltip title={url}>
-            <Button
-              variant="text"
-              color="primary"
-              disabled={!url}
-              onClick={onClick}
-              className={classes.button}
+            <Badge
+              badgeContent={<FiberNewOutlined color="success"/>}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              invisible={!isNew}
             >
-              {name}
-            </Button>
+              <Button
+                variant="text"
+                color="primary"
+                disabled={!url}
+                onClick={onClick}
+                className={classes.button}
+              >
+                {name}
+              </Button>
+            </Badge>
           </Tooltip>
           {isHovered
             ? <>
