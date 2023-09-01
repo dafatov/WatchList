@@ -37,3 +37,6 @@ build/
 
 ### Electron ###
 /electron.exe
+
+### Database ###
+/.db

@@ -25,7 +25,7 @@ public class FileController {
             log.info("generate");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Can't generate: {}", String.valueOf(e));
+            log.error("Can't generate:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
@@ -37,7 +37,7 @@ public class FileController {
 
             return ResponseEntity.ok(progress);
         } catch (Exception e) {
-            log.error("Can't get progress: {}", String.valueOf(e));
+            log.error("Can't get progress:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
@@ -50,7 +50,7 @@ public class FileController {
             log.info("reset");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Can't reset: {}", String.valueOf(e));
+            log.error("Can't reset:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
@@ -63,7 +63,7 @@ public class FileController {
         log.info("stop");
         return ResponseEntity.ok().build();
     } catch (Exception e) {
-        log.error("Can't stop: {}", String.valueOf(e));
+        log.error("Can't stop:", e);
         return ResponseEntity.internalServerError().body(e.getMessage());
     }
     }

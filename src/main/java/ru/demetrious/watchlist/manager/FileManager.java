@@ -18,12 +18,12 @@ import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
 import static java.lang.Math.ceilDivExact;
 import static java.lang.Math.floorDivExact;
 import static java.lang.Math.toIntExact;
-import static java.lang.System.*;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.collate;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
-import static org.apache.commons.lang3.tuple.Pair.*;
+import static org.apache.commons.lang3.tuple.Pair.of;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.COMPLETED;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.IDLE;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.INTERRUPTED;
@@ -49,11 +49,11 @@ public final class FileManager {
     private Pair<Long, Long> previousCurrentSize = of(0L, 0L);
 
     public void copyDirectories(List<Path> sources, Path target) throws IllegalStateException {
-        checkIsRunnable(sources);
-
-        allSize.set(sources.stream().reduce(0L, (accumulator, source) -> accumulator + sizeOfDirectory(source.toFile()), Long::sum));
-        isRunning.compareAndSet(false, true);
         try {
+            checkIsRunnable(sources);
+
+            allSize.set(sources.stream().reduce(0L, (accumulator, source) -> accumulator + sizeOfDirectory(source.toFile()), Long::sum));
+            isRunning.compareAndSet(false, true);
             for (Path source : sources) {
                 if (isInterrupted.get()) {
                     break;
@@ -67,7 +67,7 @@ public final class FileManager {
                     completedFile -> completedFileSet.updateAndGet(accumulator -> collate(accumulator, List.of(completedFile.toPath())))
                 );
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             isInterrupted.set(true);
             throw new IllegalStateException(e);
         } finally {
@@ -81,7 +81,7 @@ public final class FileManager {
     public void deleteDirectories(List<Path> targetList) throws IllegalStateException {
         try {
             for (Path target : targetList) {
-                deleteDirectory(target.toFile());
+                forceDelete(target.toFile());
             }
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -113,6 +113,7 @@ public final class FileManager {
             current - previousCurrentSize.getLeft(),
             ceilDivExact(currentTimeMillis - previousCurrentSize.getRight(), 1000)
         );
+        int percent = getPercent(current, all);
         List<Path> pathList = completedFileSet.get();
         Optional<Path> commonPath = normalizePaths(pathList);
 
@@ -122,7 +123,7 @@ public final class FileManager {
             .setAllSize(all)
             .setCurrentSize(current)
             .setSpeed(speed)
-            .setPercent(toIntExact(ceilDivExact(100 * current, all)))
+            .setPercent(percent)
             .setCommonPath(commonPath
                 .map(Path::toString)
                 .orElse(null))
@@ -151,7 +152,11 @@ public final class FileManager {
         isInterrupted.compareAndSet(false, true);
     }
 
-    public void checkIsRunnable(List<Path> pathList) {
+    // ===================================================================================================================
+    // = Implementation
+    // ===================================================================================================================
+
+    private void checkIsRunnable(List<Path> pathList) {
         if (isNotRunnable()) {
             throw new IllegalStateException(FILE_MANAGER_IS_ALREADY_RUNNING);
         }
@@ -160,10 +165,6 @@ public final class FileManager {
             throw new IllegalStateException(NO_PATHS_TO_OPERATE);
         }
     }
-
-    // ===================================================================================================================
-    // = Implementation
-    // ===================================================================================================================
 
     private boolean isNotRunnable() {
         return isRunning.get() || isCompleted.get() || isInterrupted.get();
@@ -187,5 +188,13 @@ public final class FileManager {
 
     private String mapPath(Path path, Optional<Path> commonPath) {
         return "\\".concat(commonPath.orElseThrow().relativize(path).toString());
+    }
+
+    private int getPercent(long current, long all) {
+        if (all == 0) {
+            return 0;
+        }
+
+        return toIntExact(ceilDivExact(100 * current, all));
     }
 }

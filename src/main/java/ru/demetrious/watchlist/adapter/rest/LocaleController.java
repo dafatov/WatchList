@@ -35,7 +35,7 @@ public class LocaleController {
         @PathVariable String ns,
         @RequestBody Map<String, String> pairs
     ) {
-        log.error("POST: lng={}, ns={}, pairs: {}", lng, ns, pairs.keySet());
+        log.warn("POST: lng={}, ns={}, pairs: {}", lng, ns, pairs.keySet());
         return ResponseEntity.ok().build();
     }
 }
