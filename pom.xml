@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.demetrious.watchlist</groupId>
     <artifactId>WatchList</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>WatchList</name>
     <description>Application for anime list manipulation</description>
 

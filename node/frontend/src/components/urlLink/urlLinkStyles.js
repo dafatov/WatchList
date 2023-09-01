@@ -6,7 +6,9 @@ export const useStyles = makeStyles(theme => ({
     flexDirection: 'row',
   },
   url: {
-    marginTop: theme.spacing(),
+    '&.MuiTextField-root': {
+      marginTop: theme.spacing(),
+    }
   },
   editableContainer: {
     display: 'flex',

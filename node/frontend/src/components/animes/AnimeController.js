@@ -2,6 +2,7 @@ import {CancelOutlined, DeleteOutline, EditOutlined, Save} from '@mui/icons-mate
 import {memo, useCallback, useState} from 'react';
 import {ConfirmDeleteAnimeModal} from './confirmDeleteAnimeModal/ConfirmDeleteAnimeModal';
 import {IconButton} from '../iconButton/IconButton';
+import classNames from 'classnames';
 import {useStyles} from './animeControllerStyles';
 import {useTranslation} from 'react-i18next';
 
@@ -24,7 +25,7 @@ export const AnimeController = memo(({
   return (
     <>
       {editable
-        ? <div className={classes.container}>
+        ? <div className={classNames(classes.container, classes.containerEditable)}>
           <IconButton
             title={t('common:action.save')}
             onClick={onSave}
