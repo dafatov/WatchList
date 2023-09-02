@@ -46,7 +46,8 @@ public class Web_ru extends ListResourceBundle {
                                 pair(AnimeSupplementEnum.LAGS.name(), "Лагало"),
                                 pair(AnimeSupplementEnum.NO_SUBS.name(), "Нет сабов"),
                                 pair(AnimeSupplementEnum.NOT_FULL.name(), "Не полный"),
-                                pair(AnimeSupplementEnum.HAS_VOICE.name(), "Есть озвучка")
+                                pair(AnimeSupplementEnum.HAS_VOICE.name(), "Есть озвучка"),
+                                pair(AnimeSupplementEnum.COMPLETED.name(), "Просмотрено")
                             ))
                         )),
                         pair("path", wrap(

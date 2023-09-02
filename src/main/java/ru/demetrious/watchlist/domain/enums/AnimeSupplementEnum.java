@@ -4,5 +4,6 @@ public enum AnimeSupplementEnum {
     NOT_FULL,
     NO_SUBS,
     LAGS,
-    HAS_VOICE
+    HAS_VOICE,
+    COMPLETED
 }
