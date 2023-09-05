@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.demetrious.watchlist</groupId>
     <artifactId>WatchList</artifactId>
-    <version>0.2.0</version>
+    <version>1.0.0</version>
     <name>WatchList</name>
     <description>Application for anime list manipulation</description>
 
@@ -42,10 +42,9 @@
             <version>3.1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>3.1.0</version>
-            <scope>test</scope>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.16.0</version>
         </dependency>
 
         <dependency>

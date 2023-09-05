@@ -7,6 +7,7 @@ export const Select = memo(({
   formik,
   name,
   options,
+  onBlur,
   onRender,
 }) => {
   const [value, setValue] = useState(valueProp);
@@ -20,6 +21,11 @@ export const Select = memo(({
     formik.handleChange(event);
   }, [setValue, formik.handleChange]);
 
+  const handleBlur = useCallback(event => {
+    formik.handleBlur(event);
+    onBlur?.();
+  }, [formik.handleBlur, onBlur]);
+
   const error = useMemo(() => {
     return formik.touched[name] && formik.errors[name];
   }, [formik.touched[name], formik.errors[name]]);
@@ -32,7 +38,7 @@ export const Select = memo(({
           select
           value={value}
           onChange={handleChange}
-          onBlur={formik.handleBlur}
+          onBlur={handleBlur}
           error={!!error}
           label={error}
         >

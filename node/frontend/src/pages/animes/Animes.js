@@ -130,6 +130,13 @@ export const Animes = memo(() => {
     })));
   }, [formik.values.episodes, formik.setFieldValue, formik.values.supplements]);
 
+  const handleStatusBlur = useCallback(() => {
+    if (formik.values.status !== 'WATCHING') {
+      formik.setFieldValue('supplements', formik.values.supplements
+        .filter(supplement => supplement.name !== 'COMPLETED'));
+    }
+  }, [formik.setFieldValue, formik.values.supplements, formik.values.status]);
+
   const prepareSaveEditable = useCallback(anime => ({
     ...anime,
     id: anime.isPattern
@@ -370,6 +377,7 @@ export const Animes = memo(() => {
               editable={isEditable(id)}
               value={status}
               formik={formik}
+              onBlur={handleStatusBlur}
               options={dictionaries?.statuses}
               onRender={getRenderStatus}
             />
