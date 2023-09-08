@@ -7,3 +7,6 @@
 
 ### Production ###
 /target
+
+### Database ###
+/.db

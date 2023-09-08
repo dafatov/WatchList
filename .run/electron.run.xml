@@ -1,12 +1,14 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="electron" type="js.build_tools.npm">
-    <package-json value="$PROJECT_DIR$/node/electron/package.json" />
+    <package-json value="$PROJECT_DIR$/electron/package.json" />
     <command value="run" />
     <scripts>
       <script value="start" />
     </scripts>
     <node-interpreter value="project" />
-    <envs />
+    <envs>
+      <env name="PROFILE" value="local" />
+    </envs>
     <method v="2" />
   </configuration>
 </component>

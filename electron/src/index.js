@@ -26,9 +26,9 @@ const initApp = () => {
   app.setPath('sessionData', path.join(app.getPath('exe'), '../sessionData'));
 
   app.on('ready', () => {
-    startLoading().then(() => autoUpdate())
-      .then(() => exec('java -jar ./server/server.jar')
-        .stdout.on('data', data => log.info(data)))
+    startLoading().then(() => doIfNotLocal(() => autoUpdate()))
+      .then(() => doIfNotLocal(() => exec('java -jar ./server/server.jar')
+        .stdout.on('data', data => log.info(data))))
       .then(() => startBrowser());
   });
 
@@ -119,9 +119,18 @@ const startBrowser = () => {
 
       mainWindow.on('closed', app.quit);
 
-      return mainWindow.loadURL(url);
+      return doIfNotLocal(() => url, 'http://localhost:3000')
+        .then(url => mainWindow.loadURL(url));
     })
     .then(() => setInterval(() => fetch(`${url}/health`)
       .catch(() => app.quit()), 250))
     .catch(() => setTimeout(() => startBrowser(), 250));
+};
+
+const doIfNotLocal = (callback, localValue) => {
+  if (process.env.PROFILE === 'local') {
+    return Promise.resolve(localValue);
+  }
+
+  return callback();
 };
