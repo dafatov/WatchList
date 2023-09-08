@@ -82,7 +82,7 @@ const startLoading = () => {
     width: 900,
     height: 576,
     webPreferences: {
-      preload: path.join(__dirname, 'preload/loading.js'),
+      preload: path.join(__dirname, './preload/loading.js'),
     },
   });
 
@@ -101,7 +101,7 @@ const startBrowser = () => {
         autoHideMenuBar: true,
         webPreferences: {
           nodeIntegration: true,
-          preload: path.join(__dirname, 'preload/main.js'),
+          preload: path.join(__dirname, './preload/main.js'),
         },
       });
 

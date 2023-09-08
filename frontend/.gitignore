@@ -1,9 +1,6 @@
-### Idea ###
-/.idea
-*.iml
-
 ### Node ###
+/node_modules
 /node
 
 ### Production ###
-/target
+/build
