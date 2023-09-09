@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="electron" type="js.build_tools.npm">
+  <configuration default="false" name="Electron" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/electron/package.json" />
     <command value="run" />
     <scripts>

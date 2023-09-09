@@ -8,7 +8,7 @@
     <parent>
         <groupId>ru.demetrious.watch-list</groupId>
         <artifactId>WatchList</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
     </parent>
 
     <build>

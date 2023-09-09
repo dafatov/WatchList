@@ -1,6 +1,6 @@
 {
   "name": "ru.demetrious.watch-list.electron",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A local browser to only one url",
   "type": "commonjs",
   "private": true,
@@ -69,14 +69,15 @@
     "url": "git+https://github.com/dafatov/WatchList.git"
   },
   "devDependencies": {
-    "electron": "25.3.2",
-    "electron-builder": "24.6.3"
+    "electron": "26.2.0",
+    "electron-builder": "24.6.4"
   },
   "engines": {
     "node": "16.13.0"
   },
   "dependencies": {
     "electron-log": "4.4.8",
-    "electron-updater": "6.1.1"
+    "electron-updater": "6.1.1",
+    "ru.demetrious.watch-list": "file:.."
   }
 }
