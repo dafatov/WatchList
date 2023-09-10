@@ -35,7 +35,7 @@ export const Animes = memo(() => {
   const [dictionaries, setDictionaries] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
   const [picked, setPicked] = useLocalStorage('newWatchingList');
-  const [filterList, setFilterList] = useState(['PLANNING']);
+  const [filterList, setFilterList] = useState(['PLANNING', 'CANDIDATE']);
   const [info, setInfo] = useState(null);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
@@ -103,11 +103,11 @@ export const Animes = memo(() => {
   }, [setDictionaries, setIsPendingDictionaries]);
 
   useEffect(() => {
-    setFilterList([
+    setFilterList(
       indexes
-        ? 'PLANNING'
-        : 'WATCHING',
-    ]);
+        ? ['PLANNING', 'CANDIDATE']
+        : ['WATCHING']
+    );
   }, [indexes, picked]);
 
   const handleGetInfo = useCallback(() => {
@@ -359,7 +359,7 @@ export const Animes = memo(() => {
       options: {
         sort: false,
         searchable: false,
-        filter: !indexes,
+        filterType: 'multiselect',
         filterList,
         filterOptions: {
           names: dictionaries?.statuses,
