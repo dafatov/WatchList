@@ -1,9 +1,10 @@
 {
   "name": "ru.demetrious.watch-list.electron",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A local browser to only one url",
   "type": "commonjs",
   "private": true,
+  "main": "./src/index.js",
   "build": {
     "appId": "ru.demetrious.watch-list.electron",
     "artifactName": "${productName}-${version}.${ext}",
@@ -11,27 +12,6 @@
     "win": {
       "target": "nsis-web",
       "icon": "../resources/icons/watch-list.png",
-      "files": [
-        "**/*",
-        "!**/src",
-        "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
-        "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
-        "!**/node_modules/*.d.ts",
-        "!**/node_modules/.bin",
-        "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
-        "!.editorconfig",
-        "!**/._*",
-        "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
-        "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
-        "!**/{appveyor.yml,.travis.yml,circle.yml}",
-        "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
-        "!**/pom.xml",
-        "!**/*.env",
-        {
-          "from": "./src",
-          "to": "."
-        }
-      ],
       "extraFiles": [
         {
           "from": "../backend/target/backend-spring-boot.jar",

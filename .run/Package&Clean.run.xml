@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Publish&amp;Clean" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="Package&amp;Clean" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -23,7 +23,7 @@
       </option>
     </MavenSettings>
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Publish" run_configuration_type="MavenRunConfiguration" />
+      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="package" />
     </method>
   </configuration>
 </component>

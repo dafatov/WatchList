@@ -24,7 +24,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>npm install</id>
+                        <id>npm-install</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -34,7 +34,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm package</id>
+                        <id>npm-package</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>

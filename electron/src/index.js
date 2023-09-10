@@ -26,10 +26,11 @@ const initApp = () => {
   app.setPath('sessionData', path.join(app.getPath('exe'), '../sessionData'));
 
   app.on('ready', () => {
-    startLoading().then(() => doIfNotLocal(() => autoUpdate()))
-      .then(() => doIfNotLocal(() => exec('java -jar ./server/server.jar')
-        .stdout.on('data', data => log.info(data))))
-      .then(() => startBrowser());
+    startLoading().then(() => doIfNotLocal(() => autoUpdate(), Promise.resolve()))
+      .then(() => doIfNotLocal(() => Promise.resolve(exec('java -jar ./server/server.jar')
+        .stdout.on('data', data => log.info(data))), Promise.resolve()))
+      .then(() => startBrowser())
+      .catch(error => log.error(error));
   });
 
   app.on('window-all-closed', app.quit);
@@ -82,11 +83,11 @@ const startLoading = () => {
     width: 900,
     height: 576,
     webPreferences: {
-      preload: path.join(__dirname, './preload/loading.js'),
+      preload: path.join(__dirname, `${getRoot()}/preload/loading.js`),
     },
   });
 
-  return loadingWindow.loadFile('./loading/loading.html');
+  return loadingWindow.loadFile(`${getRoot()}/loading/loading.html`);
 };
 
 const startBrowser = () => {
@@ -101,7 +102,7 @@ const startBrowser = () => {
         autoHideMenuBar: true,
         webPreferences: {
           nodeIntegration: true,
-          preload: path.join(__dirname, './preload/main.js'),
+          preload: path.join(__dirname, `${getRoot()}/preload/main.js`),
         },
       });
 
@@ -119,7 +120,7 @@ const startBrowser = () => {
 
       mainWindow.on('closed', app.quit);
 
-      return doIfNotLocal(() => url, 'http://localhost:3000')
+      return doIfNotLocal(() => Promise.resolve(url), Promise.resolve('http://localhost:3000'))
         .then(url => mainWindow.loadURL(url));
     })
     .then(() => setInterval(() => fetch(`${url}/health`)
@@ -129,8 +130,10 @@ const startBrowser = () => {
 
 const doIfNotLocal = (callback, localValue) => {
   if (process.env.PROFILE === 'local') {
-    return Promise.resolve(localValue);
+    return localValue;
   }
 
   return callback();
 };
+
+const getRoot = () => doIfNotLocal(() => './src', '.');
