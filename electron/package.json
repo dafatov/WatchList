@@ -1,25 +1,26 @@
 {
   "name": "ru.demetrious.watch-list.electron",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "A local browser to only one url",
   "type": "commonjs",
   "private": true,
+  "main": "./src/index.js",
   "build": {
     "appId": "ru.demetrious.watch-list.electron",
     "artifactName": "${productName}-${version}.${ext}",
     "productName": "WatchList",
     "win": {
       "target": "nsis-web",
-      "icon": "../../resources/icons/watch-list.png",
+      "icon": "../resources/icons/watch-list.png",
       "extraFiles": [
         {
-          "from": "../../target/WatchList-spring-boot.jar",
+          "from": "../backend/target/backend-spring-boot.jar",
           "to": "./server/server.jar"
         }
       ],
       "extraResources": [
         {
-          "from": "../../resources/icons/watch-list.png",
+          "from": "../resources/icons/watch-list.png",
           "to": "./icons/watch-list.png"
         }
       ],
@@ -38,7 +39,7 @@
     }
   },
   "scripts": {
-    "start": "electron .",
+    "start": "electron ./src",
     "package": "electron-builder --publish always"
   },
   "author": "DemetriouS",
@@ -48,8 +49,9 @@
     "url": "git+https://github.com/dafatov/WatchList.git"
   },
   "devDependencies": {
-    "electron": "25.3.2",
-    "electron-builder": "24.6.3"
+    "electron": "26.2.0",
+    "electron-builder": "24.6.4",
+    "ru.demetrious.watch-list": "file:.."
   },
   "engines": {
     "node": "16.13.0"

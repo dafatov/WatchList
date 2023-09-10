@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="WatchListApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local" />
-    <module name="WatchList" />
+    <module name="backend" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ru.demetrious.watchlist.WatchListApplication" />
     <method v="2">
       <option name="Make" enabled="true" />

@@ -1,28 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ru.demetrious.watchlist</groupId>
+    <groupId>ru.demetrious.watch-list</groupId>
     <artifactId>WatchList</artifactId>
-    <version>1.0.0</version>
-    <name>WatchList</name>
-    <description>Application for anime list manipulation</description>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.4</version>
-        <relativePath/>
-    </parent>
-
-    <properties>
-        <java.version>20</java.version>
-        <node.version>v16.13.0</node.version>
-        <node.url>https://nodejs.org/dist/</node.url>
-        <npm.version>v1.4.9</npm.version>
-        <npm.registry.url>https://registry.npmjs.org/</npm.registry.url>
-        <start-class>ru.demetrious.watchlist.WatchListApplication</start-class>
-    </properties>
+    <modules>
+        <module>frontend</module>
+        <module>backend</module>
+        <module>electron</module>
+    </modules>
 
     <profiles>
         <profile>
@@ -30,140 +20,19 @@
         </profile>
     </profiles>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>9.16.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.1.214</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.2.7.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.owenfeehan.pathpatternfinder</groupId>
-            <artifactId>path-pattern-finder</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.manoelcampos</groupId>
-            <artifactId>random-org-client</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-    </dependencies>
+    <properties>
+        <revision>1.1.2</revision>
+        <java.version>20</java.version>
+        <node.version>v16.13.0</node.version>
+        <node.url>https://nodejs.org/dist/</node.url>
+        <npm.version>v1.4.9</npm.version>
+        <npm.registry.url>https://registry.npmjs.org/</npm.registry.url>
+    </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <exec executable="cmd">
-                                    <arg value="/c"/>
-                                    <arg line="mklink /D ${project.basedir}\node\electron\node ${project.basedir}\node\node"/>
-                                </exec>
-                                <exec executable="cmd">
-                                    <arg value="/c"/>
-                                    <arg line="mklink /D ${project.basedir}\node\frontend\node ${project.basedir}\node\node"/>
-                                </exec>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources frontend</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/classes/static</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>node/frontend/build</directory>
-                                </resource>
-                                <resource>
-                                    <directory>resources/icons</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>spring-boot</classifier>
-                            <mainClass>ru.demetrious.watchlist.WatchListApplication</mainClass>
-                            <finalName>${project.name}</finalName>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
+                <inherited>false</inherited>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>1.13.4</version>
@@ -178,89 +47,80 @@
                         <goals>
                             <goal>install-node-and-npm</goal>
                         </goals>
-                        <phase>generate-sources</phase>
+                        <phase>initialize</phase>
                     </execution>
                     <execution>
                         <id>set-npm-registry</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>generate-sources</phase>
+                        <phase>initialize</phase>
                         <configuration>
                             <arguments>config set registry=${npm.registry.url}</arguments>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <inherited>false</inherited>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
                     <execution>
-                        <id>npm install frontend</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install</arguments>
-                            <workingDirectory>node/frontend</workingDirectory>
+                            <target>
+                                <exec executable="cmd">
+                                    <arg value="/c"/>
+                                    <arg line="mklink /D ${project.basedir}\electron\node ${project.basedir}\node\node"/>
+                                </exec>
+                                <exec executable="cmd">
+                                    <arg value="/c"/>
+                                    <arg line="mklink /D ${project.basedir}\frontend\node ${project.basedir}\node\node"/>
+                                </exec>
+                            </target>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm build frontend</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>run</goal>
                         </goals>
-                        <phase>compile</phase>
-                        <configuration>
-                            <arguments>run build</arguments>
-                            <workingDirectory>node/frontend</workingDirectory>
-                        </configuration>
                     </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <inherited>false</inherited>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
                     <execution>
-                        <id>npm install electron</id>
+                        <id>copy-resources</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>copy-resources</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install</arguments>
-                            <workingDirectory>node/electron</workingDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm package electron</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <arguments>run package</arguments>
-                            <workingDirectory>node/electron</workingDirectory>
+                            <outputDirectory>backend/target/classes/static</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>resources/icons</directory>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
+                <inherited>false</inherited>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>node/frontend/build</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>node/frontend/node</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>node/electron/dist</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>node/electron/node</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>node/node</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>${project.basedir}</directory>
-                            <includes>
-                                <include>electron.exe</include>
-                            </includes>
+                            <directory>node</directory>
                         </fileset>
                     </filesets>
                 </configuration>

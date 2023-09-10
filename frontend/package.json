@@ -1,6 +1,6 @@
 {
-  "name": "ru.demetrious.watch-list.app",
-  "version": "1.0.0",
+  "name": "ru.demetrious.watch-list.frontend",
+  "version": "1.1.2",
   "description": "A web application",
   "private": true,
   "scripts": {
@@ -49,7 +49,8 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-no-loops": "^0.3.0",
     "eslint-plugin-react": "^7.31.10",
-    "eslint-plugin-sort-imports-requires": "^1.0.2"
+    "eslint-plugin-sort-imports-requires": "^1.0.2",
+    "ru.demetrious.watch-list": "file:.."
   },
   "eslintConfig": {
     "extends": [
