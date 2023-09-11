@@ -15,7 +15,7 @@ export const useStyles = makeStyles(theme => ({
   },
   dialActionsHovered: {
     backgroundColor: theme.palette.secondary.main,
-    position: 'fixed',
+    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
     zIndex: 100,
