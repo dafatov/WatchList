@@ -1,6 +1,15 @@
 import {createTheme} from '@mui/material/styles';
 
 export const theme = createTheme({
+  components: {
+    MUIDataTable: {
+      styleOverrides: {
+        responsiveBase: {
+          overflow: 'visible',
+        },
+      },
+    },
+  },
   palette: {
     mode: 'dark',
     primary: {

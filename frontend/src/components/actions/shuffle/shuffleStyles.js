@@ -9,7 +9,7 @@ export const useStyles = makeStyles(theme => ({
   },
   dialActionsHoveredBottom: {
     backgroundColor: theme.palette.secondary.main,
-    position: 'fixed',
+    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
     zIndex: 100,
@@ -18,7 +18,7 @@ export const useStyles = makeStyles(theme => ({
   },
   dialActionsHoveredTop: {
     backgroundColor: theme.palette.secondary.main,
-    position: 'fixed',
+    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
     zIndex: 100,
