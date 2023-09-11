@@ -15,6 +15,9 @@ export const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
   },
   button: {
-    textAlign: 'justify',
+    '&.MuiButton-root': {
+      minWidth: 0,
+      textAlign: 'justify',
+    },
   },
 }));
