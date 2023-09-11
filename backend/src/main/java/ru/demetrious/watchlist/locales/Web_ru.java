@@ -67,6 +67,9 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("supplementEpisodesModal", wrap(
                             pair("title", "Выбрать эпизоды")
+                        )),
+                        pair("editSettingsModal", wrap(
+                            pair("title", "Изменить настройки")
                         ))
                     )),
                     pair("snackBar", wrap(

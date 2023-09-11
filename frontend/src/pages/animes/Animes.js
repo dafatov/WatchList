@@ -173,7 +173,7 @@ export const Animes = memo(() => {
         setEditableId(null);
         setInfo(null);
         formik.resetForm();
-        showSuccess(t('web:page.animes.snackBar.table.save.success'));
+        showSuccess(t('web:page.animes.snackBar.save.success'));
       }).catch(() => showError(t('web:page.animes.table.save.error')));
   }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError, setInfo, formik.resetForm]);
 
