@@ -1,4 +1,4 @@
-import {CancelOutlined, CheckCircleOutline, CircleOutlined, ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
+import {CancelOutlined, CheckCircleOutline, ShuffleOnOutlined, ShuffleOutlined} from '@mui/icons-material';
 import {memo, useCallback, useState} from 'react';
 import {IconButton} from '../../iconButton/IconButton';
 import {IconButton as MuiIconButton} from '@mui/material';
@@ -57,20 +57,18 @@ export const Shuffle = memo(({
         >
           <div className={classNames(classes.dialActions, {[classes.dialActionsHoveredTop]: isHovered})}>
             <IconButton
-              title={t('common:action.shuffle.off')}
+              title={t('common:action.shuffle.check')}
               onClick={handlePickShuffleAnimes}
             >
               <CheckCircleOutline/>
             </IconButton>
           </div>
-          <MuiIconButton color="primary">
-            {isHovered
-              ? <CircleOutlined/>
-              : <ShuffleOnOutlined/>}
+          <MuiIconButton disabled={isHovered} color="primary">
+            <ShuffleOnOutlined/>
           </MuiIconButton>
           <div className={classNames(classes.dialActions, {[classes.dialActionsHoveredBottom]: isHovered})}>
             <IconButton
-              title={t('common:action.shuffle.off')}
+              title={t('common:action.shuffle.cancel')}
               onClick={handleCancelShuffleAnimes}
             >
               <CancelOutlined/>
