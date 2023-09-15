@@ -1,10 +1,9 @@
 import * as Yup from 'yup';
-import {CircularProgress, Divider, InputAdornment, Typography} from '@mui/material';
+import {CircularProgress, InputAdornment, Typography} from '@mui/material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {ActionsController} from '../../components/actions/ActionsController';
 import {AnimeController} from '../../components/animes/AnimeController';
-import {IconButton} from '../../components/iconButton/IconButton';
-import {InfoOutlined} from '@mui/icons-material';
+import {Info} from '../../components/info/Info';
 import MUIDataTable from 'mui-datatables';
 import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
@@ -36,7 +35,6 @@ export const Animes = memo(() => {
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
   const [picked, setPicked] = useLocalStorage('newWatchingList');
   const [filterList, setFilterList] = useState(['PLANNING', 'CANDIDATE']);
-  const [info, setInfo] = useState(null);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
     validateOnMount: true,
@@ -110,19 +108,6 @@ export const Animes = memo(() => {
     );
   }, [indexes, picked]);
 
-  const handleGetInfo = useCallback(() => {
-    if (info) {
-      return;
-    }
-
-    fetch('http://localhost:8080/api/animes/info')
-      .then(throwHttpError)
-      .then(response => response.json())
-      .then(data => {
-        setInfo(data);
-      }).catch(() => showError(t('web:page.animes.info.error')));
-  }, [setInfo, info]);
-
   const handleEpisodesBlur = useCallback(() => {
     formik.setFieldValue('supplements', formik.values.supplements.map(supplement => ({
       ...supplement,
@@ -171,11 +156,10 @@ export const Animes = memo(() => {
       .then(animes => {
         setAnimes(animes);
         setEditableId(null);
-        setInfo(null);
         formik.resetForm();
         showSuccess(t('web:page.animes.snackBar.save.success'));
       }).catch(() => showError(t('web:page.animes.table.save.error')));
-  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError, setInfo, formik.resetForm]);
+  }, [prepareSaveEditable, setAnimes, setEditableId, showSuccess, showError, formik.resetForm]);
 
   const handleCancelAnime = useCallback(() => {
     setEditableId(null);
@@ -291,17 +275,7 @@ export const Animes = memo(() => {
           <div className={classes.nameHeaderContainer}>
             <div className={classNames({[classes.nameHeaderTitle]: indexes})}>{column.label}</div>
             {indexes
-              ? <>
-                <Divider flexItem orientation="vertical"/>
-                <IconButton
-                  title={info
-                    ? t('web:page.animes.table.name.info', {info})
-                    : <CircularProgress size="24px" color="secondary"/>}
-                  onMouseEnter={handleGetInfo}
-                >
-                  <InfoOutlined/>
-                </IconButton>
-              </>
+              ? <Info editableId={editableId}/>
               : <></>}
           </div>,
         customBodyRenderLite: dataIndex => {
@@ -516,8 +490,6 @@ export const Animes = memo(() => {
     formik,
     indexes,
     editableId,
-    info,
-    handleGetInfo,
     filterList,
   ]);
 

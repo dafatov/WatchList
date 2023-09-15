@@ -37,13 +37,15 @@ export const PathLink = memo(({
           label={error}
         />
         : <Tooltip title={value}>
-          <IconButton
-            color="primary"
-            disabled={!value}
-            onClick={() => onClick()}
-          >
-            <OpenInNew/>
-          </IconButton>
+          <span>
+            <IconButton
+              color="primary"
+              disabled={!value}
+              onClick={() => onClick()}
+            >
+              <OpenInNew/>
+            </IconButton>
+          </span>
         </Tooltip>}
     </>
   );
