@@ -83,6 +83,11 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("export", wrap(
                             pair("success", "Успешно экспортировано")
+                        )),
+                        pair("shuffle", wrap(
+                            pair("pick", wrap(
+                                pair("error", "Невозможно завершить выбор кандидатов")
+                            ))
                         ))
                     ))
                 ))

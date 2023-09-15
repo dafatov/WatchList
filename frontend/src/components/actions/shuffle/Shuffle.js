@@ -39,7 +39,7 @@ export const Shuffle = memo(({
         setIndexes(null);
         setPicked(data);
         onStop?.();
-      }).catch(() => showError(t('web:page.animes.shuffle.error')));
+      }).catch(() => showError(t('web:page.animes.snackBar.shuffle.pick.error')));
   }, []);
 
   const handleCancelShuffleAnimes = useCallback(() => {
