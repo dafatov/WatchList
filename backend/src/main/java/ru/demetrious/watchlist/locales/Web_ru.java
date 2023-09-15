@@ -20,7 +20,7 @@ public class Web_ru extends ListResourceBundle {
                     pair("table", wrap(
                         pair("name", wrap(
                             pair("title", "Наименование"),
-                            pair("info", "Количество: {{info.count}}({{info.remained}})\nКандидатов: {{info.candidates}}")
+                            pair("info", "Количество: {{info.count}} ({{info.remained}})\nКандидатов: {{info.candidates}}")
                         )),
                         pair("size", wrap(
                             pair("title", "Размер")
