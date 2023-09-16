@@ -34,7 +34,7 @@ export const Animes = memo(() => {
   const [dictionaries, setDictionaries] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
   const [picked, setPicked] = useLocalStorage('newWatchingList');
-  const [filterList, setFilterList] = useState(['PLANNING', 'CANDIDATE']);
+  const [filterList, setFilterList] = useState([]);
   const [editableId, setEditableId] = useState(null);
   const formik = useFormik({
     validateOnMount: true,
@@ -423,7 +423,7 @@ export const Animes = memo(() => {
       },
     },
     {
-      name: 'path',
+      name: 'pathPackage',
       label: t('web:page.animes.table.path.title'),
       options: {
         sort: false,

@@ -5,11 +5,12 @@ import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,17 @@ import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.repository.AnimeRepository;
 
 import static java.lang.Math.max;
+import static java.nio.file.Path.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.ArrayUtils.contains;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.CANDIDATE;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.PLANNING;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.WATCHING;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getPath;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getURI;
+import static ru.demetrious.watchlist.utils.FileUtils.normalizePaths;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +42,16 @@ public class AnimeService {
     private final RandomOrgClient randomOrgClient;
 
     public List<Anime> getAnimes() {
-        return animeRepository.findAll();
+        List<Anime> animeList = animeRepository.findAll();
+        Optional<Path> commonPathOptional = normalizePaths(animeList.stream()
+            .map(Anime::getPath)
+            .filter(Objects::nonNull)
+            .map(Path::of)
+            .collect(toList()));
+
+        return animeList.stream()
+            .peek(anime -> anime.setPathPackage(getPathPackage(commonPathOptional, anime.getPath())))
+            .collect(toList());
     }
 
     public List<Anime> setAnimes(List<Anime> animeList) {
@@ -88,7 +103,7 @@ public class AnimeService {
         int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(animeList.size(), 1, animeList.size());
 
         return animeList.stream()
-            .collect(Collectors.toMap(
+            .collect(toMap(
                 Anime::getId,
                 anime -> nonDuplicatedIntegers[animeList.indexOf(anime)]
             ));
@@ -120,5 +135,22 @@ public class AnimeService {
             .filter(anime -> contains(nonDuplicatedIntegers, animeList.indexOf(anime)))
             .map(Anime::getId)
             .toList();
+    }
+
+    // ===================================================================================================================
+    // = Implementation
+    // ===================================================================================================================
+
+    private String getPathPackage(Optional<Path> commonPathOptional, String path) {
+        if (isBlank(path)) {
+            return path;
+        }
+
+        return commonPathOptional
+            .map(commonPath -> "\\".concat(commonPath
+                .relativize(of(path))
+                .getParent()
+                .toString()))
+            .orElse(path);
     }
 }

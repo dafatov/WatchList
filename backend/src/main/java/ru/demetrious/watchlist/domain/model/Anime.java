@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +29,8 @@ public class Anime {
     private String name;
     private String url;
     private String path;
+    @Transient
+    private String pathPackage;
     private Long size;
     private Integer episodes;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
