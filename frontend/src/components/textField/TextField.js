@@ -22,13 +22,17 @@ export const TextField = memo(({
   }, [formik.touched[name], formik.errors[name]]);
 
   const handleValue = useCallback(event => {
-    if (!type || type === 'number' && event.target.value.match(/^$|^0$|^[1-9][0-9]*$/)) {
+    if (!type || type === 'number' && event.target.value.match(/^$|^\d$|^[1-9][\d\s]*\d$/)) {
       setValue(event.target.value);
       formik.handleChange(event);
     }
   }, [setValue, formik.handleChange, type]);
 
   const handleBlur = useCallback(event => {
+    if (type === 'number') {
+      formik.setFieldValue(name, event.target.value.replace(/\s/g, ''));
+    }
+
     formik.handleBlur(event);
     onBlur?.(event);
   }, [formik.handleBlur, onBlur]);
