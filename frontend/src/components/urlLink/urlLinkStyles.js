@@ -20,4 +20,14 @@ export const useStyles = makeStyles(theme => ({
       textAlign: 'justify',
     },
   },
+  copyButton: {
+    '&.MuiIconButton-root': {
+      alignSelf: 'center',
+    },
+  },
+  badge: {
+    '&.MuiBadge-root': {
+      flexShrink: 1,
+    },
+  },
 }));

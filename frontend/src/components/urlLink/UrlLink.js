@@ -66,8 +66,8 @@ export const UrlLink = (({
           />
         </div>
         : <div
-          onMouseLeave={() => setIsHovered(false)}
           onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className={classes.container}
         >
           <Tooltip title={url}>
@@ -78,6 +78,7 @@ export const UrlLink = (({
                 horizontal: 'left',
               }}
               invisible={!isNew}
+              className={classes.badge}
             >
               <Button
                 variant="text"
@@ -97,6 +98,7 @@ export const UrlLink = (({
                 title={t('common:action.copyToClipboard')}
                 disabled={!name}
                 onClick={() => onCopyName?.()}
+                className={classes.copyButton}
               >
                 <ContentCopyOutlined/>
               </IconButton>

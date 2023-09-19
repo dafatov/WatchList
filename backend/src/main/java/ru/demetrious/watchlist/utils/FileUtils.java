@@ -40,8 +40,7 @@ public class FileUtils {
             case 0 -> empty();
             case 1 -> of(pathList.get(0).getRoot());
             default -> FindCommonPathElements.findForFilePaths(pathList, IOCase.INSENSITIVE)
-                .map(PathElements::toPath)
-                .or( () -> of(pathList.get(0).getRoot()));
+                .map(PathElements::toPath);
         };
     }
 
