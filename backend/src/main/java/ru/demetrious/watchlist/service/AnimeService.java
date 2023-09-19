@@ -147,10 +147,10 @@ public class AnimeService {
         }
 
         return commonPathOptional
-            .map(commonPath -> "\\".concat(commonPath
-                .relativize(of(path))
-                .getParent()
-                .toString()))
+            .map(commonPath -> commonPath.relativize(of(path)))
+            .map(Path::getParent)
+            .map(Path::toString)
+            .map("\\"::concat)
             .orElse(path);
     }
 }

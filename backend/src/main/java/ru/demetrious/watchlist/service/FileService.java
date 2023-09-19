@@ -3,13 +3,14 @@ package ru.demetrious.watchlist.service;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
 import ru.demetrious.watchlist.manager.FileManager;
 import ru.demetrious.watchlist.utils.AnimeUtils;
+
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,6 @@ public class FileService {
     private final ConfigService configService;
 
     public void generate() {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
         Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
         List<Path> pathList = animeService.getAnimes().stream()
             .filter(AnimeUtils::isWatching)
@@ -30,16 +30,14 @@ public class FileService {
             .filter(targetPath -> pathList.stream().noneMatch(path -> path.getFileName().equals(targetPath.getFileName())))
             .toList();
 
-        executorService.submit(() -> {
-            try {
+        try (ExecutorService executorService = newSingleThreadExecutor()) {
+            executorService.submit(() -> {
                 fileManager.deleteDirectories(removablePathList);
                 fileManager.copyDirectories(pathList, targetFolder);
-            } catch (Exception e) {
-                log.error("Can't generate:", e);
-            }
 
-            executorService.shutdown();
-        });
+                executorService.shutdown();
+            });
+        }
     }
 
     public void reset() {
