@@ -1,6 +1,6 @@
 {
   "name": "ru.demetrious.watch-list",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "config": {
     "semver": "patch"
   },
