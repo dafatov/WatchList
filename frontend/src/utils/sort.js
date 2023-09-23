@@ -6,7 +6,7 @@ export const getCustomSort = (prepareShowAnimes, indexes, warningConsumer) => (d
   const getIsPattern = data => getAnime(data).isPattern;
   const getSortIndex = data => {
     const anime = getAnime(data);
-    const index = indexes[anime.id];
+    const index = indexes.indexOf(anime.id) + 1;
 
     if (!index && anime.status === 'PLANNING') {
       warningConsumer?.(anime);
