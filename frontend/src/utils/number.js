@@ -3,7 +3,7 @@
  * @example [1, 2, 3, 5, 6, 7, 9, 10, 12] -> '1-3, 5-7, 9, 10, 12'
  * @return string
  */
-module.exports.pack = array => {
+export const pack = array => {
   array = array.sort((a, b) => a - b);
   let result = '';
 

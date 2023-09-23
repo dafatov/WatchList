@@ -1,7 +1,7 @@
 const {createCanvas} = require('canvas');
 const {theme} = require('../styles/theme');
 
-module.exports.createWatchingList = (title, animeList) => {
+export const createWatchingList = (title, animeList) => {
   const r = 12;
   const indent = 8;
   const height72 = 64;
