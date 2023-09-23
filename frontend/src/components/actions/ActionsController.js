@@ -2,6 +2,7 @@ import {memo, useMemo, useState} from 'react';
 import {Generate} from './generate/Generate';
 import {MenuOutlined} from '@mui/icons-material';
 import {IconButton as MuiIconButton} from '@mui/material';
+import {Randomize} from './randomize/Randomize';
 import {SettingsController} from '../settings/SettingsController';
 import {Shuffle} from './shuffle/Shuffle';
 import classNames from 'classnames';
@@ -34,7 +35,12 @@ export const ActionsController = memo(({
       onStart={() => setActiveAction('shuffle')}
       onStop={() => setActiveAction(null)}
     />,
-  }), [indexes, setActiveAction, getRenderSize, setIndexes, editableId]);
+    randomize: <Randomize
+      active={activeAction === 'randomize'}
+      onStart={() => setActiveAction('randomize')}
+      onStop={() => setActiveAction(null)}
+    />
+  }), [indexes, setActiveAction, getRenderSize, setIndexes, editableId, activeAction]);
 
   return (
     <div className={classes.root}>

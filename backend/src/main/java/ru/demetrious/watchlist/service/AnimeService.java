@@ -20,9 +20,11 @@ import ru.demetrious.watchlist.repository.AnimeRepository;
 
 import static java.lang.Math.max;
 import static java.nio.file.Path.of;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.ArrayUtils.contains;
+import static org.apache.commons.lang3.StringUtils.compare;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.CANDIDATE;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.PLANNING;
@@ -135,6 +137,23 @@ public class AnimeService {
             .filter(anime -> contains(nonDuplicatedIntegers, animeList.indexOf(anime)))
             .map(Anime::getId)
             .toList();
+    }
+
+    public List<String> randomizeWatching() {
+        List<Anime> animeList = animeRepository.findAllByStatus(WATCHING).stream()
+            .sorted((a, b) -> compare(a.getName(), b.getName()))
+            .toList();
+
+        if (animeList.size() != MAX_WATCHING) {
+            throw new IllegalStateException("Must be a " + MAX_WATCHING + " watching");
+        }
+
+        int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(MAX_WATCHING, 0, MAX_WATCHING - 1);
+
+        return stream(nonDuplicatedIntegers)
+            .mapToObj(animeList::get)
+            .map(Anime::getName)
+            .collect(toList());
     }
 
     // ===================================================================================================================
