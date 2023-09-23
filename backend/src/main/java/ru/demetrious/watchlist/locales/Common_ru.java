@@ -38,15 +38,18 @@ public class Common_ru extends ListResourceBundle {
                 pair("apply", "Применить"),
                 pair("copyToClipboard", "Скопировать в буфер обмена"),
                 pair("shuffle", wrap(
-                    pair("on", "Включить перемешивание"),
+                    pair("on", "Начать перемешивание"),
                     pair("check", "Подтвердить кандидатов"),
-                    pair("cancel", "Отменить перемешивание")
+                    pair("cancel", "Завершить перемешивание")
                 )),
                 pair("selectAll", "Выбрать всех"),
                 pair("generate", "Сгенерировать"),
                 pair("stop", "Остановить"),
                 pair("reset", "Сбросить"),
-                pair("settings", "Настройки")
+                pair("settings", "Настройки"),
+                pair("randomize", wrap(
+                    pair("on", "Зарандомить смотрю")
+                ))
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),

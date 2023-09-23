@@ -121,6 +121,19 @@ public class AnimeController {
         }
     }
 
+    @PostMapping("/randomize")
+    public ResponseEntity<?> randomizeWatching() {
+        try {
+            List<String> randomizedAnimeList = animeService.randomizeWatching();
+
+            log.info("randomizeWatching: {}", randomizedAnimeList);
+            return ResponseEntity.ok(randomizedAnimeList);
+        } catch (Exception e) {
+            log.error("Can't randomize watching:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/info")
     public InfoRsDto getInfo() {
         InfoRsDto info = animeService.getInfo();
