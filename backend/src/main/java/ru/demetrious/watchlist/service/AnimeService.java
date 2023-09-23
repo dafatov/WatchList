@@ -7,7 +7,6 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,7 +21,6 @@ import static java.lang.Math.max;
 import static java.nio.file.Path.of;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.StringUtils.compare;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -95,20 +93,22 @@ public class AnimeService {
         return name;
     }
 
-    public Map<UUID, Integer> getShuffleIndexes() {
-        List<Anime> animeList = animeRepository.findAllByStatus(PLANNING);
+    public List<UUID> getShuffleIndexes() {
+        List<Anime> animeList = animeRepository.findAllByStatus(PLANNING).stream()
+            .sorted((a, b) -> compare(a.getName(), b.getName()))
+            .toList();;
 
         if (animeList.size() < 2) {
             throw new IllegalStateException("No at least 2 anime in status isPlanning");
         }
 
-        int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(animeList.size(), 1, animeList.size());
+        int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(animeList.size(), 0, animeList.size() - 1);
 
-        return animeList.stream()
-            .collect(toMap(
-                Anime::getId,
-                anime -> nonDuplicatedIntegers[animeList.indexOf(anime)]
-            ));
+        return stream(nonDuplicatedIntegers)
+            .boxed()
+            .map(animeList::get)
+            .map(Anime::getId)
+            .collect(toList());
     }
 
     public InfoRsDto getInfo() {

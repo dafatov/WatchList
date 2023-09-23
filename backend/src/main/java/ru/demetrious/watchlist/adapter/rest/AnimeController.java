@@ -1,7 +1,6 @@
 package ru.demetrious.watchlist.adapter.rest;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,7 +97,7 @@ public class AnimeController {
     @GetMapping("/shuffle")
     public ResponseEntity<?> getShuffleIndexes() {
         try {
-            Map<UUID, Integer> shuffleIndexes = animeService.getShuffleIndexes();
+            List<UUID> shuffleIndexes = animeService.getShuffleIndexes();
 
             log.info("getShuffleIndexes: {}", shuffleIndexes);
             return ResponseEntity.ok(shuffleIndexes);
