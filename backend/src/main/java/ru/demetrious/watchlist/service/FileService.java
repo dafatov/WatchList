@@ -21,6 +21,7 @@ public class FileService {
     private final ConfigService configService;
 
     public void generate() {
+        ExecutorService executorService = newSingleThreadExecutor();
         Path targetFolder = Path.of(configService.getData("default-setting.file-service.target-folder"));
         List<Path> pathList = animeService.getAnimes().stream()
             .filter(AnimeUtils::isWatching)
@@ -30,13 +31,16 @@ public class FileService {
             .filter(targetPath -> pathList.stream().noneMatch(path -> path.getFileName().equals(targetPath.getFileName())))
             .toList();
 
-        try (ExecutorService executorService = newSingleThreadExecutor()) {
+        try {
             executorService.submit(() -> {
                 fileManager.deleteDirectories(removablePathList);
                 fileManager.copyDirectories(pathList, targetFolder);
 
                 executorService.shutdown();
             });
+        } catch (Exception e) {
+            executorService.close();
+            throw new IllegalStateException(e);
         }
     }
 
