@@ -34,7 +34,7 @@ import static ru.demetrious.watchlist.utils.FileUtils.normalizePaths;
 @RequiredArgsConstructor
 @Component
 public final class FileManager {
-    public static final int BUFFER_SIZE = 1024;
+    public static final int BUFFER_SIZE = 32768;
     private static final String FILE_MANAGER_IS_ALREADY_RUNNING = "File manager is already running";
     private static final String FILE_MANAGER_IS_NOT_RUNNING = "File manager is not running";
     private static final String NO_PATHS_TO_OPERATE = "No paths to operate";
