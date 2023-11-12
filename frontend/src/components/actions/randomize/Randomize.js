@@ -53,12 +53,11 @@ export const Randomize = memo(({
 
   const handleImportRandomizeAnimes = useCallback(() => {
     const link = document.createElement('a');
-    link.href = randomizeImage;
+    link.setAttribute('href', randomizeImage);
     link.setAttribute('download', 'watching.png');
     document.body.appendChild(link);
     link.click();
     link.parentNode.removeChild(link);
-    handleCancelRandomizeAnimes();
   }, [randomizeImage, handleCancelRandomizeAnimes]);
 
   return (
