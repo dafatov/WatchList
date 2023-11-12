@@ -195,6 +195,6 @@ public final class FileManager {
             return 0;
         }
 
-        return toIntExact(ceilDivExact(100 * current, all));
+        return toIntExact(floorDivExact(100 * current, all));
     }
 }
