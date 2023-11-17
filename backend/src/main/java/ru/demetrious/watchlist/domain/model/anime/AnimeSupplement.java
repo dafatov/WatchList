@@ -1,4 +1,4 @@
-package ru.demetrious.watchlist.domain.model;
+package ru.demetrious.watchlist.domain.model.anime;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;

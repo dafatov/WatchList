@@ -9,6 +9,7 @@ import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
 import {SupplementsController} from '../../components/supplements/SupplementsController';
 import {TableFooter} from '../../components/tableFooter/TableFooter';
+import {TagsController} from '../../components/tags/TagsController';
 import {TextField} from '../../components/textField/TextField';
 import {UrlLink} from '../../components/urlLink/UrlLink';
 import classNames from 'classnames';
@@ -46,6 +47,7 @@ export const Animes = memo(() => {
       multipleViews: '0',
       episodes: '1',
       supplements: [],
+      tags: [],
       path: '',
       isPattern: true,
     },
@@ -67,6 +69,14 @@ export const Animes = memo(() => {
         ).required(t('common:validation.required'))
           .min(1, t('common:validation.noEmpty')),
         name: Yup.string().required(t('common:validation.required')),
+      })),
+      tags: Yup.array(Yup.object({
+        name: Yup.string().required(t('common:validation.required'))
+          .matches(/^red$/)
+          .test('unique', t('common:validation.unique'), (tag, context) => {
+            //TODO проверить условие
+            return context.from[1].value.tags.findIndex(t => tag.name === t.name) === context.from[1].value.tags.findLastIndex(t => tag.name === t.name);
+          }),
       })),
       path: Yup.string().required(t('common:validation.required')),
     }),
@@ -91,7 +101,7 @@ export const Animes = memo(() => {
 
   useEffect(() => {
     fetch('http://localhost:8080/api/dictionaries?' + new URLSearchParams({
-      volumes: ['statuses', 'supplements'],
+      volumes: ['statuses', 'supplements', 'tags'],
     })).then(throwHttpError)
       .then(response => response.json())
       .then(data => {
@@ -219,7 +229,8 @@ export const Animes = memo(() => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(json),
-      })).then(response => response.json())
+      })).then(throwHttpError)
+      .then(response => response.json())
       .then(animes => {
         setAnimes(animes);
         showSuccess(t('web:page.animes.snackBar.export.success'));
@@ -423,6 +434,30 @@ export const Animes = memo(() => {
       },
     },
     {
+      name: 'tags',
+      label: t('web:page:animes.table.tags.title'),
+      options: {
+        sort: false,
+        filterType: 'multiselect',
+        filterOptions: {
+          names: dictionaries?.tags.map(tag => tag.name),
+          logic: (tags, filters) => difference(filters, tags.map(tag => tag.name)).length !== 0,
+        },
+        customBodyRenderLite: dataIndex => {
+          const {id, tags} = getFields(dataIndex);
+
+          return (
+            <TagsController
+              editable={isEditable(id)}
+              tags={tags}
+              options={dictionaries?.tags}
+              formik={formik}
+            />
+          );
+        },
+      },
+    },
+    {
       name: 'pathPackage',
       label: t('web:page.animes.table.path.title'),
       options: {
@@ -466,7 +501,11 @@ export const Animes = memo(() => {
             <AnimeController
               editable={isEditable(anime.id)}
               anime={anime}
-              onSave={formik.handleSubmit}
+              onSave={() => {
+                // eslint-disable-next-line no-console
+                console.log(formik);
+                formik.handleSubmit();
+              }}
               onCancel={handleCancelAnime}
               onEdit={() => handleEditAnime(anime)}
               onDelete={handleDeleteAnime}
