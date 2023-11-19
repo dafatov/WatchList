@@ -22,12 +22,14 @@ export const ActionsController = memo(({
 
   const actions = useMemo(() => ({
     generate: <Generate
+      id="generate"
       disabled={!!indexes}
       onStart={() => setActiveAction('generate')}
       onStop={() => setActiveAction(null)}
       getRenderSize={getRenderSize}
     />,
     shuffle: <Shuffle
+      id="shuffle"
       indexes={indexes}
       setIndexes={setIndexes}
       setPicked={setPicked}
@@ -36,6 +38,7 @@ export const ActionsController = memo(({
       onStop={() => setActiveAction(null)}
     />,
     randomize: <Randomize
+      id="randomize"
       active={activeAction === 'randomize'}
       onStart={() => setActiveAction('randomize')}
       onStop={() => setActiveAction(null)}

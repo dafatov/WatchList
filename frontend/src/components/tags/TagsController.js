@@ -1,6 +1,6 @@
 import {Autocomplete, Checkbox, ListItem} from '@mui/material';
 import {CheckBoxOutlineBlankOutlined, CheckBoxOutlined} from '@mui/icons-material';
-import {memo, useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {Tags} from './tags/Tags';
 import {TextField} from '../textField/TextField';
 import {useStyles} from './tagsControllerStyles';
@@ -18,17 +18,17 @@ export const TagsController = memo(({
   const [options, setOptions] = useState(optionsProp);
   const [inputValue, setInputValue] = useState('');
 
+  const optionsPropSorted = useMemo(() => optionsProp.sort((a, b) => a.name.localeCompare(b.name)), [optionsProp]);
+
   useEffect(() => {
     setTags(tagsProp);
   }, [editable, tagsProp, setTags]);
 
   useEffect(() => {
-    setOptions(optionsProp
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .concat(inputValue && !optionsProp.map(optionProp => optionProp.name).includes(inputValue)
-        ? {name: inputValue, isPattern: true}
-        : []));
-  }, [optionsProp, setOptions, inputValue]);
+    setOptions(optionsPropSorted.concat(inputValue && !optionsPropSorted.map(optionProp => optionProp.name).includes(inputValue)
+      ? {name: inputValue, isPattern: true}
+      : []));
+  }, [editable, optionsPropSorted, setOptions, inputValue]);
 
   const handleTagsChange = useCallback((_, newTags) => {
     setTags(newTags);
@@ -77,7 +77,7 @@ export const TagsController = memo(({
           onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
           clearText={t('common:action.clear')}
           closeText={t('common:action.close')}
-          noOptionsText={t('common:action.noOptions')}
+          noOptionsText={t('common:result.noOptions')}
           openText={t('common:action.open')}
         />
         : <Tags tags={tags}/>}

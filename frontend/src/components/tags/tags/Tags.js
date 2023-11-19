@@ -7,9 +7,13 @@ export const Tags = memo(({
   formik,
   getTagProps,
 }) => {
-  const getColor = useCallback(index => {
+  const getColor = useCallback((tag, index) => {
     if (formik?.errors.tags?.[index]?.name) {
       return 'error';
+    }
+
+    if (tag.isPattern) {
+      return 'success';
     }
 
     return 'primary';
@@ -24,12 +28,14 @@ export const Tags = memo(({
             key={tag.id}
             title={formik?.errors.tags?.[index]?.name}
           >
-            <Chip
-              variant="outlined"
-              color={getColor(index)}
-              label={tag.name}
-              {...getTagProps?.({index})}
-            />
+            <span>
+              <Chip
+                variant="outlined"
+                color={getColor(tag, index)}
+                label={tag.name}
+                {...getTagProps?.({index})}
+              />
+            </span>
           </Tooltip>
         ))}
     </>
