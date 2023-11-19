@@ -1,89 +1,86 @@
-import {Autocomplete, Checkbox, Chip, ListItem} from '@mui/material';
+import {Autocomplete, Checkbox, ListItem} from '@mui/material';
 import {CheckBoxOutlineBlankOutlined, CheckBoxOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useState} from 'react';
+import {Tags} from './tags/Tags';
 import {TextField} from '../textField/TextField';
 import {useStyles} from './tagsControllerStyles';
+import {useTranslation} from 'react-i18next';
 
 export const TagsController = memo(({
   editable,
-  tags: tagsProps,
-  options,
+  tags: tagsProp,
+  options: optionsProp,
   formik,
 }) => {
   const classes = useStyles();
-  const [tags, setTags] = useState(tagsProps);
+  const {t} = useTranslation();
+  const [tags, setTags] = useState(tagsProp);
+  const [options, setOptions] = useState(optionsProp);
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    setTags(tagsProps);
-  }, [editable, tagsProps, setTags, formik.values.tags]);
+    setTags(tagsProp);
+  }, [editable, tagsProp, setTags]);
 
-  const getColor = useCallback(index => {
-    if (formik?.errors.tags?.[index]?.name) {
-      return 'error';
-    }
-
-    return 'primary';
-  }, [formik?.errors.tags]);
+  useEffect(() => {
+    setOptions(optionsProp
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .concat(inputValue && !optionsProp.map(optionProp => optionProp.name).includes(inputValue)
+        ? {name: inputValue, isPattern: true}
+        : []));
+  }, [optionsProp, setOptions, inputValue]);
 
   const handleTagsChange = useCallback((_, newTags) => {
     setTags(newTags);
-    // eslint-disable-next-line no-console
-    console.log(newTags);
     formik.setFieldValue('tags', newTags);
-    formik.setFieldTouched('tags', true, false);
-    // eslint-disable-next-line no-console
-    console.log(formik);
+    formik.setFieldTouched('tags', true, true);
   }, [setTags, formik.setFieldValue, formik.setFieldTouched]);
 
   return (
     <>
-      <Autocomplete
-        multiple
-        disableCloseOnSelect
-        readOnly={!editable}
-        value={tags}
-        inputValue={inputValue}
-        renderInput={params => (
-          <TextField
-            editable={editable}
-            formik={formik}
-            {...params}
-          />
-        )}
-        renderTags={(tags, getTagProps) => {
-          return tags.sort((a, b) => a.name.localeCompare(b.name))
-            .map((tag, index) => {
-              return (
-                <Chip
-                  key={tag.id}
-                  variant="outlined"
-                  color={getColor(index)}
-                  label={tag.name}
-                  {...getTagProps({index})}
-                />
-              );
-            });
-        }}
-        options={options.sort((a, b) => a.name.localeCompare(b.name)).concat({name: inputValue, isPattern: true})}
-        getOptionLabel={option => option.name}
-        renderOption={(props, option, {selected}) => (
-          <ListItem className={classes.optionRoot} {...props}>
-            <Checkbox
-              icon={<CheckBoxOutlineBlankOutlined/>}
-              checkedIcon={<CheckBoxOutlined/>}
-              style={{marginRight: 8}}
-              checked={selected}
+      {editable
+        ? <Autocomplete
+          multiple
+          disableCloseOnSelect
+          readOnly={!editable}
+          value={tags}
+          inputValue={inputValue}
+          renderInput={params => (
+            <TextField
+              editable={editable}
+              formik={formik}
+              {...params}
             />
-            {/*TODO remove when styled*/}
-            {option.isPattern
-              ? option.name + '*'
-              : option.name}
-          </ListItem>
-        )}
-        onChange={handleTagsChange}
-        onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
-      />
+          )}
+          renderTags={(tags, getTagProps) => (
+            <Tags
+              tags={tags}
+              formik={formik}
+              getTagProps={getTagProps}
+            />
+          )}
+          options={options}
+          getOptionLabel={option => option.name}
+          isOptionEqualToValue={(option, value) => option.name === value.name}
+          renderOption={(props, option, {selected}) => (
+            <ListItem className={classes.optionRoot} {...props}>
+              <Checkbox
+                icon={<CheckBoxOutlineBlankOutlined/>}
+                checkedIcon={<CheckBoxOutlined/>}
+                style={{marginRight: 8}}
+                checked={selected}
+              />
+              {option.name}
+            </ListItem>
+          )}
+          onChange={handleTagsChange}
+          onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
+          clearText={t('common:action.clear')}
+          closeText={t('common:action.close')}
+          noOptionsText={t('common:action.noOptions')}
+          openText={t('common:action.open')}
+        />
+        : <Tags tags={tags}/>}
     </>
   );
 });

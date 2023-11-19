@@ -49,7 +49,10 @@ public class Common_ru extends ListResourceBundle {
                 pair("settings", "Настройки"),
                 pair("randomize", wrap(
                     pair("on", "Зарандомить смотрю")
-                ))
+                )),
+                pair("close", "Закрыть"),
+                pair("clear", "Очистить"),
+                pair("open", "Открыть")
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),
@@ -59,7 +62,8 @@ public class Common_ru extends ListResourceBundle {
                 pair("noEmpty", "Должен быть пустым")
             )),
             pair("result", wrap(
-                pair("copy", "Успешно скопировано: {{name}}")
+                pair("copy", "Успешно скопировано: {{name}}"),
+                pair("noOptions", "Нет вариантов")
             ))
         );
     }

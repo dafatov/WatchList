@@ -72,11 +72,7 @@ export const Animes = memo(() => {
       })),
       tags: Yup.array(Yup.object({
         name: Yup.string().required(t('common:validation.required'))
-          .matches(/^red$/)
-          .test('unique', t('common:validation.unique'), (tag, context) => {
-            //TODO проверить условие
-            return context.from[1].value.tags.findIndex(t => tag.name === t.name) === context.from[1].value.tags.findLastIndex(t => tag.name === t.name);
-          }),
+          .matches(/^[a-z][a-z]*[ -]?[a-z]+$/),
       })),
       path: Yup.string().required(t('common:validation.required')),
     }),
@@ -108,7 +104,7 @@ export const Animes = memo(() => {
         setDictionaries(data);
         setIsPendingDictionaries(false);
       }).catch(() => showError(t('web:page.animes.error')));
-  }, [setDictionaries, setIsPendingDictionaries]);
+  }, [setDictionaries, setIsPendingDictionaries, animes]);
 
   useEffect(() => {
     setFilterList(
@@ -501,11 +497,7 @@ export const Animes = memo(() => {
             <AnimeController
               editable={isEditable(anime.id)}
               anime={anime}
-              onSave={() => {
-                // eslint-disable-next-line no-console
-                console.log(formik);
-                formik.handleSubmit();
-              }}
+              onSave={formik.handleSubmit}
               onCancel={handleCancelAnime}
               onEdit={() => handleEditAnime(anime)}
               onDelete={handleDeleteAnime}
