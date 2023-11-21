@@ -31,8 +31,10 @@ export const Animes = memo(() => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPendingAnimes, setIsPendingAnimes] = useState(true);
   const [isPendingDictionaries, setIsPendingDictionaries] = useState(true);
+  const [isPendingTags, setIsPendingTags] = useState(true);
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
+  const [tagsOptions, setTagsOptions] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
   const [picked, setPicked] = useLocalStorage('newWatchingList');
   const [filterList, setFilterList] = useState([]);
@@ -82,8 +84,8 @@ export const Animes = memo(() => {
   });
 
   useEffect(() => {
-    setIsLoading(isPendingAnimes || isPendingDictionaries);
-  }, [setIsLoading, isPendingAnimes, isPendingDictionaries]);
+    setIsLoading(isPendingAnimes || isPendingDictionaries || isPendingTags);
+  }, [setIsLoading, isPendingAnimes, isPendingDictionaries, isPendingTags]);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/animes')
@@ -96,15 +98,25 @@ export const Animes = memo(() => {
   }, [setAnimes, setIsPendingAnimes, picked]);
 
   useEffect(() => {
+    fetch('http://localhost:8080/api/tags')
+      .then(throwHttpError)
+      .then(response => response.json())
+      .then(data => {
+        setTagsOptions(data);
+        setIsPendingTags(false);
+      }).catch(() => showError(t('web:page.animes.error')));
+  }, [setTagsOptions, setIsPendingTags, animes]);
+
+  useEffect(() => {
     fetch('http://localhost:8080/api/dictionaries?' + new URLSearchParams({
-      volumes: ['statuses', 'supplements', 'tags'],
+      volumes: ['statuses', 'supplements'],
     })).then(throwHttpError)
       .then(response => response.json())
       .then(data => {
         setDictionaries(data);
         setIsPendingDictionaries(false);
       }).catch(() => showError(t('web:page.animes.error')));
-  }, [setDictionaries, setIsPendingDictionaries, animes]);
+  }, [setDictionaries, setIsPendingDictionaries]);
 
   useEffect(() => {
     setFilterList(
@@ -436,7 +448,7 @@ export const Animes = memo(() => {
         sort: false,
         filterType: 'multiselect',
         filterOptions: {
-          names: dictionaries?.tags.map(tag => tag.name),
+          names: tagsOptions?.map(tag => tag.name),
           logic: (tags, filters) => difference(filters, tags.map(tag => tag.name)).length !== 0,
         },
         customBodyRenderLite: dataIndex => {
@@ -446,7 +458,7 @@ export const Animes = memo(() => {
             <TagsController
               editable={isEditable(id)}
               tags={tags}
-              options={dictionaries?.tags}
+              options={tagsOptions}
               formik={formik}
             />
           );
@@ -508,6 +520,7 @@ export const Animes = memo(() => {
     },
   ], [
     dictionaries,
+    tagsOptions,
     handleEditAnime,
     handleSaveAnime,
     getRenderStatus,

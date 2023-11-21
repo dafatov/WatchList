@@ -28,14 +28,12 @@ export const Tags = memo(({
             key={tag.id}
             title={formik?.errors.tags?.[index]?.name}
           >
-            <span>
-              <Chip
-                variant="outlined"
-                color={getColor(tag, index)}
-                label={tag.name}
-                {...getTagProps?.({index})}
-              />
-            </span>
+            <Chip
+              variant="outlined"
+              color={getColor(tag, index)}
+              label={tag.name}
+              {...getTagProps?.({index})}
+            />
           </Tooltip>
         ))}
     </>

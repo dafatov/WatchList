@@ -1,6 +1,5 @@
-import {Autocomplete, Checkbox, ListItem} from '@mui/material';
-import {CheckBoxOutlineBlankOutlined, CheckBoxOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
+import {Autocomplete} from '../autocomplete/Autocomplete';
 import {Tags} from './tags/Tags';
 import {TextField} from '../textField/TextField';
 import {useStyles} from './tagsControllerStyles';
@@ -45,6 +44,7 @@ export const TagsController = memo(({
           readOnly={!editable}
           value={tags}
           inputValue={inputValue}
+          className={classes.autocomplete}
           renderInput={params => (
             <TextField
               editable={editable}
@@ -62,17 +62,6 @@ export const TagsController = memo(({
           options={options}
           getOptionLabel={option => option.name}
           isOptionEqualToValue={(option, value) => option.name === value.name}
-          renderOption={(props, option, {selected}) => (
-            <ListItem className={classes.optionRoot} {...props}>
-              <Checkbox
-                icon={<CheckBoxOutlineBlankOutlined/>}
-                checkedIcon={<CheckBoxOutlined/>}
-                style={{marginRight: 8}}
-                checked={selected}
-              />
-              {option.name}
-            </ListItem>
-          )}
           onChange={handleTagsChange}
           onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
           clearText={t('common:action.clear')}
