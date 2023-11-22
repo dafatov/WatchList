@@ -74,7 +74,7 @@ export const Animes = memo(() => {
       })),
       tags: Yup.array(Yup.object({
         name: Yup.string().required(t('common:validation.required'))
-          .matches(/^[a-z][a-z]*[ -]?[a-z]+$/),
+          .matches(/^[a-z][a-z]*[ -]?[a-z]+$/, t('common:validation.latinWithSpaceAndHyphen')),
       })),
       path: Yup.string().required(t('common:validation.required')),
     }),
