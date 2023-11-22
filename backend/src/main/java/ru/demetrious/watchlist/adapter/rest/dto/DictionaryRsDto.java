@@ -5,7 +5,6 @@ import lombok.Data;
 import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
 
-
 @Data
 public class DictionaryRsDto {
     private Set<WatchStatusEnum> statuses;

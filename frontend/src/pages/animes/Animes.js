@@ -9,6 +9,7 @@ import {PathLink} from '../../components/pathLink/PathLink';
 import {Select} from '../../components/select/Select';
 import {SupplementsController} from '../../components/supplements/SupplementsController';
 import {TableFooter} from '../../components/tableFooter/TableFooter';
+import {TagsController} from '../../components/tags/TagsController';
 import {TextField} from '../../components/textField/TextField';
 import {UrlLink} from '../../components/urlLink/UrlLink';
 import classNames from 'classnames';
@@ -30,8 +31,10 @@ export const Animes = memo(() => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPendingAnimes, setIsPendingAnimes] = useState(true);
   const [isPendingDictionaries, setIsPendingDictionaries] = useState(true);
+  const [isPendingTags, setIsPendingTags] = useState(true);
   const [animes, setAnimes] = useState(null);
   const [dictionaries, setDictionaries] = useState(null);
+  const [tagsOptions, setTagsOptions] = useState(null);
   const [indexes, setIndexes] = useLocalStorage('sortIndexes');
   const [picked, setPicked] = useLocalStorage('newWatchingList');
   const [filterList, setFilterList] = useState([]);
@@ -46,6 +49,7 @@ export const Animes = memo(() => {
       multipleViews: '0',
       episodes: '1',
       supplements: [],
+      tags: [],
       path: '',
       isPattern: true,
     },
@@ -68,6 +72,10 @@ export const Animes = memo(() => {
           .min(1, t('common:validation.noEmpty')),
         name: Yup.string().required(t('common:validation.required')),
       })),
+      tags: Yup.array(Yup.object({
+        name: Yup.string().required(t('common:validation.required'))
+          .matches(/^[a-z][a-z]*[ -]?[a-z]+$/, t('common:validation.latinWithSpaceAndHyphen')),
+      })),
       path: Yup.string().required(t('common:validation.required')),
     }),
     onSubmit: values => {
@@ -76,8 +84,8 @@ export const Animes = memo(() => {
   });
 
   useEffect(() => {
-    setIsLoading(isPendingAnimes || isPendingDictionaries);
-  }, [setIsLoading, isPendingAnimes, isPendingDictionaries]);
+    setIsLoading(isPendingAnimes || isPendingDictionaries || isPendingTags);
+  }, [setIsLoading, isPendingAnimes, isPendingDictionaries, isPendingTags]);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/animes')
@@ -88,6 +96,16 @@ export const Animes = memo(() => {
         setIsPendingAnimes(false);
       }).catch(() => showError(t('web:page.animes.error')));
   }, [setAnimes, setIsPendingAnimes, picked]);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/tags')
+      .then(throwHttpError)
+      .then(response => response.json())
+      .then(data => {
+        setTagsOptions(data);
+        setIsPendingTags(false);
+      }).catch(() => showError(t('web:page.animes.error')));
+  }, [setTagsOptions, setIsPendingTags, animes]);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/dictionaries?' + new URLSearchParams({
@@ -219,7 +237,8 @@ export const Animes = memo(() => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(json),
-      })).then(response => response.json())
+      })).then(throwHttpError)
+      .then(response => response.json())
       .then(animes => {
         setAnimes(animes);
         showSuccess(t('web:page.animes.snackBar.export.success'));
@@ -423,6 +442,30 @@ export const Animes = memo(() => {
       },
     },
     {
+      name: 'tags',
+      label: t('web:page:animes.table.tags.title'),
+      options: {
+        sort: false,
+        filterType: 'multiselect',
+        filterOptions: {
+          names: tagsOptions?.map(tag => tag.name),
+          logic: (tags, filters) => difference(filters, tags.map(tag => tag.name)).length !== 0,
+        },
+        customBodyRenderLite: dataIndex => {
+          const {id, tags} = getFields(dataIndex);
+
+          return (
+            <TagsController
+              editable={isEditable(id)}
+              tags={tags}
+              options={tagsOptions}
+              formik={formik}
+            />
+          );
+        },
+      },
+    },
+    {
       name: 'pathPackage',
       label: t('web:page.animes.table.path.title'),
       options: {
@@ -477,6 +520,7 @@ export const Animes = memo(() => {
     },
   ], [
     dictionaries,
+    tagsOptions,
     handleEditAnime,
     handleSaveAnime,
     getRenderStatus,

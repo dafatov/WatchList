@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import java.util.HashSet;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
+import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
+import ru.demetrious.watchlist.domain.model.anime.AnimeTag;
 
 @Entity
 @Getter
@@ -35,6 +38,8 @@ public class Anime {
     private Integer episodes;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AnimeSupplement> supplements = new HashSet<>();
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private Set<AnimeTag> tags = new HashSet<>();
     @Enumerated(EnumType.STRING)
     private WatchStatusEnum status;
     private int multipleViews;

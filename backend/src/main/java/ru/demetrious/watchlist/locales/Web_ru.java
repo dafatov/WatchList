@@ -58,6 +58,9 @@ public class Web_ru extends ListResourceBundle {
                             pair("generate", wrap(
                                 pair("info", "Процент: {{progress.percent}}\nСкопированные: {{progress.completed}}")
                             ))
+                        )),
+                        pair("tags", wrap(
+                            pair("title", "Теги")
                         ))
                     )),
                     pair("modal", wrap(
