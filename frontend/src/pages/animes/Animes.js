@@ -262,6 +262,10 @@ export const Animes = memo(() => {
   const getRenderSupplementStatus = useCallback(supplementStatus => t(`web:page.animes.table.supplements.enum.${supplementStatus}`), []);
 
   const getRenderSize = useCallback(size => {
+    if (!size) {
+      return '';
+    }
+
     const {value, prefix} = getUnitPrefix(size);
 
     return t('common:value', {

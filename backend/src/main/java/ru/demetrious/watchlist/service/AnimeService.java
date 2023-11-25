@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.InfoRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
+import ru.demetrious.watchlist.feign.ShikimoriClient;
+import ru.demetrious.watchlist.mapper.AnimeMapper;
 import ru.demetrious.watchlist.repository.AnimeRepository;
 
 import static java.lang.Math.max;
@@ -40,6 +42,8 @@ public class AnimeService {
 
     private final AnimeRepository animeRepository;
     private final RandomOrgClient randomOrgClient;
+    private final ShikimoriClient shikimoriClient;
+    private final AnimeMapper animeMapper;
 
     public List<Anime> getAnimes() {
         List<Anime> animeList = animeRepository.findAll();
@@ -57,6 +61,14 @@ public class AnimeService {
     public List<Anime> setAnimes(List<Anime> animeList) {
         animeRepository.deleteAll();
         return animeRepository.saveAll(animeList);
+    }
+
+    public List<Anime> importShikimoriAnimes(String shikimoriNickname) {
+        List<Anime> animeList = shikimoriClient.getAnimes(shikimoriNickname).getAnime().stream()
+            .map(animeMapper::animeDtoToAnime)
+            .toList();
+
+        return setAnimes(animeList);
     }
 
     public List<Anime> deleteAnimes(List<UUID> uuidList) {

@@ -1,8 +1,9 @@
-import {AddOutlined, FileDownloadOutlined, FileUploadOutlined, ImportExportOutlined} from '@mui/icons-material';
+import {AddOutlined/*, FileDownloadOutlined*/, FileUploadOutlined, ImportExportOutlined} from '@mui/icons-material';
 import {IconButton, MenuItem, TableFooter as MuiTableFooter, Select, TableCell, TableRow} from '@mui/material';
-import {memo, useCallback} from 'react';
+import {memo, useCallback, useState} from 'react';
 import MuiTablePagination from '@mui/material/TablePagination';
-import {SplitIconButton} from '../splitIconButton/SplitIconButton';
+// import {SplitIconButton} from '../splitIconButton/SplitIconButton';
+import classNames from 'classnames';
 import {useStyles} from './tableFooterStyles';
 
 export const TableFooter = memo(({
@@ -13,11 +14,12 @@ export const TableFooter = memo(({
   changePage,
   changeRowsPerPage,
   onAdd,
-  onUpload,
-  onDownload,
+  // onUpload,
+  // onDownload,
   disabled,
 }) => {
   const classes = useStyles();
+  const [isHovered, setIsHovered] = useState(true);
 
   const handleAdd = useCallback(event => {
     changePage(Math.ceil(count / rowsPerPage) - 1);
@@ -45,14 +47,26 @@ export const TableFooter = memo(({
             >
               <AddOutlined/>
             </IconButton>
-            <SplitIconButton
+            <div
+              onMouseEnter={() => setIsHovered(true)}
+              // onMouseLeave={() => setIsHovered(false)}
+              className={classNames({[classes.dialRoot]: isHovered})}
+            >
+              <div className={classNames(classes.dialActions, {[classes.dialActionsHovered]: isHovered})}>
+                <IconButton><FileUploadOutlined/></IconButton>
+              </div>
+              <IconButton color="primary">
+                <ImportExportOutlined/>
+              </IconButton>
+            </div>
+            {/*<SplitIconButton
               disabled={disabled}
               mainIcon={<ImportExportOutlined/>}
               topIcon={<FileUploadOutlined/>}
               bottomIcon={<FileDownloadOutlined/>}
               onTopClick={onUpload}
               onBottomClick={onDownload}
-            />
+            />*/}
           </div>
           <div className={classes.paginationContainer}>
             <Select
