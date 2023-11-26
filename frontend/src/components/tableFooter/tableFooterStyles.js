@@ -25,6 +25,7 @@ export const useStyles = makeStyles(theme => ({
   },
   dialRoot: {
     backgroundColor: theme.palette.secondary.light,
+    position: 'relative',
   },
   dialActions: {
     display: 'none'
@@ -33,8 +34,8 @@ export const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.secondary.main,
     position: 'absolute',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column-reverse',
     zIndex: 100,
-    top: '24px',
+    bottom: '100%',
   },
 }));

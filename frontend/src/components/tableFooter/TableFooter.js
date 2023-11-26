@@ -1,8 +1,9 @@
-import {AddOutlined/*, FileDownloadOutlined*/, FileUploadOutlined, ImportExportOutlined} from '@mui/icons-material';
-import {IconButton, MenuItem, TableFooter as MuiTableFooter, Select, TableCell, TableRow} from '@mui/material';
+import {AddOutlined, AttachFileOutlined, FileDownloadOutlined, FileUploadOutlined, ImportExportOutlined} from '@mui/icons-material';
+import {IconButton, MenuItem, TableFooter as MuiTableFooter, Select, SvgIcon, TableCell, TableRow} from '@mui/material';
 import {memo, useCallback, useState} from 'react';
 import MuiTablePagination from '@mui/material/TablePagination';
-// import {SplitIconButton} from '../splitIconButton/SplitIconButton';
+import {ReactComponent as ShikimoriIcon} from '../../assets/icons/shikimori.svg';
+import {SplitIconButton} from '../splitIconButton/SplitIconButton';
 import classNames from 'classnames';
 import {useStyles} from './tableFooterStyles';
 
@@ -14,12 +15,12 @@ export const TableFooter = memo(({
   changePage,
   changeRowsPerPage,
   onAdd,
-  // onUpload,
-  // onDownload,
+  onUpload,
+  onDownload,
   disabled,
 }) => {
   const classes = useStyles();
-  const [isHovered, setIsHovered] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleAdd = useCallback(event => {
     changePage(Math.ceil(count / rowsPerPage) - 1);
@@ -49,13 +50,23 @@ export const TableFooter = memo(({
             </IconButton>
             <div
               onMouseEnter={() => setIsHovered(true)}
-              // onMouseLeave={() => setIsHovered(false)}
+              onMouseLeave={() => setIsHovered(false)}
               className={classNames({[classes.dialRoot]: isHovered})}
             >
               <div className={classNames(classes.dialActions, {[classes.dialActionsHovered]: isHovered})}>
-                <IconButton><FileUploadOutlined/></IconButton>
+                <SplitIconButton
+                  disabled={disabled}
+                  mainIcon={<AttachFileOutlined/>}
+                  topIcon={<FileUploadOutlined/>}
+                  bottomIcon={<FileDownloadOutlined/>}
+                  onTopClick={onUpload}
+                  onBottomClick={onDownload}
+                />
+                <IconButton color="primary">
+                  <SvgIcon component={ShikimoriIcon}/>
+                </IconButton>
               </div>
-              <IconButton color="primary">
+              <IconButton style={{borderRadius: '12px 0 0 12px'}} color="primary">
                 <ImportExportOutlined/>
               </IconButton>
             </div>
