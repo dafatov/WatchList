@@ -5,10 +5,10 @@ import {useStyles} from './splitIconButtonStyles';
 export const SplitIconButton = memo(({
   disabled,
   mainIcon,
-  topIcon,
-  bottomIcon,
-  onTopClick,
-  onBottomClick,
+  leftIcon,
+  rightIcon,
+  onLeftClick,
+  onRightClick,
 }) => {
   const classes = useStyles();
   const [isHovered, setIsHovered] = useState(false);
@@ -22,17 +22,19 @@ export const SplitIconButton = memo(({
         >
           <IconButton
             color="primary"
-            className={classes.topButton}
-            onClick={() => onTopClick?.()}
+            disabled={!onLeftClick}
+            className={classes.leftButton}
+            onClick={() => onLeftClick?.()}
           >
-            {topIcon}
+            {leftIcon}
           </IconButton>
           <IconButton
             color="primary"
-            className={classes.bottomButton}
-            onClick={() => onBottomClick?.()}
+            disabled={!onRightClick}
+            className={classes.rightButton}
+            onClick={() => onRightClick?.()}
           >
-            {bottomIcon}
+            {rightIcon}
           </IconButton>
         </div>
         : <IconButton

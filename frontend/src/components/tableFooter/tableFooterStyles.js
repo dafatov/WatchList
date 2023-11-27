@@ -1,6 +1,6 @@
 import {makeStyles} from '@mui/styles';
 
-export const useStyles = makeStyles(theme => ({
+export const useStyles = makeStyles(() => ({
   tableCell: {
     display: 'grid',
   },
@@ -22,20 +22,5 @@ export const useStyles = makeStyles(theme => ({
   },
   paginationSelect: {
     alignSelf: 'center',
-  },
-  dialRoot: {
-    backgroundColor: theme.palette.secondary.light,
-    position: 'relative',
-  },
-  dialActions: {
-    display: 'none'
-  },
-  dialActionsHovered: {
-    backgroundColor: theme.palette.secondary.main,
-    position: 'absolute',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    zIndex: 100,
-    bottom: '100%',
   },
 }));

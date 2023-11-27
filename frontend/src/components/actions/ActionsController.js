@@ -1,11 +1,10 @@
-import {memo, useMemo, useState} from 'react';
+import {memo, useMemo} from 'react';
 import {Generate} from './generate/Generate';
+import {Menu} from '../menu/Menu';
 import {MenuOutlined} from '@mui/icons-material';
-import {IconButton as MuiIconButton} from '@mui/material';
 import {Randomize} from './randomize/Randomize';
 import {SettingsController} from '../settings/SettingsController';
 import {Shuffle} from './shuffle/Shuffle';
-import classNames from 'classnames';
 import {useLocalStorage} from '../../utils/localStorage';
 import {useStyles} from './actionsControllerStyles';
 
@@ -17,7 +16,6 @@ export const ActionsController = memo(({
   getRenderSize,
 }) => {
   const classes = useStyles();
-  const [isHovered, setIsHovered] = useState(false);
   const [activeAction, setActiveAction] = useLocalStorage('activeAction');
 
   const actions = useMemo(() => ({
@@ -49,18 +47,13 @@ export const ActionsController = memo(({
     <div className={classes.root}>
       {activeAction
         ? <>{actions[activeAction]}</>
-        : <div
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className={classNames({[classes.dialRoot]: isHovered})}
+        : <Menu
+          mainIcon={<MenuOutlined/>}
+          menuRootHoveredClassName={classes.dialRootHovered}
+          menuActionsHoveredClassName={classes.dialActionsHovered}
         >
-          <MuiIconButton color="primary">
-            <MenuOutlined/>
-          </MuiIconButton>
-          <div className={classNames(classes.dialActions, {[classes.dialActionsHovered]: isHovered})}>
-            {Object.values(actions).sort()}
-          </div>
-        </div>}
+          {Object.values(actions).sort()}
+        </Menu>}
       <SettingsController/>
     </div>
   );

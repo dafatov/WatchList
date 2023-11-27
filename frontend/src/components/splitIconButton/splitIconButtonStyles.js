@@ -3,27 +3,27 @@ import {makeStyles} from '@mui/styles';
 export const useStyles = makeStyles(() => ({
   container: {
     display: 'flex',
-    flexDirection: 'column',
-    minHeight: '52px',
+    flexDirection: 'row',
+    minWidth: '48px',
   },
-  topButton: {
+  leftButton: {
     '&.MuiIconButton-root': {
-      paddingTop: 0,
-      paddingBottom: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
       borderRadius: 0,
-    }
+    },
   },
-  bottomButton: {
+  rightButton: {
     '&.MuiIconButton-root': {
-      paddingTop: 1,
-      paddingBottom: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
       borderRadius: 0,
-    }
+    },
   },
   mainButton: {
     '&.MuiIconButton-root': {
-      minHeight: '52px',
+      minWidth: '48px',
       borderRadius: 0,
-    }
+    },
   },
 }));
