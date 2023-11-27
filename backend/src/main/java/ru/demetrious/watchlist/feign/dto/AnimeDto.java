@@ -10,4 +10,5 @@ public class AnimeDto {
     private int series_episodes;
     private int my_times_watched;
     private String my_status;
+    private String series_animedb_id;
 }

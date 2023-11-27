@@ -1,7 +1,7 @@
 import {memo, useCallback,} from 'react';
 import {Dialog} from '../../../modal/Dialog';
 import {TextField} from '../../../textField/TextField';
-import {useLocalStorage} from '../../../../utils/localStorage';
+import {useSessionStorage} from '../../../../utils/storage';
 import {useTranslation} from 'react-i18next';
 
 export const ChooseShikimoriNickname = memo(({
@@ -10,7 +10,7 @@ export const ChooseShikimoriNickname = memo(({
   onSubmit,
 }) => {
   const {t} = useTranslation();
-  const [value, setValue] = useLocalStorage('shikimoriNickname');
+  const [value, setValue] = useSessionStorage('shikimoriNickname');
 
   const handleSubmit = useCallback(() => {
     onSubmit(value);

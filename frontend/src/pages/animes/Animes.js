@@ -19,7 +19,7 @@ import {getCustomSort} from '../../utils/sort';
 import {getUnitPrefix} from '../../utils/convert';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
-import {useLocalStorage} from '../../utils/localStorage';
+import {useLocalStorage} from '../../utils/storage';
 import {useSnackBar} from '../../utils/snackBar';
 import {useStyles} from './animesStyles';
 import {useTranslation} from 'react-i18next';

@@ -115,24 +115,26 @@ export const Generate = memo(({
           <BrowserUpdatedOutlined/>
         </IconButton>
         : <FileProgressTooltip title={title} progress={progress} getRenderSize={getRenderSize}>
-          {progress.status === 'RUNNING'
-            ? <LoadingIconButton
-              disabled={disabled || localDisabled}
-              value={progress.percent}
-              onClick={handleStop}
-            >
-              <ResetTvOutlined/>
-            </LoadingIconButton>
-            : <></>}
-          {progress.status === 'COMPLETED' || progress.status === 'INTERRUPTED'
-            ? <MuiIconButton
-              color={color}
-              disabled={disabled || localDisabled}
-              onClick={handleReset}
-            >
-              <CancelPresentationOutlined/>
-            </MuiIconButton>
-            : <></>}
+          <>
+            {progress.status === 'RUNNING'
+              ? <LoadingIconButton
+                disabled={disabled || localDisabled}
+                value={progress.percent}
+                onClick={handleStop}
+              >
+                <ResetTvOutlined/>
+              </LoadingIconButton>
+              : <></>}
+            {progress.status === 'COMPLETED' || progress.status === 'INTERRUPTED'
+              ? <MuiIconButton
+                color={color}
+                disabled={disabled || localDisabled}
+                onClick={handleReset}
+              >
+                <CancelPresentationOutlined/>
+              </MuiIconButton>
+              : <></>}
+          </>
         </FileProgressTooltip>}
     </>
   );
