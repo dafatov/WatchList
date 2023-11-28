@@ -1,6 +1,6 @@
 import {FileDownloadOutlined, FileUploadOutlined} from '@mui/icons-material';
 import {memo, useState} from 'react';
-import {ChooseShikimoriNickname} from './chooseShikimoriNickname/ChooseShikimoriNickname';
+import {ChooseShikimoriNicknameModal} from './chooseShikimoriNicknameModal/ChooseShikimoriNicknameModal';
 import {ReactComponent as ShikimoriIcon} from '../../../assets/icons/shikimori.svg';
 import {SplitIconButton} from '../../splitIconButton/SplitIconButton';
 import {SvgIcon} from '@mui/material';
@@ -18,7 +18,7 @@ export const Shikimori = memo(({
         rightIcon={<FileDownloadOutlined/>}
         onLeftClick={() => setOpen(true)}
       />
-      <ChooseShikimoriNickname
+      <ChooseShikimoriNicknameModal
         open={open}
         setOpen={setOpen}
         onSubmit={onImport}

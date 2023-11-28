@@ -2,4 +2,4 @@ export const getComponentsFromObject = componentsObject => Object.keys(component
   .map(key => ({
     ...componentsObject[key],
     key,
-  }));
+  })).sort();

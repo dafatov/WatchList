@@ -18,7 +18,7 @@ public abstract class AnimeMapper {
         @Mapping(target = "name", source = "series_title"),
         @Mapping(target = "episodes", source = "series_episodes"),
         @Mapping(target = "multipleViews", source = "my_times_watched"),
-        @Mapping(target = "status", source = "my_status", qualifiedByName = "statusMapper"),
+        @Mapping(target = "status", source = "my_status", qualifiedByName = "mapStatus"),
         @Mapping(target = "url", expression = "java(SHIKIMORI_URL + \"/animes/\" + animeDto.getSeries_animedb_id())"),
         @Mapping(target = "id", ignore = true),
         @Mapping(target = "path", ignore = true),
@@ -29,7 +29,7 @@ public abstract class AnimeMapper {
     })
     public abstract Anime animeDtoToAnime(AnimeDto animeDto);
 
-    @Named("statusMapper")
+    @Named("mapStatus")
     static WatchStatusEnum mapStatus(String status) {
         return switch (status) {
             case "Completed" -> WatchStatusEnum.COMPLETED;

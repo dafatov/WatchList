@@ -34,7 +34,7 @@ export const ImportExportController = memo(({
       menuRootHoveredClassName={classes.dialRootHovered}
       menuActionsHoveredClassName={classes.dialActionsHovered}
     >
-      {getComponentsFromObject(importExports).sort()}
+      {getComponentsFromObject(importExports)}
     </Menu>
   );
 });

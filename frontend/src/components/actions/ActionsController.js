@@ -50,7 +50,7 @@ export const ActionsController = memo(({
           menuRootHoveredClassName={classes.dialRootHovered}
           menuActionsHoveredClassName={classes.dialActionsHovered}
         >
-          {getComponentsFromObject(actions).sort()}
+          {getComponentsFromObject(actions)}
         </Menu>}
       <SettingsController/>
     </div>
