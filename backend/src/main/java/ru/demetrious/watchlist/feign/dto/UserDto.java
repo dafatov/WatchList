@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class UserDto {
     private ImageDto image;
+    private String nickname;
     private List<String> common_info;
 
     @Data

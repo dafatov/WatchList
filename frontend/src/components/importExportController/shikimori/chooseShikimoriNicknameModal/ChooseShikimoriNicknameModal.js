@@ -1,12 +1,13 @@
 import * as Yup from 'yup';
 import {Avatar, InputAdornment} from '@mui/material';
-import {memo, useState} from 'react';
 import {ClearOutlined} from '@mui/icons-material';
 import {Dialog} from '../../../modal/Dialog';
 import {IconButton} from '../../../iconButton/IconButton';
 import {TextField} from '../../../textField/TextField';
+import {memo} from 'react';
 import {throwHttpError} from '../../../../utils/reponse';
 import {useFormik} from 'formik';
+import {useSessionStorage} from '../../../../utils/storage';
 import {useSnackBar} from '../../../../utils/snackBar';
 import {useTranslation} from 'react-i18next';
 
@@ -17,13 +18,13 @@ export const ChooseShikimoriNicknameModal = memo(({
 }) => {
   const {t} = useTranslation();
   const {showError} = useSnackBar();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useSessionStorage('shikimoriUser');
   const formik = useFormik({
     validateOnMount: true,
     validateOnBlur: false,
     validateOnChange: true,
     initialValues: {
-      nickname: '',
+      nickname: user?.nickname ?? '',
     },
     validationSchema: Yup.object({
       nickname: Yup.string().required(t('common:validation.required'))

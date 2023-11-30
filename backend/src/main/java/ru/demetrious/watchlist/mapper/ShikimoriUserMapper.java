@@ -11,6 +11,7 @@ public abstract class ShikimoriUserMapper {
     static final String PERSONAL_DATA_HIDDEN = "Личные данные скрыты";
 
     @Mappings({
+        @Mapping(target = "nickname", source = "nickname"),
         @Mapping(target = "avatar", source = "image.x32"),
         @Mapping(target = "isPublic", expression = "java(!userDto.getCommon_info().contains(PERSONAL_DATA_HIDDEN))")
     })
