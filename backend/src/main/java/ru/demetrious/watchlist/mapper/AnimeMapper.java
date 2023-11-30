@@ -7,7 +7,7 @@ import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Value;
 import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
 import ru.demetrious.watchlist.domain.model.Anime;
-import ru.demetrious.watchlist.feign.dto.AnimeDto;
+import ru.demetrious.watchlist.feign.dto.AnimeListDto.AnimeDto;
 
 @Mapper
 public abstract class AnimeMapper {

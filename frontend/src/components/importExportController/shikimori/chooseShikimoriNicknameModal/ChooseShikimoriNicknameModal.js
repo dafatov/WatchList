@@ -1,7 +1,10 @@
 import * as Yup from 'yup';
+import {Avatar, InputAdornment} from '@mui/material';
+import {memo, useState} from 'react';
+import {ClearOutlined} from '@mui/icons-material';
 import {Dialog} from '../../../modal/Dialog';
+import {IconButton} from '../../../iconButton/IconButton';
 import {TextField} from '../../../textField/TextField';
-import {memo} from 'react';
 import {throwHttpError} from '../../../../utils/reponse';
 import {useFormik} from 'formik';
 import {useSnackBar} from '../../../../utils/snackBar';
@@ -14,20 +17,28 @@ export const ChooseShikimoriNicknameModal = memo(({
 }) => {
   const {t} = useTranslation();
   const {showError} = useSnackBar();
+  const [user, setUser] = useState(null);
   const formik = useFormik({
     validateOnMount: true,
-    validateOnBlur: true,
-    validateOnChange: false,
+    validateOnBlur: false,
+    validateOnChange: true,
     initialValues: {
       nickname: '',
     },
     validationSchema: Yup.object({
       nickname: Yup.string().required(t('common:validation.required'))
-        .test('exist shikimori nickname', t('common:validation.userNotExist'), nickname =>
-          fetch('http://localhost:8080/api/shikimori/user/exist?' + new URLSearchParams({nickname}))
+        .test('exist shikimori nickname', t('common:validation.userNotAvailable'), nickname =>
+          fetch('http://localhost:8080/api/shikimori/user?' + new URLSearchParams({nickname}))
             .then(throwHttpError)
             .then(response => response.json())
-            .catch(() => showError(t('web:page.animes.modal.chooseShikimoriNickname.error')))),
+            .then(user => {
+              setUser(user);
+              return user?.isPublic;
+            })
+            .catch(() => {
+              showError(t('web:page.animes.modal.chooseShikimoriNickname.error'));
+              return false;
+            })),
     }),
     onSubmit: values => {
       onSubmit(values.nickname);
@@ -48,10 +59,25 @@ export const ChooseShikimoriNicknameModal = memo(({
         editable
         name="nickname"
         value={formik.values.nickname}
-        onBlur={formik.handleBlur}
-        onChange={formik.handleChange}
-        error={formik.touched.nickname && formik.errors.nickname}
-        label={formik.errors.nickname}
+        formik={formik}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Avatar src={user?.avatar}/>
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <IconButton
+              title={t('common:action.clear')}
+              onClick={() => {
+                formik.setFieldValue('nickname', '');
+                setUser(null);
+              }}
+            >
+              <ClearOutlined/>
+            </IconButton>
+          ),
+        }}
       />
     </Dialog>
   );

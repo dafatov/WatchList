@@ -60,7 +60,8 @@ public class Common_ru extends ListResourceBundle {
                 pair("positive", "Должно быть положительным"),
                 pair("greaterZero", "Должно быть не меньше нуля"),
                 pair("noEmpty", "Должен быть пустым"),
-                pair("latinWithSpaceAndHyphen", "Должен быть латинскими буквами, пробелом или дефисом в одном экземпляре внутри слова")
+                pair("latinWithSpaceAndHyphen", "Должен быть латинскими буквами, пробелом или дефисом в одном экземпляре внутри слова"),
+                pair("userNotAvailable", "Должен быть доступным")
             )),
             pair("result", wrap(
                 pair("copy", "Успешно скопировано: {{name}}"),

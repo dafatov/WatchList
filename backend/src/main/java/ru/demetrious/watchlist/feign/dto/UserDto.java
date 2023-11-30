@@ -1,9 +1,15 @@
 package ru.demetrious.watchlist.feign.dto;
 
+import java.util.List;
 import lombok.Data;
 
 @Data
 public class UserDto {
-    private String id;
-    private String nickname;
+    private ImageDto image;
+    private List<String> common_info;
+
+    @Data
+    public static class ImageDto {
+        private String x32;
+    }
 }
