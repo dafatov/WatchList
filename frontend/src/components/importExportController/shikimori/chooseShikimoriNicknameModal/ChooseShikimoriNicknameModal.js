@@ -1,10 +1,10 @@
 import * as Yup from 'yup';
 import {Avatar, InputAdornment} from '@mui/material';
+import {memo, useEffect} from 'react';
 import {ClearOutlined} from '@mui/icons-material';
 import {Dialog} from '../../../modal/Dialog';
 import {IconButton} from '../../../iconButton/IconButton';
 import {TextField} from '../../../textField/TextField';
-import {memo} from 'react';
 import {throwHttpError} from '../../../../utils/reponse';
 import {useFormik} from 'formik';
 import {useSessionStorage} from '../../../../utils/storage';
@@ -22,30 +22,33 @@ export const ChooseShikimoriNicknameModal = memo(({
   const formik = useFormik({
     validateOnMount: true,
     validateOnBlur: false,
-    validateOnChange: true,
+    validateOnChange: false,
     initialValues: {
       nickname: user?.nickname ?? '',
     },
     validationSchema: Yup.object({
       nickname: Yup.string().required(t('common:validation.required'))
-        .test('exist shikimori nickname', t('common:validation.userNotAvailable'), nickname =>
-          fetch('http://localhost:8080/api/shikimori/user?' + new URLSearchParams({nickname}))
-            .then(throwHttpError)
-            .then(response => response.json())
-            .then(user => {
-              setUser(user);
-              return user?.isPublic;
-            })
-            .catch(() => {
-              showError(t('web:page.animes.modal.chooseShikimoriNickname.error'));
-              return false;
-            })),
+        .test('exist shikimori nickname', t('common:validation.userNotAvailable'), () => user?.isPublic),
     }),
     onSubmit: values => {
       onSubmit(values.nickname);
       setOpen(false);
-    }
+    },
   });
+
+  useEffect(() => {
+    if (formik.values.nickname) {
+      fetch('http://localhost:8080/api/shikimori/user?' + new URLSearchParams({nickname: formik.values.nickname}))
+        .then(throwHttpError)
+        .then(response => response.json())
+        .then(user => setUser(user))
+        .catch(() => showError(t('web:page.animes.modal.chooseShikimoriNickname.error')))
+        .then(() => formik.validateForm());
+    } else {
+      setUser(null);
+      formik.validateForm().then(() => {});
+    }
+  }, [formik.values.nickname, setUser]);
 
   return (
     <Dialog
@@ -70,10 +73,7 @@ export const ChooseShikimoriNicknameModal = memo(({
           endAdornment: (
             <IconButton
               title={t('common:action.clear')}
-              onClick={() => {
-                formik.setFieldValue('nickname', '');
-                setUser(null);
-              }}
+              onClick={() => formik.setFieldValue('nickname', '')}
             >
               <ClearOutlined/>
             </IconButton>
