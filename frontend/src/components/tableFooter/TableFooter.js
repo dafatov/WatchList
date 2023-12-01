@@ -1,8 +1,8 @@
-import {AddOutlined, FileDownloadOutlined, FileUploadOutlined, ImportExportOutlined} from '@mui/icons-material';
 import {IconButton, MenuItem, TableFooter as MuiTableFooter, Select, TableCell, TableRow} from '@mui/material';
 import {memo, useCallback} from 'react';
+import {AddOutlined} from '@mui/icons-material';
+import {ImportExportController} from '../importExportController/ImportExportController';
 import MuiTablePagination from '@mui/material/TablePagination';
-import {SplitIconButton} from '../splitIconButton/SplitIconButton';
 import {useStyles} from './tableFooterStyles';
 
 export const TableFooter = memo(({
@@ -13,8 +13,9 @@ export const TableFooter = memo(({
   changePage,
   changeRowsPerPage,
   onAdd,
-  onUpload,
-  onDownload,
+  onImport,
+  onShikimoriImport,
+  onExport,
   disabled,
 }) => {
   const classes = useStyles();
@@ -45,13 +46,11 @@ export const TableFooter = memo(({
             >
               <AddOutlined/>
             </IconButton>
-            <SplitIconButton
+            <ImportExportController
+              onImport={onImport}
+              onExport={onExport}
+              onShikimoriImport={onShikimoriImport}
               disabled={disabled}
-              mainIcon={<ImportExportOutlined/>}
-              topIcon={<FileUploadOutlined/>}
-              bottomIcon={<FileDownloadOutlined/>}
-              onTopClick={onUpload}
-              onBottomClick={onDownload}
             />
           </div>
           <div className={classes.paginationContainer}>

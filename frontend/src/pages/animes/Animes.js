@@ -19,7 +19,7 @@ import {getCustomSort} from '../../utils/sort';
 import {getUnitPrefix} from '../../utils/convert';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
-import {useLocalStorage} from '../../utils/localStorage';
+import {useLocalStorage} from '../../utils/storage';
 import {useSnackBar} from '../../utils/snackBar';
 import {useStyles} from './animesStyles';
 import {useTranslation} from 'react-i18next';
@@ -241,12 +241,23 @@ export const Animes = memo(() => {
       .then(response => response.json())
       .then(animes => {
         setAnimes(animes);
-        showSuccess(t('web:page.animes.snackBar.export.success'));
+        showSuccess(t('web:page.animes.snackBar.export.file.success'));
       }).catch(() => showError(t('web:page.animes.table.export.error'))));
     document.body.appendChild(link);
     link.click();
     link.parentNode.removeChild(link);
   }, [setAnimes, showSuccess, showError]);
+
+  const handleImportShikimori = useCallback(shikimoriNickname => {
+    fetch('http://localhost:8080/api/animes/import/shikimori?' + new URLSearchParams({shikimoriNickname}), {
+      method: 'POST',
+    }).then(throwHttpError)
+      .then(response => response.json())
+      .then(animes => {
+        setAnimes(animes);
+        showSuccess(t('web:page.animes.snackBar.export.shikimori.success'));
+      }).catch(() => showError(t('web:page.animes.table.export.error')));
+  }, [setAnimes, showSuccess]);
 
   const handleDownload = useCallback(() => {
     const link = document.createElement('a');
@@ -262,6 +273,10 @@ export const Animes = memo(() => {
   const getRenderSupplementStatus = useCallback(supplementStatus => t(`web:page.animes.table.supplements.enum.${supplementStatus}`), []);
 
   const getRenderSize = useCallback(size => {
+    if (!size) {
+      return '';
+    }
+
     const {value, prefix} = getUnitPrefix(size);
 
     return t('common:value', {
@@ -561,8 +576,9 @@ export const Animes = memo(() => {
         options={options}
         disabled={!!editableId || !!indexes}
         onAdd={handleAddAnime}
-        onUpload={handleUpload}
-        onDownload={handleDownload}
+        onImport={handleUpload}
+        onShikimoriImport={handleImportShikimori}
+        onExport={handleDownload}
       />,
   }), [editableId, handleAddAnime, prepareShowAnimes, indexes, showWarning, setFilterList, handleUpload, handleDownload]);
 

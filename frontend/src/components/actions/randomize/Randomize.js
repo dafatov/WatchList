@@ -6,7 +6,7 @@ import {Tooltip} from '../../tooltip/Tooltip';
 import classNames from 'classnames';
 import {createWatchingList} from '../../../utils/image';
 import {throwHttpError} from '../../../utils/reponse';
-import {useLocalStorage} from '../../../utils/localStorage';
+import {useLocalStorage} from '../../../utils/storage';
 import {useSnackBar} from '../../../utils/snackBar';
 import {useStyles} from './randomizeStyles';
 import {useTranslation} from 'react-i18next';

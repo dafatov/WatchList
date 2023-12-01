@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 
 export const Dialog = memo(({
   children,
+  autoSubmitClose = true,
   open,
   setOpen,
   onClose,
@@ -19,9 +20,11 @@ export const Dialog = memo(({
   }, [onClose, setOpen]);
 
   const handleSubmit = useCallback(() => {
-    setOpen(false);
+    if (autoSubmitClose) {
+      setOpen(false);
+    }
     onSubmit();
-  }, [onSubmit, setOpen]);
+  }, [onSubmit, setOpen, autoSubmitClose]);
 
   return (
     <MuiDialog open={open} onClose={handleClose}>

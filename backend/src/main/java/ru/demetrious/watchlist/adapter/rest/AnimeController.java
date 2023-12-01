@@ -41,6 +41,14 @@ public class AnimeController {
         return animeService.getAnimes();
     }
 
+    @PostMapping("/import/shikimori")
+    public List<Anime> importAnimesFromShikimori(@RequestParam String shikimoriNickname) {
+        List<Anime> animeList = animeService.importShikimoriAnimes(shikimoriNickname);
+
+        log.info("importAnimesFromShikimori: {}", animeList);
+        return animeService.getAnimes();
+    }
+
     @DeleteMapping
     public List<Anime> deleteAnimes(@RequestBody List<UUID> uuidList) {
         List<Anime> animeListDeleted = animeService.deleteAnimes(uuidList);
