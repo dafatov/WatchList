@@ -11,7 +11,7 @@ export const useStyles = makeStyles(theme => ({
     borderColor: theme.palette.primary.main,
     borderRadius: '0 12px 12px 0',
   },
-  'dialRootDisabled': {
+  dialRootDisabled: {
     borderColor: theme.palette.action.disabled,
     borderLeft: 'none',
     right: 0,

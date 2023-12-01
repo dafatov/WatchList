@@ -44,7 +44,9 @@ export const FileProgressTooltip = memo(({
         />
       </div>
     }>
-      {children}
+      <>
+        {children}
+      </>
     </Tooltip>
   );
 });
