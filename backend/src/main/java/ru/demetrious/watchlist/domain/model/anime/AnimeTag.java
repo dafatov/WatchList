@@ -3,7 +3,6 @@ package ru.demetrious.watchlist.domain.model.anime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import java.util.HashSet;
@@ -13,6 +12,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.demetrious.watchlist.annotation.UuidGenerator;
 import ru.demetrious.watchlist.domain.model.Anime;
 
 @Entity(name = "anime_tag")
@@ -22,7 +22,7 @@ import ru.demetrious.watchlist.domain.model.Anime;
 @ToString
 public class AnimeTag {
     @Id
-    @GeneratedValue
+    @UuidGenerator
     private UUID id;
     @Column(unique = true)
     private String name;
