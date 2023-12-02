@@ -4,7 +4,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -16,6 +15,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.demetrious.watchlist.annotation.UuidGenerator;
 import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
 import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
 import ru.demetrious.watchlist.domain.model.anime.AnimeTag;
@@ -27,7 +27,7 @@ import ru.demetrious.watchlist.domain.model.anime.AnimeTag;
 @ToString
 public class Anime {
     @Id
-    @GeneratedValue
+    @UuidGenerator
     private UUID id;
     private String name;
     private String url;

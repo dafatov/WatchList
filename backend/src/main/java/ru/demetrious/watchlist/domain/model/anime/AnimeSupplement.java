@@ -4,7 +4,6 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +13,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.NaturalId;
+import ru.demetrious.watchlist.annotation.UuidGenerator;
 import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 
 @Entity(name = "anime_supplement")
@@ -24,9 +25,10 @@ import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class AnimeSupplement {
     @Id
-    @GeneratedValue
+    @UuidGenerator
     private UUID id;
     @Enumerated(EnumType.STRING)
+    @NaturalId
     @EqualsAndHashCode.Include
     private AnimeSupplementEnum name;
     @ElementCollection
