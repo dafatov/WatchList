@@ -3,6 +3,7 @@ import {memo, useMemo} from 'react';
 import {Menu} from '../menu/Menu';
 import {Shikimori} from './shikimori/Shikimori';
 import {SplitIconButton} from '../splitIconButton/SplitIconButton';
+import {Yandex} from './yandex/Yandex';
 import classNames from 'classnames';
 import {getComponentsFromObject} from '../../utils/component';
 import {useStyles} from './importExportControllerStyles';
@@ -24,6 +25,7 @@ export const ImportExportController = memo(({
       onRightClick={onExport}
     />,
     shikimori: <Shikimori onImport={onShikimoriImport}/>,
+    yandex: <Yandex/>,
   }), [onImport, onExport, onShikimoriImport]);
 
   return (
