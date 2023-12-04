@@ -53,8 +53,9 @@ public class AnimeController {
     @PostMapping("/export/yandex")
     public ResponseEntity<?> exportAnimesToYandex(@RequestHeader(name = "Authorization") String accessToken) {
         try {
-            animeService.exportAnimesToYandex(accessToken);
-            log.info("exportAnimesToYandex");
+            String animesFile = animeService.exportAnimesToYandex(accessToken);
+
+            log.info("exportAnimesToYandex: \"{}\"", animesFile);
         } catch (Exception e) {
             log.error("Can't export animes to yandex", e);
             return ResponseEntity.internalServerError().body(e.getMessage());

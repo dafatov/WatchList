@@ -71,8 +71,8 @@ public class AnimeService {
         return setAnimes(animeList);
     }
 
-    public void exportAnimesToYandex(String accessToken) {
-        yandexService.uploadAnimeList(accessToken, getAnimes());
+    public String exportAnimesToYandex(String accessToken) {
+        return yandexService.uploadAnimeList(accessToken, getAnimes());
     }
 
     public List<Anime> deleteAnimes(List<UUID> uuidList) {

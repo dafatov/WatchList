@@ -1,0 +1,17 @@
+# Spring
+spring:
+  datasource:
+    url: jdbc:h2:file:./.db/WatchList;AUTO_SERVER=TRUE
+  h2:
+    console:
+      enabled: true
+
+# Yandex
+yandex:
+  api:
+    disk:
+      app-folder: /Приложения/WatchList/_local
+
+logging:
+  level:
+    ru.demetrious.watchlist.feign.YandexClient: off

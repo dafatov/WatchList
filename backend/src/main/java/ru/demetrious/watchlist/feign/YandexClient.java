@@ -2,6 +2,7 @@ package ru.demetrious.watchlist.feign;
 
 import java.util.Optional;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,7 +16,7 @@ public interface YandexClient {
     LinkDto getUploadLink(
         @RequestHeader(name = "Authorization") String accessToken,
         @RequestParam(name = "path") String path,
-        @RequestParam(name = "overwrite", required = false) Boolean overwrite
+        @RequestParam(name = "overwrite") Boolean overwrite
     );
 
     @GetMapping("/disk/resources")
@@ -26,6 +27,12 @@ public interface YandexClient {
 
     @PutMapping("/disk/resources")
     LinkDto createFolder(
+        @RequestHeader(name = "Authorization") String accessToken,
+        @RequestParam(name = "path") String path
+    );
+
+    @DeleteMapping("/disk/resources")
+    LinkDto deletePath(
         @RequestHeader(name = "Authorization") String accessToken,
         @RequestParam(name = "path") String path
     );

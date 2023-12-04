@@ -1,5 +1,5 @@
 import {FileDownloadOutlined, LogoutOutlined} from '@mui/icons-material';
-import {memo, useCallback} from 'react';
+import {memo, useCallback, useState} from 'react';
 import {Login} from './login/Login';
 import {SplitIconButton} from '../../splitIconButton/SplitIconButton';
 import {SvgIcon} from '@mui/material';
@@ -13,8 +13,10 @@ export const Yandex = memo(() => {
   const {t} = useTranslation();
   const {showSuccess, showError} = useSnackBar();
   const [session, setSession] = useLocalStorage('shikimoriSession');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleExport = useCallback(() => {
+    setIsLoading(true);
     fetch('http://localhost:8080/api/animes/export/yandex', {
       method: 'POST',
       headers: {
@@ -22,20 +24,22 @@ export const Yandex = memo(() => {
       }
     }).then(throwHttpError)
       .then(() => showSuccess(t('web:page.animes.snackBar.yandex.export.success')))
-      .catch(() => showError(t('web:page.animes.snackBar.yandex.export.error')));
-  });
+      .catch(() => showError(t('web:page.animes.snackBar.yandex.export.error')))
+      .finally(() => setIsLoading(false));
+  }, [setIsLoading, showSuccess, showError, session]);
 
   return (
     <>
       {session
         ? <SplitIconButton
+          disabled={isLoading}
           mainIcon={<SvgIcon component={YandexDiskIcon}/>}
           leftIcon={<LogoutOutlined/>}
           rightIcon={<FileDownloadOutlined/>}
           onLeftClick={() => setSession(null)}
           onRightClick={handleExport}
         />
-        : <Login clientId="c4d5fd5fcd2d4bbc81bfb17bf840fd44" onSuccess={session => setSession(session)}/>}
+        : <Login clientId={process.env.REACT_APP_YANDEX_CLIENT_ID} onSuccess={session => setSession(session)}/>}
     </>
   );
 });

@@ -1,44 +1,86 @@
 package ru.demetrious.watchlist.service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.feign.YandexClient;
-import ru.demetrious.watchlist.feign.dto.LinkDto;
 import ru.demetrious.watchlist.feign.dto.ResourceDto;
 
+import static java.lang.Math.max;
+import static java.lang.Math.toIntExact;
+import static java.nio.file.Path.of;
+import static java.text.MessageFormat.format;
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static ru.demetrious.watchlist.utils.RestTemplateUtils.getRestTemplate;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class YandexService {
-    private static final String BACKUPS_FOLDER = "/Приложения/WatchList/backups";
-    private static final String ANIMES_FILE = BACKUPS_FOLDER + "/animes.json";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd_hh-mm-ss");
+    private static final int MAX_BACKUPS = 2;
+    private static final Comparator<ResourceDto> RESOURCE_DTO_COMPARATOR = (a, b) ->
+        toIntExact(a.getCreated().toEpochSecond() - b.getCreated().toEpochSecond());
 
     private final YandexClient yandexClient;
 
-    public void uploadAnimeList(String accessToken, List<Anime> animeList) {
-        Optional<ResourceDto> pathMetadata = yandexClient.getPathMetadata(accessToken, BACKUPS_FOLDER);
-        if (pathMetadata.isEmpty()) {
-            yandexClient.createFolder(accessToken, BACKUPS_FOLDER);
-        }
+    @Value("${yandex.api.disk.app-folder}")
+    private String APP_FOLDER;
 
-        LinkDto uploadLink = yandexClient.getUploadLink(accessToken, ANIMES_FILE, true);
+    public String uploadAnimeList(String accessToken, List<Anime> animeList) {
+        String backupsFolder = APP_FOLDER + "/backups";
+        String animesFile = format(backupsFolder + "/animes_{0}.json", now().format(DATE_TIME_FORMATTER));
+
+        createMissingFolders(accessToken, backupsFolder);
+
+        getRestTemplate().postForEntity(
+            yandexClient.getUploadLink(accessToken, animesFile, true).getHref(),
+            createHttpEntity(animeList),
+            String.class
+        );
+        yandexClient.getPathMetadata(accessToken, backupsFolder)
+            .map(ResourceDto::get_embedded)
+            .ifPresent(embedded -> embedded.getItems().stream()
+                .sorted(RESOURCE_DTO_COMPARATOR)
+                .limit(max(embedded.getItems().size() - MAX_BACKUPS, 0))
+                .map(ResourceDto::getPath)
+                .peek(path -> log.info("File \"{}\" will be deleted", path))
+                .forEach(path -> yandexClient.deletePath(accessToken, path))
+            );
+        return animesFile;
+    }
+
+    // ===================================================================================================================
+    // = Implementation
+    // ===================================================================================================================
+
+    private void createMissingFolders(String accessToken, String path) {
+        yandexClient.getPathMetadata(accessToken, path).ifPresentOrElse(resourceDto -> {
+        }, () -> {
+            String parentPath = of(path).getParent().toString().replaceAll("\\\\", "/");
+            createMissingFolders(accessToken, parentPath);
+            yandexClient.createFolder(accessToken, path);
+        });
+    }
+
+    private HttpEntity<MultiValueMap<String, List<Anime>>> createHttpEntity(List<Anime> animeList) {
         HttpHeaders headers = new HttpHeaders();
         MultiValueMap<String, List<Anime>> body = new LinkedMultiValueMap<>();
 
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setContentType(MULTIPART_FORM_DATA);
         body.add("file", animeList);
 
-        getRestTemplate().postForEntity(uploadLink.getHref(), new HttpEntity<>(body, headers), String.class);
+        return new HttpEntity<>(body, headers);
     }
 }
