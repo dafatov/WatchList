@@ -36,6 +36,8 @@ export const Yandex = memo(() => {
           mainIcon={<SvgIcon component={YandexDiskIcon}/>}
           leftIcon={<LogoutOutlined/>}
           rightIcon={<FileDownloadOutlined/>}
+          leftTitle={t('common:action.logout')}
+          rightTitle={t('common:action.export')}
           onLeftClick={() => setSession(null)}
           onRightClick={handleExport}
         />

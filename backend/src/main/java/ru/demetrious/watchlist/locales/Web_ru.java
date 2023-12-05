@@ -73,6 +73,9 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("editSettingsModal", wrap(
                             pair("title", "Изменить настройки")
+                        )),
+                        pair("chooseShikimoriNickname", wrap(
+                            pair("title", "Пользователь shikimori")
                         ))
                     )),
                     pair("snackBar", wrap(
@@ -91,8 +94,17 @@ public class Web_ru extends ListResourceBundle {
                             pair("pick", wrap(
                                 pair("error", "Невозможно завершить выбор кандидатов")
                             ))
+                        )),
+                        pair("yandex", wrap(
+                            pair("export", wrap(
+                                pair("success", "Успешно сохранено в Яндексе")
+                            ))
+                        )),
+                        pair("generateFolder", wrap(
+                            pair("error", "Произошла ошибка при генерации папки")
                         ))
-                    ))
+                    )),
+                    pair("error", "Произошла ошибка")
                 ))
             ))
         );

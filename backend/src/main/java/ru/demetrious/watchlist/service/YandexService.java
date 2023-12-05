@@ -6,11 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.feign.YandexClient;
 import ru.demetrious.watchlist.feign.dto.ResourceDto;
@@ -21,7 +17,7 @@ import static java.nio.file.Path.of;
 import static java.text.MessageFormat.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
+import static ru.demetrious.watchlist.utils.RestTemplateUtils.createHttpEntity;
 import static ru.demetrious.watchlist.utils.RestTemplateUtils.getRestTemplate;
 
 @Service
@@ -29,7 +25,7 @@ import static ru.demetrious.watchlist.utils.RestTemplateUtils.getRestTemplate;
 @Slf4j
 public class YandexService {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd_hh-mm-ss");
-    private static final int MAX_BACKUPS = 2;
+    private static final int MAX_BACKUPS = 10;
     private static final Comparator<ResourceDto> RESOURCE_DTO_COMPARATOR = (a, b) ->
         toIntExact(a.getCreated().toEpochSecond() - b.getCreated().toEpochSecond());
 
@@ -66,21 +62,10 @@ public class YandexService {
     // ===================================================================================================================
 
     private void createMissingFolders(String accessToken, String path) {
-        yandexClient.getPathMetadata(accessToken, path).ifPresentOrElse(resourceDto -> {
-        }, () -> {
+        if (yandexClient.getPathMetadata(accessToken, path).isEmpty()) {
             String parentPath = of(path).getParent().toString().replaceAll("\\\\", "/");
             createMissingFolders(accessToken, parentPath);
             yandexClient.createFolder(accessToken, path);
-        });
-    }
-
-    private HttpEntity<MultiValueMap<String, List<Anime>>> createHttpEntity(List<Anime> animeList) {
-        HttpHeaders headers = new HttpHeaders();
-        MultiValueMap<String, List<Anime>> body = new LinkedMultiValueMap<>();
-
-        headers.setContentType(MULTIPART_FORM_DATA);
-        body.add("file", animeList);
-
-        return new HttpEntity<>(body, headers);
+        }
     }
 }

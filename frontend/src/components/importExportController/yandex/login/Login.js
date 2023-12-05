@@ -5,12 +5,14 @@ import {LoginOutlined} from '@mui/icons-material';
 import {SvgIcon} from '@mui/material';
 import {ReactComponent as YandexDiskIcon} from '../../../../assets/icons/yandexDisk.svg';
 import {useStyles} from './loginStyles';
+import {useTranslation} from 'react-i18next';
 
 export const Login = memo(({
   clientId,
   onSuccess,
 }) => {
   const classes = useStyles();
+  const {t} = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
 
   const accessKey = useMemo(() => getAccessKey(window.location.href), [getAccessKey, window.location.href]);
@@ -61,14 +63,13 @@ export const Login = memo(({
     >
       {isHovered
         ? <IconButton
-          title="Yandex"
+          title={t('common:action.login')}
           onClick={handleClick}
           className={classes.login}
         >
           <LoginOutlined/>
         </IconButton>
-        : <IconButton
-        >
+        : <IconButton onClick={() => setIsHovered(true)}>
           <SvgIcon component={YandexDiskIcon}/>
         </IconButton>}
     </div>
