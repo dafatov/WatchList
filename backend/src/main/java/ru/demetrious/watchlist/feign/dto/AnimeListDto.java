@@ -15,6 +15,7 @@ public class AnimeListDto {
         private String series_title;
         private int series_episodes;
         private int my_times_watched;
+        private int my_watched_episodes;
         private String my_status;
         private String series_animedb_id;
     }
