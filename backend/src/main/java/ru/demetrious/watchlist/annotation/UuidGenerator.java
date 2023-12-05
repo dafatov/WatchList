@@ -13,5 +13,5 @@ import static org.hibernate.annotations.UuidGenerator.Style;
 @Retention(RUNTIME)
 @Target({FIELD, METHOD})
 public @interface UuidGenerator {
-    Style style() default Style.TIME;
+    Style style() default Style.AUTO;
 }

@@ -1,6 +1,5 @@
 package ru.demetrious.watchlist.domain.model.anime;
 
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,12 +7,12 @@ import jakarta.persistence.Id;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import ru.demetrious.watchlist.annotation.UuidGenerator;
 import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 
@@ -22,15 +21,13 @@ import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 @Setter
 @RequiredArgsConstructor
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class AnimeSupplement {
     @Id
     @UuidGenerator
     private UUID id;
     @Enumerated(EnumType.STRING)
-    @NaturalId
-    @EqualsAndHashCode.Include
     private AnimeSupplementEnum name;
-    @ElementCollection
+
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<Integer> episodes = new HashSet<>();
 }
