@@ -1,4 +1,4 @@
-CREATE TABLE anime_tag
+CREATE TABLE IF NOT EXISTS anime_tag
 (
     id   uuid NOT NULL
         PRIMARY KEY,
@@ -7,7 +7,7 @@ CREATE TABLE anime_tag
             UNIQUE
 );
 
-CREATE TABLE anime_tags
+CREATE TABLE IF NOT EXISTS anime_tags
 (
     animes_id uuid NOT NULL,
     tags_id   uuid NOT NULL,
