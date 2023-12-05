@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +48,19 @@ public class AnimeController {
 
         log.info("importAnimesFromShikimori: {}", animeList);
         return animeService.getAnimes();
+    }
+
+    @PostMapping("/export/yandex")
+    public ResponseEntity<?> exportAnimesToYandex(@RequestHeader(name = "Authorization") String accessToken) {
+        try {
+            String animesFile = animeService.exportAnimesToYandex(accessToken);
+
+            log.info("exportAnimesToYandex: \"{}\"", animesFile);
+        } catch (Exception e) {
+            log.error("Can't export animes to yandex", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping

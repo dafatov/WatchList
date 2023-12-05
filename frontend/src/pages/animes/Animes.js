@@ -122,7 +122,7 @@ export const Animes = memo(() => {
     setFilterList(
       indexes
         ? ['PLANNING', 'CANDIDATE']
-        : ['WATCHING']
+        : ['WATCHING'],
     );
   }, [indexes, picked]);
 

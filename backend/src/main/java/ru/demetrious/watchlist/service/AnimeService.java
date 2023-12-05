@@ -42,6 +42,7 @@ public class AnimeService {
     private final AnimeRepository animeRepository;
     private final RandomOrgClient randomOrgClient;
     private final ShikimoriService shikimoriService;
+    private final YandexService yandexService;
     private final AnimeMapper animeMapper;
 
     public List<Anime> getAnimes() {
@@ -68,6 +69,10 @@ public class AnimeService {
             .toList();
 
         return setAnimes(animeList);
+    }
+
+    public String exportAnimesToYandex(String accessToken) {
+        return yandexService.uploadAnimeList(accessToken, getAnimes());
     }
 
     public List<Anime> deleteAnimes(List<UUID> uuidList) {

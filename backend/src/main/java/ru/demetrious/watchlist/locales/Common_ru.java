@@ -52,7 +52,11 @@ public class Common_ru extends ListResourceBundle {
                 )),
                 pair("close", "Закрыть"),
                 pair("clear", "Очистить"),
-                pair("open", "Открыть")
+                pair("open", "Открыть"),
+                pair("login", "Войти"),
+                pair("logout", "Выйти"),
+                pair("import", "Импорт"),
+                pair("export", "Экспорт")
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),

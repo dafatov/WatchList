@@ -4,10 +4,12 @@ import {ChooseShikimoriNicknameModal} from './chooseShikimoriNicknameModal/Choos
 import {ReactComponent as ShikimoriIcon} from '../../../assets/icons/shikimori.svg';
 import {SplitIconButton} from '../../splitIconButton/SplitIconButton';
 import {SvgIcon} from '@mui/material';
+import {useTranslation} from 'react-i18next';
 
 export const Shikimori = memo(({
   onImport,
 }) => {
+  const {t} = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -16,6 +18,7 @@ export const Shikimori = memo(({
         mainIcon={<SvgIcon component={ShikimoriIcon}/>}
         leftIcon={<FileUploadOutlined/>}
         rightIcon={<FileDownloadOutlined/>}
+        leftTitle={t('common:action.import')}
         onLeftClick={() => setOpen(true)}
       />
       <ChooseShikimoriNicknameModal

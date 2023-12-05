@@ -1,5 +1,5 @@
 import {memo, useState} from 'react';
-import {IconButton} from '@mui/material';
+import {IconButton} from '../iconButton/IconButton';
 import {useStyles} from './splitIconButtonStyles';
 
 export const SplitIconButton = memo(({
@@ -7,6 +7,8 @@ export const SplitIconButton = memo(({
   mainIcon,
   leftIcon,
   rightIcon,
+  leftTitle,
+  rightTitle,
   onLeftClick,
   onRightClick,
 }) => {
@@ -21,7 +23,7 @@ export const SplitIconButton = memo(({
           onMouseLeave={() => setIsHovered(false)}
         >
           <IconButton
-            color="primary"
+            title={leftTitle}
             disabled={!onLeftClick}
             className={classes.leftButton}
             onClick={() => onLeftClick?.()}
@@ -29,7 +31,7 @@ export const SplitIconButton = memo(({
             {leftIcon}
           </IconButton>
           <IconButton
-            color="primary"
+            title={rightTitle}
             disabled={!onRightClick}
             className={classes.rightButton}
             onClick={() => onRightClick?.()}
@@ -39,9 +41,9 @@ export const SplitIconButton = memo(({
         </div>
         : <IconButton
           className={classes.mainButton}
-          color="primary"
           disabled={disabled}
           onMouseEnter={() => setIsHovered(true)}
+          onClick={() => setIsHovered(true)}
         >
           {mainIcon}
         </IconButton>}
