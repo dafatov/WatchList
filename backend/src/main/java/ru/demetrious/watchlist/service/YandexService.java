@@ -24,7 +24,7 @@ import static ru.demetrious.watchlist.utils.RestTemplateUtils.getRestTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public class YandexService {
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd_hh-mm-ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final int MAX_BACKUPS = 10;
     private static final Comparator<ResourceDto> RESOURCE_DTO_COMPARATOR = (a, b) ->
         toIntExact(a.getCreated().toEpochSecond() - b.getCreated().toEpochSecond());
