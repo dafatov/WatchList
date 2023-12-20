@@ -12,7 +12,7 @@ import {useTranslation} from 'react-i18next';
 export const Yandex = memo(() => {
   const {t} = useTranslation();
   const {showSuccess, showError} = useSnackBar();
-  const [session, setSession] = useLocalStorage('shikimoriSession');
+  const [session, setSession] = useLocalStorage('yandexSession');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleExport = useCallback(() => {
