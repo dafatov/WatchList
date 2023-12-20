@@ -42,7 +42,7 @@ export const Select = memo(({
           error={!!error}
           label={error}
         >
-          {options.map(option =>
+          {options.sort().map(option =>
             <MenuItem key={option} value={option}>
               {onRender(option)}
             </MenuItem>,
