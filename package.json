@@ -1,13 +1,13 @@
 {
   "name": "ru.demetrious.watch-list",
-  "version": "1.4.6",
+  "version": "1.5.0-0",
   "config": {
-    "semver": "patch"
+    "semver": "prerelease"
   },
   "scripts": {
     "prepare": "husky install",
     "bump": "grunt bump-only:%npm_package_config_semver% && node syncPackageToPom",
-    "postbump": "npm pkg set config.semver=patch && npm install && npm install --prefix frontend && npm install --prefix electron && git add package.json package-lock.json frontend/package.json frontend/package-lock.json electron/package.json electron/package-lock.json pom.xml"
+    "postbump": "npm pkg set config.semver=prerelease && npm install && npm install --prefix frontend && npm install --prefix electron && git add package.json package-lock.json frontend/package.json frontend/package-lock.json electron/package.json electron/package-lock.json pom.xml"
   },
   "devDependencies": {
     "grunt-bump": "^0.8.0",

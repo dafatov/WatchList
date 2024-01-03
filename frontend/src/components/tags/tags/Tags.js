@@ -1,4 +1,5 @@
-import {memo, useCallback} from 'react';
+import * as MuiIcons from '@mui/icons-material';
+import {createElement, memo, useCallback} from 'react';
 import {Chip} from '@mui/material';
 import {Tooltip} from '../../tooltip/Tooltip';
 
@@ -19,6 +20,16 @@ export const Tags = memo(({
     return 'primary';
   }, [formik?.errors.tags]);
 
+  const getIcon = useCallback(tag => (
+    <Tooltip
+      disableInteractive
+      title={tag.group.name}
+    >
+      {/* eslint-disable-next-line import/namespace */}
+      {createElement(MuiIcons[tag.group.iconName])}
+    </Tooltip>
+  ), [createElement]);
+
   return (
     <>
       {tags.sort((a, b) => a.name.localeCompare(b.name))
@@ -31,6 +42,7 @@ export const Tags = memo(({
             <Chip
               variant="outlined"
               color={getColor(tag, index)}
+              icon={getIcon(tag)}
               label={tag.name}
               {...getTagProps?.({index})}
             />
