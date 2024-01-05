@@ -6,6 +6,7 @@ import {Tooltip} from '../../tooltip/Tooltip';
 export const Tags = memo(({
   tags,
   formik,
+  onClick,
   getTagProps,
 }) => {
   const getColor = useCallback((tag, index) => {
@@ -23,10 +24,10 @@ export const Tags = memo(({
   const getIcon = useCallback(tag => (
     <Tooltip
       disableInteractive
-      title={tag.group.name}
+      title={tag.group?.name ?? ''}
     >
       {/* eslint-disable-next-line import/namespace */}
-      {createElement(MuiIcons[tag.group.iconName])}
+      {createElement(MuiIcons[tag.group?.iconName ?? 'QuestionMarkOutlined'])}
     </Tooltip>
   ), [createElement]);
 
@@ -44,6 +45,7 @@ export const Tags = memo(({
               color={getColor(tag, index)}
               icon={getIcon(tag)}
               label={tag.name}
+              onClick={event => onClick?.(event.currentTarget, index)}
               {...getTagProps?.({index})}
             />
           </Tooltip>

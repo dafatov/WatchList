@@ -1,5 +1,6 @@
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {Autocomplete} from '../autocomplete/Autocomplete';
+import {EditTagGroupPopup} from './editTagGroupPopup/EditTagGroupPopup';
 import {Tags} from './tags/Tags';
 import {TextField} from '../textField/TextField';
 import {useStyles} from './tagsControllerStyles';
@@ -14,6 +15,8 @@ export const TagsController = memo(({
   const classes = useStyles();
   const {t} = useTranslation();
   const [tags, setTags] = useState(tagsProp);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [index, setIndex] = useState(null);
   const [options, setOptions] = useState(optionsProp);
   const [inputValue, setInputValue] = useState('');
 
@@ -38,37 +41,51 @@ export const TagsController = memo(({
   return (
     <>
       {editable
-        ? <Autocomplete
-          multiple
-          disableCloseOnSelect
-          readOnly={!editable}
-          value={tags}
-          inputValue={inputValue}
-          className={classes.autocomplete}
-          renderInput={params => (
-            <TextField
-              editable={editable}
-              formik={formik}
-              {...params}
-            />
-          )}
-          renderTags={(tags, getTagProps) => (
-            <Tags
-              tags={tags}
-              formik={formik}
-              getTagProps={getTagProps}
-            />
-          )}
-          options={options}
-          getOptionLabel={option => option.name}
-          isOptionEqualToValue={(option, value) => option.name === value.name}
-          onChange={handleTagsChange}
-          onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
-          clearText={t('common:action.clear')}
-          closeText={t('common:action.close')}
-          noOptionsText={t('common:result.noOptions')}
-          openText={t('common:action.open')}
-        />
+        ? <>
+          <Autocomplete
+            multiple
+            disableCloseOnSelect
+            readOnly={!editable}
+            value={tags}
+            inputValue={inputValue}
+            className={classes.autocomplete}
+            renderInput={params => (
+              <TextField
+                editable={editable}
+                formik={formik}
+                {...params}
+              />
+            )}
+            renderTags={(tags, getTagProps) => (
+              <Tags
+                tags={tags}
+                formik={formik}
+                onClick={(currentTarget, index) => {
+                  setIndex(index);
+                  setAnchorEl(currentTarget);
+                }}
+                getTagProps={getTagProps}
+              />
+            )}
+            options={options}
+            getOptionLabel={option => option.name}
+            isOptionEqualToValue={(option, value) => option.name === value.name}
+            onChange={handleTagsChange}
+            onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
+            clearText={t('common:action.clear')}
+            closeText={t('common:action.close')}
+            noOptionsText={t('common:result.noOptions')}
+            openText={t('common:action.open')}
+          />
+          <EditTagGroupPopup
+            index={index}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            formik={formik}
+            options={[{name: 'name1'}, {name: 'name2'}, {name: 'group', iconName: 'FemaleOutlined'}]}
+            group={tags[index]?.group}
+          />
+        </>
         : <Tags tags={tags}/>}
     </>
   );
