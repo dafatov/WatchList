@@ -21,15 +21,23 @@ export const Tags = memo(({
     return 'primary';
   }, [formik?.errors.tags]);
 
-  const getIcon = useCallback(tag => (
+  const getGroupColor = useCallback(index => {
+    if (formik?.errors.tags?.[index]?.group) {
+      return 'error';
+    }
+
+    return 'primary';
+  }, [formik?.errors.tags]);
+
+  const getIcon = useCallback((tag, index) => (
     <Tooltip
       disableInteractive
-      title={tag.group?.name ?? ''}
+      title={tag?.group?.name ?? ''}
     >
       {/* eslint-disable-next-line import/namespace */}
-      {createElement(MuiIcons[tag.group?.iconName ?? 'QuestionMarkOutlined'])}
+      {createElement(MuiIcons[tag?.group?.iconName ?? 'QuestionMarkOutlined'], {color: getGroupColor(index)})}
     </Tooltip>
-  ), [createElement]);
+  ), [createElement, getGroupColor]);
 
   return (
     <>
@@ -43,7 +51,7 @@ export const Tags = memo(({
             <Chip
               variant="outlined"
               color={getColor(tag, index)}
-              icon={getIcon(tag)}
+              icon={getIcon(tag, index)}
               label={tag.name}
               onClick={event => onClick?.(event.currentTarget, index)}
               {...getTagProps?.({index})}

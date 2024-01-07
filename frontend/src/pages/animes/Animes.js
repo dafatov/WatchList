@@ -529,7 +529,11 @@ export const Animes = memo(() => {
             <AnimeController
               editable={isEditable(anime.id)}
               anime={anime}
-              onSave={formik.handleSubmit}
+              onSave={() => {
+                // eslint-disable-next-line no-console
+                console.log(formik);
+                formik.handleSubmit();
+              }}
               onCancel={handleCancelAnime}
               onEdit={() => handleEditAnime(anime)}
               onDelete={handleDeleteAnime}
