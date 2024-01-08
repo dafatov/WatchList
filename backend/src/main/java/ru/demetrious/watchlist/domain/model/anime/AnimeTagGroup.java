@@ -2,6 +2,7 @@ package ru.demetrious.watchlist.domain.model.anime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -29,9 +30,10 @@ public class AnimeTagGroup {
     @NaturalId
     @EqualsAndHashCode.Include
     private String name;
+    @Column(nullable = false)
     private String iconName;
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group")
     @JsonIgnore
     @ToString.Exclude
-    private Set<AnimeTag> groups = new HashSet<>();
+    private Set<AnimeTag> tags = new HashSet<>();
 }

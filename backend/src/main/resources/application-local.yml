@@ -8,6 +8,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        use_sql_comments: true
+        format_sql: true
+        event:
+          merge:
+            entity_copy_observer: log
 
 # Yandex
 yandex:
@@ -18,3 +26,8 @@ yandex:
 logging:
   level:
     ru.demetrious.watchlist.feign.YandexClient: off
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            bind: TRACE

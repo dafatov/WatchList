@@ -3,6 +3,7 @@ import {Autocomplete} from '../autocomplete/Autocomplete';
 import {EditTagGroupPopup} from './editTagGroupPopup/EditTagGroupPopup';
 import {Tags} from './tags/Tags';
 import {TextField} from '../textField/TextField';
+import uniqWith from 'lodash/uniqWith';
 import {useStyles} from './tagsControllerStyles';
 import {useTranslation} from 'react-i18next';
 
@@ -38,6 +39,8 @@ export const TagsController = memo(({
     formik.setFieldTouched('tags', true, true);
   }, [setTags, formik.setFieldValue, formik.setFieldTouched]);
 
+  // eslint-disable-next-line no-console
+  console.log({options, unqi: uniqWith(options.map(option => option.group), (a, b) => a?.id === b?.id)});
   return (
     <>
       {editable
@@ -82,7 +85,7 @@ export const TagsController = memo(({
             anchorEl={anchorEl}
             onClose={() => setAnchorEl(null)}
             formik={formik}
-            options={[{name: 'name1'}, {name: 'name2'}, {name: 'group', iconName: 'FemaleOutlined'}]}
+            options={uniqWith(options.filter(option => option.group).map(option => option.group), (a, b) => a?.id === b?.id)}
             group={tags[index]?.group}
           />
         </>

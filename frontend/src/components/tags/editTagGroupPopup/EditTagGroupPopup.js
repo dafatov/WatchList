@@ -1,9 +1,16 @@
 import * as MuiIcons from '@mui/icons-material';
-import {Button, ImageList, InputAdornment, MenuItem, Popover, TextField} from '@mui/material';
+import {Divider, InputAdornment, MenuItem, Popover, TextField} from '@mui/material';
 import {createElement, memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {Autocomplete} from '../../autocomplete/Autocomplete';
+import {FixedSizeGrid} from 'react-window';
+import {IconButton} from '../../iconButton/IconButton';
+import chunk from 'lodash/chunk';
 // import {useStyles} from './editTagGroupPopupStyles';
 import {useTranslation} from 'react-i18next';
+
+const ICONS_COLUMNS_COUNT = 16;
+const ICONS_ROWS_COUNT = 12;
+const ICON_SIZE = 32;
 
 export const EditTagGroupPopup = memo(({
   index,
@@ -19,8 +26,14 @@ export const EditTagGroupPopup = memo(({
   const [options, setOptions] = useState(optionsProp);
   const [inputValue, setInputValue] = useState('');
   const [isEditIcon, setIsEditIcon] = useState(false);
+  const [filterIcons, setFilterIcons] = useState('');
 
   const optionsPropSorted = useMemo(() => optionsProp.sort((a, b) => a.name.localeCompare(b.name)), [optionsProp]);
+  const icons = useMemo(() => chunk(Object.keys(MuiIcons)
+    .filter(iconName => iconName.endsWith('Outlined'))
+    .filter(iconName => iconName.match(filterIcons))
+    .sort(), ICONS_COLUMNS_COUNT), [MuiIcons, filterIcons, ICONS_COLUMNS_COUNT]);
+  const error = useMemo(() => formik?.errors.tags?.[index]?.group.name, [formik?.errors.tags?.[index]?.group.name]);
 
   useEffect(() => {
     setGroup(groupProp);
@@ -28,8 +41,6 @@ export const EditTagGroupPopup = memo(({
 
   useEffect(() => {
     if (!anchorEl) {
-      // eslint-disable-next-line no-console
-      console.log('reset');
       setIsEditIcon(false);
     }
   }, [setIsEditIcon, anchorEl]);
@@ -64,10 +75,8 @@ export const EditTagGroupPopup = memo(({
     setIsEditIcon(false);
   }, [setGroup, formik.setFieldValue, formik.setFieldTouched, index, setIsEditIcon]);
 
-  const error = useMemo(() => formik?.errors.tags?.[index]?.group.name, [formik?.errors.tags?.[index]?.group.name]);
-  const icons = useMemo(() => Object.keys(MuiIcons).filter(iconName => iconName.endsWith('Outlined')).sort(), [MuiIcons]);
-
-
+  // eslint-disable-next-line no-console
+  console.log({optionsPropSorted, options, optionsProp});
   return (
     <>
       <Popover
@@ -84,7 +93,8 @@ export const EditTagGroupPopup = memo(({
         }}
       >
         <Autocomplete
-          style={{margin: '12px'}}
+          disabled={isEditIcon}
+          style={{margin: '16px'}}
           value={group}
           inputValue={inputValue}
           renderInput={params => (
@@ -96,11 +106,15 @@ export const EditTagGroupPopup = memo(({
                 ...params.InputProps,
                 startAdornment: (
                   <InputAdornment position="start">
-                    {/* eslint-disable-next-line import/namespace */}
-                    {createElement(MuiIcons[group?.iconName ?? 'QuestionMarkOutlined'], {
-                      color: getGroupColor(),
-                      onClick: () => setIsEditIcon(isEditIcon => !isEditIcon),
-                    })}
+                    <IconButton
+                      disabled={!group?.name}
+                      color={getGroupColor()}
+                      onClick={() => setIsEditIcon(isEditIcon => !isEditIcon)}
+                      title={t('common:action.pickIcon')}
+                    >
+                      {/* eslint-disable-next-line import/namespace */}
+                      {createElement(MuiIcons[group?.iconName ?? 'QuestionMarkOutlined'])}
+                    </IconButton>
                   </InputAdornment>
                 ),
               }}
@@ -123,17 +137,58 @@ export const EditTagGroupPopup = memo(({
           openText={t('common:action.open')}
         />
         {isEditIcon
-          // TODO: Need virtualization cause long render
-          ? <ImageList cols={4}>
-            {icons.map(iconName => (
-              <ImageList key={iconName}>
-                <Button onClick={() => handleGroupIconChange(iconName)} style={{minWidth: 0, padding: 0}}>
-                  {/* eslint-disable-next-line import/namespace */}
-                  {createElement(MuiIcons[iconName])}
-                </Button>
-              </ImageList>
-            ))}
-          </ImageList>
+          ? <>
+            <Divider/>
+            <TextField
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MuiIcons.SearchOutlined/>
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      title={t('common:action.clear')}
+                      onClick={() => setFilterIcons('')}
+                    >
+                      <MuiIcons.ClearOutlined/>
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              style={{display: 'flex', margin: '16px'}}
+              value={filterIcons}
+              onChange={event => setFilterIcons(event.target.value)}
+            />
+            <FixedSizeGrid
+              columnCount={Math.min(ICONS_COLUMNS_COUNT, icons[0]?.length ?? 0)}
+              rowCount={icons.length}
+              columnWidth={ICON_SIZE}
+              rowHeight={ICON_SIZE}
+              width={ICON_SIZE * (ICONS_COLUMNS_COUNT + 1)}
+              height={ICONS_ROWS_COUNT * ICON_SIZE}
+            >
+              {({columnIndex, rowIndex, style}) => {
+                const iconName = icons[rowIndex][columnIndex];
+
+                if (!iconName) {
+                  return <></>;
+                }
+
+                return (
+                  <IconButton
+                    title={iconName}
+                    onClick={() => handleGroupIconChange(iconName)}
+                    style={style}
+                  >
+                    {/* eslint-disable-next-line import/namespace */}
+                    {createElement(MuiIcons[iconName])}
+                  </IconButton>
+                );
+              }}
+            </FixedSizeGrid>
+          </>
           : <></>}
       </Popover>
     </>
