@@ -30,11 +30,11 @@ public class AnimeTagService {
     private void deleteAllIsUnused() {
         List<UUID> unusedAnimeTagUuidList = animeTagRepository.findAll().stream()
             .filter(animeTag -> animeTag.getAnimes().isEmpty())
-            .peek(animeTag -> animeTagGroupService.deleteUnused(animeTag.getGroup()))
             .map(AnimeTag::getId)
             .collect(Collectors.toList());
 
         animeTagRepository.deleteByIdIsIn(unusedAnimeTagUuidList);
         log.info("deleteAllIsUnused: {}", unusedAnimeTagUuidList);
+        animeTagGroupService.deleteAllIsUnused();
     }
 }

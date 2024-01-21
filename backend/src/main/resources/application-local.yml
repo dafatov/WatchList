@@ -28,6 +28,12 @@ logging:
     ru.demetrious.watchlist.feign.YandexClient: off
     org:
       hibernate:
+        engine:
+          internal:
+            Cascade: TRACE
+        event:
+          internal:
+            EntityCopyAllowedLoggedObserver: TRACE
         orm:
           jdbc:
             bind: TRACE

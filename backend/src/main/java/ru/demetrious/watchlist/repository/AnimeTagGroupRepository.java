@@ -8,4 +8,5 @@ import ru.demetrious.watchlist.domain.model.anime.AnimeTagGroup;
 
 @Repository
 public interface AnimeTagGroupRepository extends JpaRepository<AnimeTagGroup, UUID> {
+    void deleteByIdIsIn(List<UUID> uuids);
 }

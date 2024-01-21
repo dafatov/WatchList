@@ -40,7 +40,7 @@ export const TagsController = memo(({
   }, [setTags, formik.setFieldValue, formik.setFieldTouched]);
 
   // eslint-disable-next-line no-console
-  console.log({options, unqi: uniqWith(options.map(option => option.group), (a, b) => a?.id === b?.id)});
+  console.log({tags, options, unqi: uniqWith(options.map(option => option.group), (a, b) => a?.id === b?.id)});
   return (
     <>
       {editable
@@ -85,7 +85,7 @@ export const TagsController = memo(({
             anchorEl={anchorEl}
             onClose={() => setAnchorEl(null)}
             formik={formik}
-            options={uniqWith(options.filter(option => option.group).map(option => option.group), (a, b) => a?.id === b?.id)}
+            options={uniqWith(options.concat(tags).filter(option => option.group).map(option => option.group), (a, b) => a?.id === b?.id)}
             group={tags[index]?.group}
           />
         </>
