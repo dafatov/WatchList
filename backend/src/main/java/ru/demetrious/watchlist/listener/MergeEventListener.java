@@ -24,12 +24,12 @@ public class MergeEventListener extends DefaultMergeEventListener {
         Object original = event.getOriginal();
         EntityPersister entityPersister = session.getEntityPersister(event.getEntityName(), original);
 
-        findIdentifierByNaturalId(session, original, entityPersister)
-            .map(identifierByNaturalId -> entityPersister.getIdentifierType().deepCopy(identifierByNaturalId, session.getFactory()))
-            .ifPresent(identifierByNaturalId -> {
-                entityPersister.setIdentifier(original, identifierByNaturalId, session);
+        findIdentifierByNaturalId(session, original, entityPersister).ifPresent(identifierByNaturalId -> {
+            if (entityPersister.getIdentifier(original, session) == null) {
                 log.debug("For entity {} set id ({})", original, identifierByNaturalId);
-            });
+                entityPersister.setIdentifier(original, identifierByNaturalId, session);
+            }
+        });
 
         super.onMerge(event, copiedAlready);
     }
@@ -38,17 +38,18 @@ public class MergeEventListener extends DefaultMergeEventListener {
     // = Implementation
     // ===================================================================================================================
 
-    private Optional<Object> findIdentifierByNaturalId(SharedSessionContractImplementor session, Object owner, EntityPersister entityPersister) {
+    private Optional<Object> findIdentifierByNaturalId(SharedSessionContractImplementor session, Object entity, EntityPersister entityPersister) {
         return ofNullable(entityPersister.getNaturalIdentifierProperties())
             .filter(naturalIdPositions -> naturalIdPositions.length > 0)
             .map(naturalIdPositions -> stream(naturalIdPositions)
                 .mapToObj(entityPersister::getAttributeMapping)
-                .map(naturalAttribute -> naturalAttribute.getValue(owner))
+                .map(naturalAttribute -> naturalAttribute.getValue(entity))
                 .toArray())
             .map(naturalIds -> entityPersister.getEntityMappingType().getNaturalIdMapping() instanceof SimpleNaturalIdMapping
                 ? naturalIds[0]
                 : naturalIds)
             .map(naturalId -> session.getPersistenceContext().getNaturalIdResolutions()
-                .findCachedIdByNaturalId(naturalId, entityPersister.getEntityMappingType()));
+                .findCachedIdByNaturalId(naturalId, entityPersister.getEntityMappingType()))
+            .map(naturalId -> entityPersister.getIdentifierType().deepCopy(naturalId, session.getFactory()));
     }
 }
