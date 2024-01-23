@@ -1,6 +1,6 @@
-import * as MuiIcons from '@mui/icons-material';
 import {createElement, memo, useCallback} from 'react';
 import {Chip} from '@mui/material';
+import {Icon} from '../../icon/Icon';
 import {Tooltip} from '../../tooltip/Tooltip';
 
 export const Tags = memo(({
@@ -21,7 +21,7 @@ export const Tags = memo(({
     return 'primary';
   }, [formik?.errors.tags]);
 
-  const getGroupColor = useCallback(index => {
+  const getGroupColor = useCallback((tag, index) => {
     if (formik?.errors.tags?.[index]?.group) {
       return 'error';
     }
@@ -34,8 +34,7 @@ export const Tags = memo(({
       disableInteractive
       title={tag?.group?.name ?? ''}
     >
-      {/* eslint-disable-next-line import/namespace */}
-      {createElement(MuiIcons[tag?.group?.iconName ?? 'QuestionMarkOutlined'], {color: getGroupColor(index)})}
+      <Icon iconName={tag?.group?.iconName} color={getGroupColor(tag, index)}/>
     </Tooltip>
   ), [createElement, getGroupColor]);
 

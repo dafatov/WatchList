@@ -1,6 +1,6 @@
 import {Button, FormGroup} from '@mui/material';
 import {memo, useCallback, useEffect, useState} from 'react';
-import {Dialog} from '../../modal/Dialog';
+import {Dialog} from '../../dialog/Dialog';
 import {Folder} from '@mui/icons-material';
 import {useTranslation} from 'react-i18next';
 

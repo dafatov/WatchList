@@ -8,9 +8,9 @@ export const IconButton = memo(({
   disabled = false,
   onClick,
   ...props
-}) => {
-  return (
-    <Tooltip disableInteractive title={title}>
+}) => (
+  <Tooltip disableInteractive title={title}>
+    <span>
       <MuiIconButton
         color="primary"
         disabled={disabled}
@@ -19,8 +19,8 @@ export const IconButton = memo(({
       >
         {children}
       </MuiIconButton>
-    </Tooltip>
-  );
-});
+    </span>
+  </Tooltip>
+));
 
 IconButton.displayName = 'IconButton';

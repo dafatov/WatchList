@@ -1,5 +1,5 @@
 import {memo, useCallback} from 'react';
-import {Dialog} from '../../modal/Dialog';
+import {Dialog} from '../../dialog/Dialog';
 import {DialogContentText} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 
