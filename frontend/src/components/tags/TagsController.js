@@ -22,9 +22,10 @@ export const TagsController = memo(({
   const [inputValue, setInputValue] = useState('');
 
   const optionsPropSorted = useMemo(() => uniqWith(
-    optionsProp.concat(tags).sort((a, b) => a.name.localeCompare(b.name)),
+    tags.concat(optionsProp).sort((a, b) => a.name.localeCompare(b.name)),
     (a, b) => a?.name === b?.name,
   ), [optionsProp, tags]);
+
   const groupOptions = useMemo(() => uniqWith(
     options.filter(option => option.group).map(option => option.group),
     (a, b) => a?.name === b?.name,

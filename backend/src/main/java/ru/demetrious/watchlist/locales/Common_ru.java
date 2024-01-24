@@ -56,7 +56,11 @@ public class Common_ru extends ListResourceBundle {
                 pair("login", "Войти"),
                 pair("logout", "Выйти"),
                 pair("import", "Импорт"),
-                pair("export", "Экспорт")
+                pair("export", "Экспорт"),
+                pair("pickIcon", wrap(
+                    pair("on", "Начать выбор иконки"),
+                    pair("off", "Закончить выбор иконки")
+                ))
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),

@@ -68,11 +68,10 @@ export const IconPicker = memo(({
 
           return (
             <IconButton
-              title={iconName}
               onClick={() => onSubmit(iconName)}
               style={style}
             >
-              <Icon iconName={iconName}/>
+              <Icon title={iconName} iconName={iconName}/>
             </IconButton>
           );
         }}

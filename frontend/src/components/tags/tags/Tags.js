@@ -1,4 +1,4 @@
-import {createElement, memo, useCallback} from 'react';
+import {memo, useCallback} from 'react';
 import {Chip} from '@mui/material';
 import {Icon} from '../../icon/Icon';
 import {Tooltip} from '../../tooltip/Tooltip';
@@ -29,15 +29,6 @@ export const Tags = memo(({
     return 'primary';
   }, [formik?.errors.tags]);
 
-  const getIcon = useCallback((tag, index) => (
-    <Tooltip
-      disableInteractive
-      title={tag?.group?.name ?? ''}
-    >
-      <Icon iconName={tag?.group?.iconName} color={getGroupColor(tag, index)}/>
-    </Tooltip>
-  ), [createElement, getGroupColor]);
-
   return (
     <>
       {tags.sort((a, b) => a.name.localeCompare(b.name))
@@ -50,9 +41,15 @@ export const Tags = memo(({
             <Chip
               variant="outlined"
               color={getColor(tag, index)}
-              icon={getIcon(tag, index)}
+              icon={
+                <Icon
+                  title={tag?.group?.name ?? ''}
+                  iconName={tag?.group?.iconName}
+                  color={getGroupColor(tag, index)}
+                />
+              }
               label={tag.name}
-              onClick={event => onClick?.(event.currentTarget, index)}
+              onClick={onClick && (event => onClick(event.currentTarget, index))}
               {...getTagProps?.({index})}
             />
           </Tooltip>

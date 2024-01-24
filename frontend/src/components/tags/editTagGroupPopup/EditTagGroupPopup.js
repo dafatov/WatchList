@@ -89,7 +89,9 @@ export const EditTagGroupPopup = memo(({
                     disabled={!group?.name}
                     color={getGroupColor()}
                     onClick={() => setIsEditIcon(isEditIcon => !isEditIcon)}
-                    title={t('common:action.pickIcon')}
+                    title={isEditIcon
+                      ? t('common:action.pickIcon.off')
+                      : t('common:action.pickIcon.on')}
                   >
                     <Icon iconName={group?.iconName}/>
                   </IconButton>

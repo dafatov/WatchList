@@ -9,7 +9,7 @@ export const IconButton = memo(({
   onClick,
   ...props
 }) => (
-  <Tooltip disableInteractive title={title}>
+  <Tooltip disableInteractive title={!disabled && title}>
     <span>
       <MuiIconButton
         color="primary"
