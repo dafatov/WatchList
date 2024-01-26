@@ -1,8 +1,9 @@
-const {app, BrowserWindow, ipcMain, dialog} = require('electron');
+const {app, BrowserWindow, ipcMain, dialog, Menu, MenuItem} = require('electron');
 const {exec} = require('child_process');
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
+const packageJson = require('../package.json');
 
 const url = 'http://localhost:8080';
 const icon = './resources/icons/watch-list.png';
@@ -91,6 +92,7 @@ const startLoading = () => {
 };
 
 const startBrowser = () => {
+  createMenu();
   fetch(url)
     .then(() => {
       mainWindow = new BrowserWindow({
@@ -126,6 +128,18 @@ const startBrowser = () => {
     .then(() => setInterval(() => fetch(`${url}/health`)
       .catch(() => app.quit()), 250))
     .catch(() => setTimeout(() => startBrowser(), 250));
+};
+
+const createMenu = () => {
+  const menu = Menu.getApplicationMenu();
+  const helpSubMenu = menu?.items.find(item => item.role === 'help')?.submenu;
+
+  if (helpSubMenu) {
+    helpSubMenu.append(new MenuItem({
+      label: `Version: ${packageJson.version}`,
+      enabled: false,
+    }));
+  }
 };
 
 const doIfNotLocal = (callback, localValue) => {
