@@ -33,6 +33,7 @@ public class AnimeTag {
     private String name;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
     @NaturalId(mutable = true)
+    @EqualsAndHashCode.Include
     private AnimeTagGroup group;
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore

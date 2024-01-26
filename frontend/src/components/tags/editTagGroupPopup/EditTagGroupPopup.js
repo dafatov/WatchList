@@ -26,6 +26,22 @@ export const EditTagGroupPopup = memo(({
   const optionsPropSorted = useMemo(() => optionsProp.sort((a, b) => a.name.localeCompare(b.name)), [optionsProp]);
   const error = useMemo(() => formik?.errors.tags?.[index]?.group?.name, [formik?.errors.tags?.[index]?.group?.name]);
 
+  const groupColor = useMemo(() => {
+    if (formik?.errors.tags?.[index]?.group?.iconName) {
+      return 'error';
+    }
+
+    return 'primary';
+  }, [formik?.errors.tags?.[index]?.group?.iconName]);
+
+  const groupError = useMemo(() => {
+    if (!formik?.errors.tags?.[index]?.group?.iconName) {
+      return null;
+    }
+
+    return formik?.errors.tags?.[index]?.group?.iconName;
+  }, [formik?.errors.tags?.[index]?.group?.iconName]);
+
   useEffect(() => {
     setGroup(groupProp);
   }, [groupProp, setGroup]);
@@ -41,14 +57,6 @@ export const EditTagGroupPopup = memo(({
       ? {name: inputValue, isPattern: true}
       : []));
   }, [optionsPropSorted, setOptions, inputValue]);
-
-  const getGroupColor = useCallback(() => {
-    if (formik?.errors.tags?.[index]?.group?.iconName) {
-      return 'error';
-    }
-
-    return 'primary';
-  }, [formik?.errors.tags?.[index]?.group?.iconName]);
 
   const handleGroupChange = useCallback((_, newGroup) => {
     setGroup(newGroup);
@@ -80,14 +88,14 @@ export const EditTagGroupPopup = memo(({
           <TextField
             {...params}
             error={!!error}
-            label={error}
+            label={error ?? groupError}
             InputProps={{
               ...params.InputProps,
               startAdornment: (
                 <InputAdornment position="start" className={classes.inputAdornment}>
                   <IconButton
                     disabled={!group?.name}
-                    color={getGroupColor()}
+                    color={groupColor}
                     onClick={() => setIsEditIcon(isEditIcon => !isEditIcon)}
                     title={isEditIcon
                       ? t('common:action.pickIcon.off')

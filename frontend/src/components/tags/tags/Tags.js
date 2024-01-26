@@ -35,7 +35,7 @@ export const Tags = memo(({
         .map((tag, index) => (
           <Tooltip
             disableInteractive
-            key={tag.id}
+            key={tag.name}
             title={formik?.errors.tags?.[index]?.name}
           >
             <Chip
