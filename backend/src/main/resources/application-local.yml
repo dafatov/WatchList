@@ -8,6 +8,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: false
+        use_sql_comments: false
+        format_sql: false
+        event:
+          merge:
+            entity_copy_observer: allow
 
 # Yandex
 yandex:
@@ -17,4 +25,21 @@ yandex:
 
 logging:
   level:
-    ru.demetrious.watchlist.feign.YandexClient: off
+    ru:
+      demetrious:
+        watchlist:
+          feign:
+            YandexClient: off
+          listener:
+            MergeEventListener: off
+    org:
+      hibernate:
+        engine:
+          internal:
+            Cascade: off
+        event:
+          internal:
+            EntityCopyAllowedLoggedObserver: off
+        orm:
+          jdbc:
+            bind: off

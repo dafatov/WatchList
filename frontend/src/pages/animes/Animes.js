@@ -17,6 +17,7 @@ import {defaultOptions} from '../../configs/muiDataTableConfig';
 import difference from 'lodash/difference';
 import {getCustomSort} from '../../utils/sort';
 import {getUnitPrefix} from '../../utils/convert';
+import last from 'lodash/last';
 import {throwHttpError} from '../../utils/reponse';
 import {useFormik} from 'formik';
 import {useLocalStorage} from '../../utils/storage';
@@ -75,6 +76,15 @@ export const Animes = memo(() => {
       tags: Yup.array(Yup.object({
         name: Yup.string().required(t('common:validation.required'))
           .matches(/^[a-z]+[ -]?[a-z]+$/, t('common:validation.latinWithSpaceAndHyphen')),
+        group: Yup.object({
+          name: Yup.string().required(t('common:validation.required'))
+            .matches(/^[a-z]+[ -]?[a-z]+$/, t('common:validation.latinWithSpaceAndHyphen')),
+          iconName: Yup.string().required(t('common:validation.required'))
+            .test('same', t('common:validation.sameIcon'), (iconName, context) => last(context.from).value.tags
+              .filter(tag => tag.group?.name === context.parent.name && tag.group?.iconName !== iconName)
+              .length === 0,
+            ),
+        }),
       })),
       path: Yup.string().required(t('common:validation.required')),
     }),

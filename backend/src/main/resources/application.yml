@@ -12,6 +12,11 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: true
+    properties:
+      hibernate:
+        event:
+          merge:
+            entity_copy_observer: allow
 
 # RandomOrg
 random-org:

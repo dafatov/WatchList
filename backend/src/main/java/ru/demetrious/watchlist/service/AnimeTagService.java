@@ -15,6 +15,7 @@ import ru.demetrious.watchlist.repository.AnimeTagRepository;
 @Slf4j
 public class AnimeTagService {
     private final AnimeTagRepository animeTagRepository;
+    private final AnimeTagGroupService animeTagGroupService;
 
     @Transactional
     public List<AnimeTag> getAnimeTags() {
@@ -34,5 +35,6 @@ public class AnimeTagService {
 
         animeTagRepository.deleteByIdIsIn(unusedAnimeTagUuidList);
         log.info("deleteAllIsUnused: {}", unusedAnimeTagUuidList);
+        animeTagGroupService.deleteAllIsUnused();
     }
 }

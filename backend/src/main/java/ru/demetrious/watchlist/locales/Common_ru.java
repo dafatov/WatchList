@@ -56,7 +56,11 @@ public class Common_ru extends ListResourceBundle {
                 pair("login", "Войти"),
                 pair("logout", "Выйти"),
                 pair("import", "Импорт"),
-                pair("export", "Экспорт")
+                pair("export", "Экспорт"),
+                pair("pickIcon", wrap(
+                    pair("on", "Начать выбор иконки"),
+                    pair("off", "Закончить выбор иконки")
+                ))
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),
@@ -65,7 +69,8 @@ public class Common_ru extends ListResourceBundle {
                 pair("greaterZero", "Должно быть не меньше нуля"),
                 pair("noEmpty", "Должен быть пустым"),
                 pair("latinWithSpaceAndHyphen", "Должен быть латинскими буквами, пробелом или дефисом в одном экземпляре внутри слова"),
-                pair("userNotAvailable", "Должен быть доступным")
+                pair("userNotAvailable", "Должен быть доступным"),
+                pair("sameIcon", "Должна быть одинаковая иконка")
             )),
             pair("result", wrap(
                 pair("copy", "Успешно скопировано: {{name}}"),

@@ -1,6 +1,6 @@
 import {Checkbox, Divider, FormControlLabel, FormGroup} from '@mui/material';
 import {memo, useCallback, useEffect, useState} from 'react';
-import {Dialog} from '../../modal/Dialog';
+import {Dialog} from '../../dialog/Dialog';
 import {union} from 'lodash';
 import {useTranslation} from 'react-i18next';
 

@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 import {Avatar, InputAdornment} from '@mui/material';
 import {memo, useEffect} from 'react';
 import {ClearOutlined} from '@mui/icons-material';
-import {Dialog} from '../../../modal/Dialog';
+import {Dialog} from '../../../dialog/Dialog';
 import {IconButton} from '../../../iconButton/IconButton';
 import {TextField} from '../../../textField/TextField';
 import {throwHttpError} from '../../../../utils/reponse';
