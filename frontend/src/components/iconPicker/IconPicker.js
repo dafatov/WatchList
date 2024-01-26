@@ -19,9 +19,9 @@ export const IconPicker = memo(({
   const {t} = useTranslation();
   const [filterIcons, setFilterIcons] = useState('');
 
-  const muiIcons = useMemo(() => Object.keys(MuiIcons).filter(iconName => iconName.endsWith('Outlined')), [MuiIcons]);
+  const muiIcons = useMemo(() => Object.keys(MuiIcons).filter(iconName => iconName.endsWith('Outlined')).sort(), [MuiIcons]);
   const icons = useMemo(() => chunk(
-    muiIcons.filter(iconName => iconName.match(filterIcons)).sort(),
+    muiIcons.filter(iconName => iconName.match(filterIcons)),
     ICONS_COLUMNS_COUNT,
   ), [muiIcons, filterIcons, ICONS_COLUMNS_COUNT]);
 

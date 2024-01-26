@@ -1,6 +1,6 @@
 {
   "name": "ru.demetrious.watch-list.frontend",
-  "version": "1.5.0-9",
+  "version": "1.5.0-10",
   "description": "A web application",
   "private": true,
   "scripts": {
