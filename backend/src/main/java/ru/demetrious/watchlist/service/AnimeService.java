@@ -28,7 +28,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.CANDIDATE;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.PLANNING;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.WATCHING;
-import static ru.demetrious.watchlist.utils.AnimeUtils.getPath;
 import static ru.demetrious.watchlist.utils.AnimeUtils.getURI;
 import static ru.demetrious.watchlist.utils.FileUtils.normalizePaths;
 
@@ -77,14 +76,6 @@ public class AnimeService {
 
     public List<Anime> deleteAnimes(List<UUID> uuidList) {
         return animeRepository.deleteByIdIsIn(uuidList);
-    }
-
-    public void openAnimeFolder(UUID id) throws IOException {
-        Optional<Anime> anime = animeRepository.findById(id);
-
-        System.setProperty("java.awt.headless", "false");
-
-        Desktop.getDesktop().open(getPath(anime.orElseThrow()).toFile());
     }
 
     public void openAnimeUrl(UUID id) throws IOException {

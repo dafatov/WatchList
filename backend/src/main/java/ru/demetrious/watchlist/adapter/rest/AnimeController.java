@@ -71,18 +71,6 @@ public class AnimeController {
         return animeService.getAnimes();
     }
 
-    @PostMapping("/open/folder")
-    public ResponseEntity<String> openAnimeFolder(@RequestParam UUID id) {
-        try {
-            animeService.openAnimeFolder(id);
-            log.info("openAnimeFolder: {}", id);
-        } catch (Exception e) {
-            log.error("Can't open Anime folder", e);
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/open/url")
     public ResponseEntity<String> openAnimeUrl(@RequestParam UUID id) {
         try {

@@ -51,8 +51,7 @@ public class Web_ru extends ListResourceBundle {
                             ))
                         )),
                         pair("path", wrap(
-                            pair("title", "Путь"),
-                            pair("error", "Не удалось открыть папку")
+                            pair("title", "Путь")
                         )),
                         pair("action", wrap(
                             pair("generate", wrap(
@@ -102,6 +101,13 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("generateFolder", wrap(
                             pair("error", "Произошла ошибка при генерации папки")
+                        )),
+                        pair("sync", wrap(
+                            pair("success", "Синхронизация успешно выполнена"),
+                            pair("error", "Произошла ошибка при синхронизации")
+                        )),
+                        pair("openFolder", wrap(
+                            pair("error", "Не удалось открыть папку")
                         ))
                     )),
                     pair("error", "Произошла ошибка")

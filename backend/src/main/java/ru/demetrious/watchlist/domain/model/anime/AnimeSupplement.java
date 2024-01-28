@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import ru.demetrious.watchlist.annotation.UuidGenerator;
@@ -21,6 +22,7 @@ import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 @Setter
 @RequiredArgsConstructor
 @ToString
+@Accessors(chain = true)
 public class AnimeSupplement {
     @Id
     @UuidGenerator
