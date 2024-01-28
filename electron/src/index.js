@@ -92,8 +92,8 @@ const startLoading = () => {
 };
 
 const startBrowser = () => {
-  createMenu();
   fetch(url)
+    .then(() => createMenu())
     .then(() => {
       mainWindow = new BrowserWindow({
         show: false,
@@ -135,6 +135,7 @@ const createMenu = () => {
   const helpSubMenu = menu?.items.find(item => item.role === 'help')?.submenu;
 
   if (helpSubMenu) {
+    log.debug('version set into submenu help');
     helpSubMenu.append(new MenuItem({
       label: `Version: ${packageJson.version}`,
       enabled: false,
