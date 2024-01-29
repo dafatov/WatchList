@@ -46,7 +46,7 @@ export const PathLink = memo(({
       .finally(() => setIsLoading(false));
   }, [formik.setFieldValue, setIsLoading, value]);
 
-  const handleOpenFile = useCallback(() => {
+  const handleOpen = useCallback(() => {
     fetch('http://localhost:8080/api/files/open/folder?' + new URLSearchParams({
       path: value,
     }), {
@@ -59,15 +59,15 @@ export const PathLink = memo(({
     return formik.touched[name] && formik.errors[name];
   }, [formik.touched[name], formik.errors[name]]);
 
-  const openFileButton = useMemo(() => (
+  const openButton = useMemo(() => (
     <IconButton
       title={value}
       disabled={!value}
-      onClick={() => handleOpenFile()}
+      onClick={() => handleOpen()}
     >
       <OpenInNew/>
     </IconButton>
-  ), [value, handleOpenFile]);
+  ), [value, handleOpen]);
 
   const actions = useMemo(() => ({
     sync: <IconButton
@@ -102,11 +102,11 @@ export const PathLink = memo(({
               </InputAdornment>,
             endAdornment:
               <InputAdornment position="end">
-                {openFileButton}
+                {openButton}
               </InputAdornment>,
           }}
         />
-        : openFileButton}
+        : openButton}
     </>
   );
 });
