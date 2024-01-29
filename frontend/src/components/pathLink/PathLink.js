@@ -1,9 +1,12 @@
 import {InputAdornment, TextField} from '@mui/material';
-import {OpenInNew, SyncOutlined} from '@mui/icons-material';
+import {MenuOutlined, OpenInNew, SyncOutlined} from '@mui/icons-material';
 import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {IconButton} from '../iconButton/IconButton';
+import {Menu} from '../menu/Menu';
+import {getComponentsFromObject} from '../../utils/component';
 import {throwHttpError} from '../../utils/reponse';
 import {useSnackBar} from '../../utils/snackBar';
+import {useStyles} from './pathLinkStyles';
 import {useTranslation} from 'react-i18next';
 
 export const PathLink = memo(({
@@ -12,6 +15,7 @@ export const PathLink = memo(({
   formik,
   name,
 }) => {
+  const classes = useStyles();
   const {t} = useTranslation();
   const {showError, showSuccess} = useSnackBar();
   const [value, setValue] = useState(valueProp);
@@ -44,7 +48,7 @@ export const PathLink = memo(({
 
   const handleOpenFile = useCallback(() => {
     fetch('http://localhost:8080/api/files/open/folder?' + new URLSearchParams({
-      path: value
+      path: value,
     }), {
       method: 'POST',
     }).then(throwHttpError)
@@ -65,6 +69,16 @@ export const PathLink = memo(({
     </IconButton>
   ), [value, handleOpenFile]);
 
+  const actions = useMemo(() => ({
+    sync: <IconButton
+      title={t('common:action.sync')}
+      disabled={!value || isLoading}
+      onClick={() => handleSync()}
+    >
+      <SyncOutlined/>
+    </IconButton>,
+  }), [value, isLoading, handleSync]);
+
   return (
     <>
       {editable
@@ -78,13 +92,13 @@ export const PathLink = memo(({
           InputProps={{
             startAdornment:
               <InputAdornment position="start">
-                <IconButton
-                  title={t('common:action.sync')}
-                  disabled={!value || isLoading}
-                  onClick={() => handleSync()}
+                <Menu
+                  mainIcon={<MenuOutlined/>}
+                  menuRootHoveredClassName={classes.dialRootHovered}
+                  menuActionsHoveredClassName={classes.dialActionsHovered}
                 >
-                  <SyncOutlined/>
-                </IconButton>
+                  {getComponentsFromObject(actions)}
+                </Menu>
               </InputAdornment>,
             endAdornment:
               <InputAdornment position="end">
