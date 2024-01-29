@@ -60,7 +60,8 @@ public class Common_ru extends ListResourceBundle {
                 pair("pickIcon", wrap(
                     pair("on", "Начать выбор иконки"),
                     pair("off", "Закончить выбор иконки")
-                ))
+                )),
+                pair("sync", "Синхронизировать остальные поля текущим")
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),

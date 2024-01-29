@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
+import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.service.FileService;
 
 @RestController
@@ -58,13 +60,38 @@ public class FileController {
     @PostMapping("/stop")
     public ResponseEntity<?> stop() {
         try {
-        fileService.stop();
+            fileService.stop();
 
-        log.info("stop");
-        return ResponseEntity.ok().build();
-    } catch (Exception e) {
-        log.error("Can't stop:", e);
-        return ResponseEntity.internalServerError().body(e.getMessage());
+            log.info("stop");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Can't stop:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
+
+    @PostMapping("/open/folder")
+    public ResponseEntity<String> openFolder(@RequestParam String path) {
+        try {
+            fileService.openFolder(path);
+            log.info("openFolder: {}", path);
+        } catch (Exception e) {
+            log.error("Can't open folder:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> getInfo(@RequestParam String path) {
+        try {
+            Anime animeDirectoryInfo = fileService.getAnimeDirectoryInfo(path);
+
+            log.info("getInfo: {}", animeDirectoryInfo);
+            return ResponseEntity.ok(animeDirectoryInfo);
+        } catch (Exception e) {
+            log.error("Can't get info:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 }

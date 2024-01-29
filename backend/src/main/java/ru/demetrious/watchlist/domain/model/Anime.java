@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import ru.demetrious.watchlist.annotation.UuidGenerator;
 import ru.demetrious.watchlist.domain.enums.WatchStatusEnum;
 import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
@@ -25,6 +26,7 @@ import ru.demetrious.watchlist.domain.model.anime.AnimeTag;
 @Setter
 @RequiredArgsConstructor
 @ToString
+@Accessors(chain = true)
 public class Anime {
     @Id
     @UuidGenerator

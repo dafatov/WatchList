@@ -213,13 +213,6 @@ export const Animes = memo(() => {
     formik.resetForm();
   }, [setEditableId, formik.resetForm]);
 
-  const handleOpenPath = useCallback(id => {
-    fetch('http://localhost:8080/api/animes/open/folder?' + new URLSearchParams({id}), {
-      method: 'POST',
-    }).then(throwHttpError)
-      .catch(() => showError(t('web:page.animes.table.path.error')));
-  }, [showError]);
-
   const handleOpenUrl = useCallback(id => {
     fetch('http://localhost:8080/api/animes/open/url?' + new URLSearchParams({id}), {
       method: 'POST',
@@ -505,7 +498,6 @@ export const Animes = memo(() => {
               editable={isEditable(id)}
               value={path}
               formik={formik}
-              onClick={() => handleOpenPath(id)}
             />
           );
         },
@@ -552,7 +544,6 @@ export const Animes = memo(() => {
     getRenderSize,
     handleCancelAnime,
     handleDeleteAnime,
-    handleOpenPath,
     getRenderSupplementStatus,
     isEditable,
     getFields,

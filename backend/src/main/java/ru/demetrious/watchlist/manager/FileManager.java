@@ -1,10 +1,14 @@
 package ru.demetrious.watchlist.manager;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,6 +18,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
+import ru.demetrious.watchlist.domain.model.Anime;
+import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
 
 import static java.lang.Math.ceilDivExact;
 import static java.lang.Math.floorDivExact;
@@ -24,6 +30,8 @@ import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
 import static org.apache.commons.lang3.tuple.Pair.of;
+import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.HAS_VOICE;
+import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.NO_SUBS;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.COMPLETED;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.IDLE;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.INTERRUPTED;
@@ -152,6 +160,17 @@ public final class FileManager {
         isInterrupted.compareAndSet(false, true);
     }
 
+    public Anime getAnimeDirectoryInfo(Path source) {
+        return new Anime()
+            .setName(source.getFileName().toString())
+            .setSize(sizeOfDirectory(source.toFile()))
+            .setPath(source.toString())
+            .setEpisodes(toIntExact(getSubPathList(source).stream()
+                .filter(path -> isType(path, "video"))
+                .count()))
+            .setSupplements(getSupplements(source));
+    }
+
     // ===================================================================================================================
     // = Implementation
     // ===================================================================================================================
@@ -196,5 +215,42 @@ public final class FileManager {
         }
 
         return toIntExact(floorDivExact(100 * current, all));
+    }
+
+    private boolean isType(Path path, String type) {
+        String contentType = getType(path);
+
+        return contentType != null && contentType.matches(type + "/.*");
+    }
+
+    private String getType(Path path) {
+        try {
+            return Files.probeContentType(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Set<AnimeSupplement> getSupplements(Path source) {
+        Set<AnimeSupplement> animeSupplements = new HashSet<>();
+        List<Path> subPathList = getSubPathList(source);
+        long countNullType = subPathList.stream()
+            .filter(Files::isRegularFile)
+            .map(this::getType)
+            .filter(Objects::isNull)
+            .count();
+        long countVideoType = subPathList.stream()
+            .filter(path -> isType(path, "video"))
+            .count();
+
+        if (subPathList.stream().anyMatch(path -> isType(path, "audio"))) {
+            animeSupplements.add(new AnimeSupplement().setName(HAS_VOICE));
+        }
+
+        if (countNullType != countVideoType) {
+            animeSupplements.add(new AnimeSupplement().setName(NO_SUBS));
+        }
+
+        return animeSupplements;
     }
 }
