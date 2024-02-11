@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.manager.FileManager;
 import ru.demetrious.watchlist.utils.AnimeUtils;
@@ -60,13 +62,20 @@ public class FileService {
         return fileManager.getProgress();
     }
 
-    public Anime getAnimeDirectoryInfo(String path) {
-        return fileManager.getAnimeDirectoryInfo(of(path));
+    public Anime getAnimeDirectoryInfo(String pathString, FilesGroupsDto filesGroups) {
+        Path path = of(pathString);
+
+        fileManager.renameFiles(path, filesGroups);
+        return fileManager.getAnimeDirectoryInfo(path, filesGroups);
     }
 
     public void openFolder(String path) throws IOException {
         System.setProperty("java.awt.headless", "false");
 
         Desktop.getDesktop().open(of(path).toFile());
+    }
+
+    public FilesRsDto getFiles(String path) {
+        return fileManager.getFiles(of(path));
     }
 }

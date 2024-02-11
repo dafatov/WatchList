@@ -75,6 +75,14 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("chooseShikimoriNickname", wrap(
                             pair("title", "Пользователь shikimori")
+                        )),
+                        pair("reorderFiles", wrap(
+                            pair("title", "Файлы директории аниме"),
+                            pair("list", wrap(
+                                pair("videos", "Видео"),
+                                pair("voices", "Озвучка"),
+                                pair("subtitles", "Субтитры")
+                            ))
                         ))
                     )),
                     pair("snackBar", wrap(

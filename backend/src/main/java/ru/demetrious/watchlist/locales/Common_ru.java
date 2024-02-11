@@ -68,10 +68,11 @@ public class Common_ru extends ListResourceBundle {
                 pair("url", "Должно быть ссылкой"),
                 pair("positive", "Должно быть положительным"),
                 pair("greaterZero", "Должно быть не меньше нуля"),
-                pair("noEmpty", "Должен быть пустым"),
+                pair("noEmpty", "Должен быть не пустым"),
                 pair("latinWithSpaceAndHyphen", "Должен быть латинскими буквами, пробелом или дефисом в одном экземпляре внутри слова"),
                 pair("userNotAvailable", "Должен быть доступным"),
-                pair("sameIcon", "Должна быть одинаковая иконка")
+                pair("sameIcon", "Должна быть одинаковая иконка"),
+                pair("equalArrays", "Списки должны иметь одинаковое количество элементов")
             )),
             pair("result", wrap(
                 pair("copy", "Успешно скопировано: {{name}}"),

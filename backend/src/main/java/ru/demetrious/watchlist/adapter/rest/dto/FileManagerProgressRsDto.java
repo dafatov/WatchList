@@ -13,6 +13,7 @@ public class FileManagerProgressRsDto {
     private Long currentSize;
     private Long speed;
     private Integer percent;
+    //TODO переделать в FilesRsDto.java
     private List<String> completed;
     private String commonPath;
 }

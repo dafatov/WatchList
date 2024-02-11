@@ -13,10 +13,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
@@ -25,10 +28,13 @@ import static java.lang.Math.ceilDivExact;
 import static java.lang.Math.floorDivExact;
 import static java.lang.Math.toIntExact;
 import static java.lang.System.currentTimeMillis;
+import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.lang3.StringUtils.leftPad;
 import static org.apache.commons.lang3.tuple.Pair.of;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.HAS_VOICE;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.NO_SUBS;
@@ -160,15 +166,46 @@ public final class FileManager {
         isInterrupted.compareAndSet(false, true);
     }
 
-    public Anime getAnimeDirectoryInfo(Path source) {
+    public Anime getAnimeDirectoryInfo(Path source, FilesGroupsDto filesGroups) {
         return new Anime()
             .setName(source.getFileName().toString())
             .setSize(sizeOfDirectory(source.toFile()))
             .setPath(source.toString())
-            .setEpisodes(toIntExact(getSubPathList(source).stream()
-                .filter(path -> isType(path, "video"))
-                .count()))
-            .setSupplements(getSupplements(source));
+            .setEpisodes(toIntExact(filesGroups.getVideos().stream().filter(Objects::nonNull).count()))
+            .setSupplements(getSupplements(filesGroups));
+    }
+
+    public FilesRsDto getFiles(Path path) {
+        List<Path> pathList = getSubPathList(path).stream()
+            .filter(Files::isRegularFile)
+            .toList();
+        Optional<Path> commonPathOptional = normalizePaths(pathList);
+
+        if (commonPathOptional.isEmpty()) {
+            return new FilesRsDto().setFiles(pathList.stream()
+                .map(Path::toString)
+                .collect(Collectors.toList()));
+        }
+
+        return new FilesRsDto()
+            .setCommonPath(commonPathOptional.get().toString())
+            .setFiles(pathList.stream()
+                .map(filePath -> commonPathOptional.get().relativize(filePath))
+                .map(Path::toString)
+                .map("\\"::concat)
+                .collect(Collectors.toList()));
+    }
+
+    public void renameFiles(Path path, FilesGroupsDto filesGroups) {
+        filesGroups.getVideos().stream()
+            .filter(Objects::nonNull)
+            .forEach(video -> moveFile(path, video, filesGroups.getVideos()));
+        filesGroups.getVoices().stream()
+            .filter(Objects::nonNull)
+            .forEach(voice -> moveFile(path, voice, filesGroups.getVoices()));
+        filesGroups.getSubtitles().stream()
+            .filter(Objects::nonNull)
+            .forEach(subtitle -> moveFile(path, subtitle, filesGroups.getSubtitles()));
     }
 
     // ===================================================================================================================
@@ -217,40 +254,51 @@ public final class FileManager {
         return toIntExact(floorDivExact(100 * current, all));
     }
 
-    private boolean isType(Path path, String type) {
-        String contentType = getType(path);
-
-        return contentType != null && contentType.matches(type + "/.*");
-    }
-
-    private String getType(Path path) {
-        try {
-            return Files.probeContentType(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Set<AnimeSupplement> getSupplements(Path source) {
+    private Set<AnimeSupplement> getSupplements(FilesGroupsDto filesGroups) {
         Set<AnimeSupplement> animeSupplements = new HashSet<>();
-        List<Path> subPathList = getSubPathList(source);
-        long countNullType = subPathList.stream()
-            .filter(Files::isRegularFile)
-            .map(this::getType)
-            .filter(Objects::isNull)
-            .count();
-        long countVideoType = subPathList.stream()
-            .filter(path -> isType(path, "video"))
-            .count();
 
-        if (subPathList.stream().anyMatch(path -> isType(path, "audio"))) {
-            animeSupplements.add(new AnimeSupplement().setName(HAS_VOICE));
+        if (filesGroups.getSubtitles().size() != filesGroups.getVoices().size()
+            || filesGroups.getVideos().size() != filesGroups.getSubtitles().size()) {
+            throw new IllegalStateException("Not equal size of fileGroups arrays");
         }
 
-        if (countNullType != countVideoType) {
-            animeSupplements.add(new AnimeSupplement().setName(NO_SUBS));
+        if (filesGroups.getSubtitles().stream().anyMatch(Objects::isNull)) {
+            animeSupplements.add(new AnimeSupplement()
+                .setName(NO_SUBS)
+                .setEpisodes(IntStream.range(1, filesGroups.getSubtitles().size() + 1)
+                    .filter(index -> filesGroups.getSubtitles().get(index - 1) == null)
+                    .boxed()
+                    .collect(Collectors.toSet())));
+        }
+
+        if (filesGroups.getVoices().stream().anyMatch(Objects::nonNull)) {
+            animeSupplements.add(new AnimeSupplement()
+                .setName(HAS_VOICE)
+                .setEpisodes(IntStream.range(1, filesGroups.getVoices().size() + 1)
+                    .filter(index -> filesGroups.getVoices().get(index - 1) != null)
+                    .boxed()
+                    .collect(Collectors.toSet())));
         }
 
         return animeSupplements;
+    }
+
+    private void moveFile(Path folder, String filePath, List<String> pathStringList) {
+        try {
+            Files.move(
+                Path.of(folder + filePath),
+                Path.of(format("{0}\\{1}.{2}", folder, getFileName(folder, filePath, pathStringList), getExtension(filePath)))
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private String getFileName(Path folder, String filePath, List<String> pathStringList) {
+        return leftPad(
+            format("{0} {1}", folder.getFileName().toString(), pathStringList.indexOf(filePath) + 1),
+            String.valueOf(pathStringList.size()).length(),
+            '0'
+        );
     }
 }

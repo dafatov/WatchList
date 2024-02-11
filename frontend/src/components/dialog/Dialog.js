@@ -11,6 +11,7 @@ export const Dialog = memo(({
   onSubmit,
   title,
   submitTitle,
+  classes,
 }) => {
   const {t} = useTranslation();
 
@@ -27,9 +28,9 @@ export const Dialog = memo(({
   }, [onSubmit, setOpen, autoSubmitClose]);
 
   return (
-    <MuiDialog open={open} onClose={handleClose}>
+    <MuiDialog open={open} onClose={handleClose} PaperProps={{className: classes?.paper}}>
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent dividers>
+      <DialogContent className={classes?.content} dividers>
         {children}
       </DialogContent>
       <DialogActions>

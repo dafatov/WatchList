@@ -5,10 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.service.FileService;
 
@@ -82,15 +85,28 @@ public class FileController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/info")
-    public ResponseEntity<?> getInfo(@RequestParam String path) {
+    @PostMapping("/info")
+    public ResponseEntity<?> getInfo(@RequestParam String path, @RequestBody FilesGroupsDto filesGroups) {
         try {
-            Anime animeDirectoryInfo = fileService.getAnimeDirectoryInfo(path);
+            Anime animeDirectoryInfo = fileService.getAnimeDirectoryInfo(path, filesGroups);
 
             log.info("getInfo: {}", animeDirectoryInfo);
             return ResponseEntity.ok(animeDirectoryInfo);
         } catch (Exception e) {
             log.error("Can't get info:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> get(@RequestParam String path) {
+        try {
+            FilesRsDto fileList = fileService.getFiles(path);
+
+            log.info("get: {}", fileList);
+            return ResponseEntity.ok(fileList);
+        } catch (Exception e) {
+            log.error("Can't get:", e);
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
