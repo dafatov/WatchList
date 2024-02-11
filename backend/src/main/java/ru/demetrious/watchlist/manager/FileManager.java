@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
@@ -47,6 +48,7 @@ import static ru.demetrious.watchlist.utils.FileUtils.normalizePaths;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public final class FileManager {
     public static final int BUFFER_SIZE = 32768;
     private static final String FILE_MANAGER_IS_ALREADY_RUNNING = "File manager is already running";
@@ -83,6 +85,7 @@ public final class FileManager {
             }
         } catch (Exception e) {
             isInterrupted.set(true);
+            log.error(e.getMessage());
             throw new IllegalStateException(e);
         } finally {
             isRunning.compareAndSet(true, false);
@@ -138,12 +141,13 @@ public final class FileManager {
             .setCurrentSize(current)
             .setSpeed(speed)
             .setPercent(percent)
-            .setCommonPath(commonPath
-                .map(Path::toString)
-                .orElse(null))
-            .setCompleted(pathList.stream()
-                .map(path -> mapPath(path, commonPath))
-                .collect(Collectors.toList()));
+            .setCompleted(new FilesRsDto()
+                .setCommonPath(commonPath
+                    .map(Path::toString)
+                    .orElse(null))
+                .setFiles(pathList.stream()
+                    .map(path -> mapPath(path, commonPath))
+                    .collect(Collectors.toList())));
     }
 
     public void reset() {
