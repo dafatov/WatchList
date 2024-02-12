@@ -5,7 +5,7 @@ export const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     minHeight: '400px',
-    minWidth: '100px',
+    minWidth: '200px',
     width: `calc(calc(100% - ${(count - 1) * 8}px) / ${count})`,
   }),
   list: {
