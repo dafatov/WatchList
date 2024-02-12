@@ -72,7 +72,7 @@ public class Web_ru extends ListResourceBundle {
                             pair("title", "Пользователь shikimori")
                         )),
                         pair("reorderFiles", wrap(
-                            pair("title", "Файлы директории аниме"),
+                            pair("title", "Файлы директории аниме \"{{title}}\""),
                             pair("list", wrap(
                                 pair("videos", "Видео"),
                                 pair("voices", "Озвучка"),

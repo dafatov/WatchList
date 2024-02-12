@@ -4,6 +4,7 @@ import {Dialog} from '../../dialog/Dialog';
 import {DraggableLists} from '../../draggableLists/DraggableLists';
 import {Typography} from '@mui/material';
 import classNames from 'classnames';
+import last from 'lodash/last';
 import {useFormik} from 'formik';
 import {useStyles} from './reorderFilesModalStyles';
 import {useTranslation} from 'react-i18next';
@@ -21,7 +22,7 @@ export const ReorderFilesModal = memo(({
     validateOnBlur: false,
     validateOnChange: false,
     initialValues: {
-      videos: files,
+      videos: files.files,
       voices: [],
       subtitles: [],
     },
@@ -49,11 +50,11 @@ export const ReorderFilesModal = memo(({
 
   useEffect(() => {
     formik.setValues({
-      videos: files,
+      videos: files.files,
       voices: [],
       subtitles: [],
     });
-  }, [files, formik.setValues]);
+  }, [files.files, formik.setValues]);
 
   const handleChange = useCallback(result => {
     formik.setValues(result, true);
@@ -65,7 +66,7 @@ export const ReorderFilesModal = memo(({
       open={open}
       setOpen={setOpen}
       onSubmit={formik.handleSubmit}
-      title={t('web:page.animes.modal.reorderFiles.title')}
+      title={t('web:page.animes.modal.reorderFiles.title', {title: last(files.commonPath?.split('\\'))})}
       submitTitle={t('common:action.apply')}
       classes={{paper: classes.dialogPaper, content: classes.dialogContent}}
     >

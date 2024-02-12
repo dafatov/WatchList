@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,16 +25,20 @@ import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
 
 import static java.lang.Math.ceilDivExact;
 import static java.lang.Math.floorDivExact;
+import static java.lang.Math.max;
 import static java.lang.Math.toIntExact;
+import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.IntStream.range;
 import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.apache.commons.lang3.tuple.Pair.of;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.HAS_VOICE;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.NO_SUBS;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.COMPLETED;
@@ -62,7 +64,7 @@ public final class FileManager {
     private final AtomicBoolean isCompleted = new AtomicBoolean(false);
     private final AtomicBoolean isInterrupted = new AtomicBoolean(false);
 
-    private Pair<Long, Long> previousCurrentSize = of(0L, 0L);
+    private Pair<Long, Long> previousCurrentSize = Pair.of(0L, 0L);
 
     public void copyDirectories(List<Path> sources, Path target) throws IllegalStateException {
         try {
@@ -112,7 +114,7 @@ public final class FileManager {
 
         return Arrays.stream(requireNonNull(target.toFile().list()))
             .map(fileName -> Path.of(target.toString(), fileName))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     public FileManagerProgressRsDto getProgress() {
@@ -131,8 +133,7 @@ public final class FileManager {
             ceilDivExact(currentTimeMillis - previousCurrentSize.getRight(), 1000)
         );
         int percent = getPercent(current, all);
-        List<Path> pathList = completedFileSet.get();
-        Optional<Path> commonPath = normalizePaths(pathList);
+        FilesRsDto completed = getFiles(completedFileSet.get());
 
         previousCurrentSize = Pair.of(current, currentTimeMillis);
 
@@ -141,13 +142,7 @@ public final class FileManager {
             .setCurrentSize(current)
             .setSpeed(speed)
             .setPercent(percent)
-            .setCompleted(new FilesRsDto()
-                .setCommonPath(commonPath
-                    .map(Path::toString)
-                    .orElse(null))
-                .setFiles(pathList.stream()
-                    .map(path -> mapPath(path, commonPath))
-                    .collect(Collectors.toList())));
+            .setCompleted(completed);
     }
 
     public void reset() {
@@ -183,33 +178,30 @@ public final class FileManager {
         List<Path> pathList = getSubPathList(path).stream()
             .filter(Files::isRegularFile)
             .toList();
+
+        return getFiles(pathList);
+    }
+
+    public FilesRsDto getFiles(List<Path> pathList) {
         Optional<Path> commonPathOptional = normalizePaths(pathList);
 
         if (commonPathOptional.isEmpty()) {
             return new FilesRsDto().setFiles(pathList.stream()
                 .map(Path::toString)
-                .collect(Collectors.toList()));
+                .collect(toList()));
         }
 
         return new FilesRsDto()
             .setCommonPath(commonPathOptional.get().toString())
             .setFiles(pathList.stream()
-                .map(filePath -> commonPathOptional.get().relativize(filePath))
-                .map(Path::toString)
-                .map("\\"::concat)
-                .collect(Collectors.toList()));
+                .map(filePath -> relativize(commonPathOptional.get(), filePath))
+                .collect(toList()));
     }
 
-    public void renameFiles(Path path, FilesGroupsDto filesGroups) {
-        filesGroups.getVideos().stream()
+    public void renameFiles(Path folder, List<String> fileList) {
+        fileList.stream()
             .filter(Objects::nonNull)
-            .forEach(video -> moveFile(path, video, filesGroups.getVideos()));
-        filesGroups.getVoices().stream()
-            .filter(Objects::nonNull)
-            .forEach(voice -> moveFile(path, voice, filesGroups.getVoices()));
-        filesGroups.getSubtitles().stream()
-            .filter(Objects::nonNull)
-            .forEach(subtitle -> moveFile(path, subtitle, filesGroups.getSubtitles()));
+            .forEach(file -> moveFile(folder, file, fileList));
     }
 
     // ===================================================================================================================
@@ -246,8 +238,8 @@ public final class FileManager {
         return IDLE;
     }
 
-    private String mapPath(Path path, Optional<Path> commonPath) {
-        return "\\".concat(commonPath.orElseThrow().relativize(path).toString());
+    private String relativize(Path commonPath, Path filePath) {
+        return "\\".concat(commonPath.relativize(filePath).toString());
     }
 
     private int getPercent(long current, long all) {
@@ -269,19 +261,19 @@ public final class FileManager {
         if (filesGroups.getSubtitles().stream().anyMatch(Objects::isNull)) {
             animeSupplements.add(new AnimeSupplement()
                 .setName(NO_SUBS)
-                .setEpisodes(IntStream.range(1, filesGroups.getSubtitles().size() + 1)
+                .setEpisodes(range(1, filesGroups.getSubtitles().size() + 1)
                     .filter(index -> filesGroups.getSubtitles().get(index - 1) == null)
                     .boxed()
-                    .collect(Collectors.toSet())));
+                    .collect(toSet())));
         }
 
         if (filesGroups.getVoices().stream().anyMatch(Objects::nonNull)) {
             animeSupplements.add(new AnimeSupplement()
                 .setName(HAS_VOICE)
-                .setEpisodes(IntStream.range(1, filesGroups.getVoices().size() + 1)
+                .setEpisodes(range(1, filesGroups.getVoices().size() + 1)
                     .filter(index -> filesGroups.getVoices().get(index - 1) != null)
                     .boxed()
-                    .collect(Collectors.toSet())));
+                    .collect(toSet())));
         }
 
         return animeSupplements;
@@ -299,10 +291,10 @@ public final class FileManager {
     }
 
     private String getFileName(Path folder, String filePath, List<String> pathStringList) {
-        return leftPad(
-            format("{0} {1}", folder.getFileName().toString(), pathStringList.indexOf(filePath) + 1),
-            String.valueOf(pathStringList.size()).length(),
+        return format("{0} {1}", folder.getFileName().toString(), leftPad(
+            valueOf(pathStringList.indexOf(filePath) + 1),
+            max(2, valueOf(pathStringList.size()).length()),
             '0'
-        );
+        ));
     }
 }

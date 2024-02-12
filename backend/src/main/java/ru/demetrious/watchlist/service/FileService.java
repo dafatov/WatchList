@@ -62,11 +62,12 @@ public class FileService {
         return fileManager.getProgress();
     }
 
-    public Anime getAnimeDirectoryInfo(String pathString, FilesGroupsDto filesGroups) {
-        Path path = of(pathString);
+    public Anime getAnimeDirectoryInfo(String path, FilesGroupsDto filesGroups) {
+        Path folder = of(path);
 
-        fileManager.renameFiles(path, filesGroups);
-        return fileManager.getAnimeDirectoryInfo(path, filesGroups);
+        filesGroups.acceptAll(fileList -> fileManager.renameFiles(folder, fileList));
+
+        return fileManager.getAnimeDirectoryInfo(folder, filesGroups);
     }
 
     public void openFolder(String path) throws IOException {

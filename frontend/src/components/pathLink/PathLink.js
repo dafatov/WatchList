@@ -22,7 +22,7 @@ export const PathLink = memo(({
   const [value, setValue] = useState(valueProp);
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState({});
 
   useEffect(() => {
     setValue(valueProp);
@@ -40,7 +40,7 @@ export const PathLink = memo(({
     })).then(throwHttpError)
       .then(response => response.json())
       .then(data => {
-        setFiles(data.files);
+        setFiles(data);
         setOpen(true);
       }).catch(() => showError(t('web:page.animes.snackBar.getFiles.error')))
       .finally(() => setIsLoading(false));

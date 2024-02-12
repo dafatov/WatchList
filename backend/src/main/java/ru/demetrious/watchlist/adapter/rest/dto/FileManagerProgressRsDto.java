@@ -1,6 +1,5 @@
 package ru.demetrious.watchlist.adapter.rest.dto;
 
-import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
