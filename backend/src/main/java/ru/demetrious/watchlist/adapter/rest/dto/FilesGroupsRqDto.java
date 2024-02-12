@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import lombok.Data;
 
 @Data
-public class FilesGroupsDto {
+public class FilesGroupsRqDto {
     private List<String> videos;
     private List<String> voices;
     private List<String> subtitles;

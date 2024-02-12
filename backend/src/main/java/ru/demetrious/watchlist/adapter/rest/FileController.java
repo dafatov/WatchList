@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
-import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.service.FileService;
@@ -86,7 +86,7 @@ public class FileController {
     }
 
     @PostMapping("/info")
-    public ResponseEntity<?> getInfo(@RequestParam String path, @RequestBody FilesGroupsDto filesGroups) {
+    public ResponseEntity<?> getInfo(@RequestParam String path, @RequestBody FilesGroupsRqDto filesGroups) {
         try {
             Anime animeDirectoryInfo = fileService.getAnimeDirectoryInfo(path, filesGroups);
 

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
-import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.manager.FileManager;
@@ -62,7 +62,7 @@ public class FileService {
         return fileManager.getProgress();
     }
 
-    public Anime getAnimeDirectoryInfo(String path, FilesGroupsDto filesGroups) {
+    public Anime getAnimeDirectoryInfo(String path, FilesGroupsRqDto filesGroups) {
         Path folder = of(path);
 
         filesGroups.acceptAll(fileList -> fileManager.renameFiles(folder, fileList));

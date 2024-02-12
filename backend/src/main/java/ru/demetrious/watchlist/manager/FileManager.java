@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
-import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
 import ru.demetrious.watchlist.domain.model.Anime;
@@ -165,7 +165,7 @@ public final class FileManager {
         isInterrupted.compareAndSet(false, true);
     }
 
-    public Anime getAnimeDirectoryInfo(Path source, FilesGroupsDto filesGroups) {
+    public Anime getAnimeDirectoryInfo(Path source, FilesGroupsRqDto filesGroups) {
         return new Anime()
             .setName(source.getFileName().toString())
             .setSize(sizeOfDirectory(source.toFile()))
@@ -250,7 +250,7 @@ public final class FileManager {
         return toIntExact(floorDivExact(100 * current, all));
     }
 
-    private Set<AnimeSupplement> getSupplements(FilesGroupsDto filesGroups) {
+    private Set<AnimeSupplement> getSupplements(FilesGroupsRqDto filesGroups) {
         Set<AnimeSupplement> animeSupplements = new HashSet<>();
 
         if (filesGroups.getSubtitles().size() != filesGroups.getVoices().size()
