@@ -9,9 +9,9 @@ import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.ProgressRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.manager.FileManager;
 import ru.demetrious.watchlist.utils.AnimeUtils;
@@ -59,7 +59,7 @@ public class FileService {
         fileManager.stop();
     }
 
-    public FileManagerProgressRsDto getProgress() {
+    public ProgressRsDto getProgress() {
         return fileManager.getProgress();
     }
 
