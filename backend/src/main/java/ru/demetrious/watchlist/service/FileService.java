@@ -2,6 +2,7 @@ package ru.demetrious.watchlist.service;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -77,6 +78,10 @@ public class FileService {
     }
 
     public FilesRsDto getFiles(String path) {
-        return fileManager.getFiles(of(path));
+        List<Path> pathList = fileManager.getSubPathList(of(path)).stream()
+            .filter(Files::isRegularFile)
+            .toList();
+
+        return fileManager.getFiles(pathList);
     }
 }

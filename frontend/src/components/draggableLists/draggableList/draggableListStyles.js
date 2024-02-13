@@ -34,14 +34,17 @@ export const useStyles = makeStyles(theme => ({
       bottom: '-1px',
       '&.Mui-disabled': {
         backgroundColor: theme.palette.background.paper,
+        pointerEvents: 'auto',
+        cursor: 'default',
       },
     },
   },
   removeButton: {
-    '&.MuiIconButton-root': {
-      width: '100%',
+    '&.MuiButton-root': {
       borderRadius: 0,
       padding: 0,
+      backgroundColor: 'transparent',
+      color: theme.palette.primary.main,
     },
   },
   listTitle: {

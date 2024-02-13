@@ -174,14 +174,6 @@ public final class FileManager {
             .setSupplements(getSupplements(filesGroups));
     }
 
-    public FilesRsDto getFiles(Path path) {
-        List<Path> pathList = getSubPathList(path).stream()
-            .filter(Files::isRegularFile)
-            .toList();
-
-        return getFiles(pathList);
-    }
-
     public FilesRsDto getFiles(List<Path> pathList) {
         Optional<Path> commonPathOptional = normalizePaths(pathList);
 

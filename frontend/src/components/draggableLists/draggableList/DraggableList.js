@@ -1,5 +1,5 @@
 import {AddOutlined, RemoveOutlined} from '@mui/icons-material';
-import {Button, IconButton, Paper, Stack, Typography} from '@mui/material';
+import {Button, Paper, Stack, Typography} from '@mui/material';
 import {memo, useCallback} from 'react';
 import {Draggable} from 'react-beautiful-dnd';
 import {Tooltip} from '../../tooltip/Tooltip';
@@ -72,12 +72,14 @@ export const DraggableList = memo(({
               >
                 {element.data
                   ? children({data: element.data, isDragging: snapshot.isDragging})
-                  : <IconButton
+                  : <Button
+                    fullWidth
+                    variant="contained"
                     className={classes.removeButton}
                     onClick={handleRemoveFiller(listName, element)}
                   >
                     <RemoveOutlined/>
-                  </IconButton>}
+                  </Button>}
               </Paper>
             )}
           </Draggable>

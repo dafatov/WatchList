@@ -18,7 +18,7 @@ export const useLongClick = (onLongClick, onClick, delay = 300) => {
     }
 
     return () => clearTimeout(timerId);
-  }, [isStartingLongClick, onLongClick, delay]);
+  }, [isStartingLongClick, onLongClick, delay, setIsStartingLongClick, setIsLongClicked]);
 
   return {
     onMouseDown: () => setIsStartingLongClick(true),
