@@ -407,7 +407,7 @@ export const Animes = memo(() => {
     },
     {
       name: 'episodes',
-      label: t('web:page:animes.table.episodes.title'),
+      label: t('web:page.animes.table.episodes.title'),
       options: {
         filter: false,
         searchable: false,
@@ -430,7 +430,7 @@ export const Animes = memo(() => {
     },
     {
       name: 'supplements',
-      label: t('web:page:animes.table.supplements.title'),
+      label: t('web:page.animes.table.supplements.title'),
       options: {
         sort: false,
         searchable: false,
@@ -461,7 +461,7 @@ export const Animes = memo(() => {
     },
     {
       name: 'tags',
-      label: t('web:page:animes.table.tags.title'),
+      label: t('web:page.animes.table.tags.title'),
       options: {
         sort: false,
         filterType: 'multiselect',

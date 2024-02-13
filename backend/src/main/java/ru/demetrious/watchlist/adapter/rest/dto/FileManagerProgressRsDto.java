@@ -1,6 +1,5 @@
 package ru.demetrious.watchlist.adapter.rest.dto;
 
-import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
@@ -13,6 +12,5 @@ public class FileManagerProgressRsDto {
     private Long currentSize;
     private Long speed;
     private Integer percent;
-    private List<String> completed;
-    private String commonPath;
+    private FilesRsDto completed;
 }

@@ -23,11 +23,11 @@ export const FileList = memo(({
       scrollerProps={getRenderer(classes.scroller)}
     >
       <List className={classes.list} dense>
-        {progress.completed?.map((path, index) =>
+        {progress.completed?.files.map((path, index) =>
           <Tooltip
             disableInteractive
             key={index}
-            title={`${progress.commonPath}${path}`}
+            title={`${progress.completed.commonPath}${path}`}
             PopperProps={{anchorEl}}
           >
             <ListItem>

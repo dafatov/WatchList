@@ -125,8 +125,8 @@ const startBrowser = () => {
       return doIfNotLocal(() => Promise.resolve(url), Promise.resolve('http://localhost:3000'))
         .then(url => mainWindow.loadURL(url));
     })
-    .then(() => setInterval(() => fetch(`${url}/health`)
-      .catch(() => app.quit()), 250))
+    .then(() => setInterval(doIfNotLocal(() => () => fetch(`${url}/health`)
+      .catch(() => app.quit()), () => {}), 250))
     .catch(() => setTimeout(() => startBrowser(), 250));
 };
 
