@@ -25,6 +25,12 @@ public interface YandexClient {
         @RequestParam(name = "path") String path
     );
 
+    @GetMapping("/disk/resources/download")
+    LinkDto getAnimeList(
+        @RequestHeader(name = "Authorization") String accessToken,
+        @RequestParam(name = "path") String path
+    );
+
     @PutMapping("/disk/resources")
     LinkDto createFolder(
         @RequestHeader(name = "Authorization") String accessToken,

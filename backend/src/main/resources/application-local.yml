@@ -33,6 +33,10 @@ logging:
           listener:
             MergeEventListener: off
     org:
+      springframework:
+        web:
+          client:
+            RestTemplate: off
       hibernate:
         engine:
           internal:

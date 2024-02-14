@@ -63,6 +63,19 @@ public class AnimeController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/import/yandex")
+    public ResponseEntity<?> importAnimesFromYandex(@RequestHeader(name = "Authorization") String accessToken) {
+        try {
+            List<Anime> animeList = animeService.importAnimesToYandex(accessToken);
+
+            log.info("importAnimesFromYandex: \"{}\"", animeList);
+            return ResponseEntity.ok(animeList);
+        } catch (Exception e) {
+            log.error("Can't import animes from yandex", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping
     public List<Anime> deleteAnimes(@RequestBody List<UUID> uuidList) {
         List<Anime> animeListDeleted = animeService.deleteAnimes(uuidList);
