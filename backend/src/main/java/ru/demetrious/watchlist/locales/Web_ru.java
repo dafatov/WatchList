@@ -78,6 +78,9 @@ public class Web_ru extends ListResourceBundle {
                                 pair("voices", "Озвучка"),
                                 pair("subtitles", "Субтитры")
                             ))
+                        )),
+                        pair("showDiff", wrap(
+                            pair("title", "Изменения с последнего экспорта")
                         ))
                     )),
                     pair("snackBar", wrap(

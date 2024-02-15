@@ -63,7 +63,7 @@ public class AnimeController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/import/yandex")
+    @GetMapping("/import/yandex")
     public ResponseEntity<?> importAnimesFromYandex(@RequestHeader(name = "Authorization") String accessToken) {
         try {
             List<Anime> animeList = animeService.importAnimesToYandex(accessToken);
