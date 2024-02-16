@@ -1,5 +1,6 @@
 package ru.demetrious.watchlist.manager;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,9 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
-import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.ProgressRsDto;
 import ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
@@ -58,8 +59,10 @@ public final class FileManager {
     private static final String NO_PATHS_TO_OPERATE = "No paths to operate";
 
     private final AtomicLong currentSize = new AtomicLong(0);
+    private final AtomicLong currentFileSize = new AtomicLong(0);
     private final AtomicLong allSize = new AtomicLong(0);
-    private final AtomicReference<List<Path>> completedFileSet = new AtomicReference<>(List.of());
+    private final AtomicReference<List<Path>> completedFiles = new AtomicReference<>(List.of());
+    private final AtomicReference<Path> copingFile = new AtomicReference<>(null);
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final AtomicBoolean isCompleted = new AtomicBoolean(false);
     private final AtomicBoolean isInterrupted = new AtomicBoolean(false);
@@ -81,8 +84,9 @@ public final class FileManager {
                     isInterrupted,
                     source.toFile(),
                     Path.of(target.toString(), source.getFileName().toString()).toFile(),
-                    currentSize::addAndGet,
-                    completedFile -> completedFileSet.updateAndGet(accumulator -> collate(accumulator, List.of(completedFile.toPath())))
+                    this::addSize,
+                    this::fileCopyStart,
+                    this::fileCopyComplete
                 );
             }
         } catch (Exception e) {
@@ -117,32 +121,42 @@ public final class FileManager {
             .collect(toList());
     }
 
-    public FileManagerProgressRsDto getProgress() {
-        FileManagerProgressRsDto progressRsDto = new FileManagerProgressRsDto()
+    public ProgressRsDto getProgress() {
+        ProgressRsDto progressRsDto = new ProgressRsDto()
             .setStatus(getStatus());
 
         if (!isNotRunnable()) {
             return progressRsDto;
         }
 
-        long currentTimeMillis = currentTimeMillis();
+        Path coping = copingFile.get();
+        FilesRsDto completed = getFiles(completedFiles.get());
         long current = currentSize.get();
+        long currentFile = currentFileSize.get();
         long all = allSize.get();
+        long allFile = coping.toFile().length();
+        int percent = getPercent(current, all);
+        int percentFile = getPercent(currentFile, allFile);
+        long currentTimeMillis = currentTimeMillis();
         long speed = floorDivExact(
             current - previousCurrentSize.getLeft(),
             ceilDivExact(currentTimeMillis - previousCurrentSize.getRight(), 1000)
         );
-        int percent = getPercent(current, all);
-        FilesRsDto completed = getFiles(completedFileSet.get());
 
         previousCurrentSize = Pair.of(current, currentTimeMillis);
 
         return progressRsDto
-            .setAllSize(all)
-            .setCurrentSize(current)
+            .setFullProgress(new ProgressRsDto.ProgressPart()
+                .setAllSize(all)
+                .setCurrentSize(current)
+                .setPercent(percent))
+            .setFileProgress(new ProgressRsDto.ProgressPart()
+                .setAllSize(allFile)
+                .setCurrentSize(currentFile)
+                .setPercent(percentFile))
             .setSpeed(speed)
-            .setPercent(percent)
-            .setCompleted(completed);
+            .setCompleted(completed)
+            .setCoping(coping.toString());
     }
 
     public void reset() {
@@ -154,7 +168,9 @@ public final class FileManager {
         isInterrupted.compareAndSet(true, false);
         allSize.set(0);
         currentSize.set(0);
-        completedFileSet.set(List.of());
+        completedFiles.set(List.of());
+        currentFileSize.set(0);
+        copingFile.set(null);
     }
 
     public void stop() {
@@ -228,6 +244,20 @@ public final class FileManager {
         }
 
         return IDLE;
+    }
+
+    private void fileCopyComplete(File copingFile) {
+        completedFiles.updateAndGet(accumulator -> collate(accumulator, List.of(copingFile.toPath())));
+    }
+
+    private void fileCopyStart(File copingFile) {
+        this.copingFile.set(copingFile.toPath());
+        currentFileSize.set(0);
+    }
+
+    private void addSize(Long delta) {
+        currentSize.addAndGet(delta);
+        currentFileSize.addAndGet(delta);
     }
 
     private String relativize(Path commonPath, Path filePath) {

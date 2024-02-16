@@ -25,13 +25,14 @@ import static ru.demetrious.watchlist.manager.FileManager.BUFFER_SIZE;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtils {
-    public static void copyDirectory(AtomicBoolean isInterrupted, File source, File target, Consumer<Long> lengthConsumer, Consumer<File> fileConsumer) throws IOException {
+    public static void copyDirectory(AtomicBoolean isInterrupted, File source, File target, Consumer<Long> onWrite, Consumer<File> onFileStart,
+                                     Consumer<File> onFileComplete) throws IOException {
         if (!target.exists()) {
             target.mkdirs();
         }
 
         for (String fileName : Objects.requireNonNull(source.list())) {
-            copyDirectoryOrFile(isInterrupted, new File(source, fileName), new File(target, fileName), lengthConsumer, fileConsumer);
+            copyDirectoryOrFile(isInterrupted, new File(source, fileName), new File(target, fileName), onWrite, onFileStart, onFileComplete);
         }
     }
 
@@ -48,27 +49,30 @@ public class FileUtils {
     // = Implementation
     // ===================================================================================================================
 
-    private static void copyDirectoryOrFile(AtomicBoolean isInterrupted, File source, File target, Consumer<Long> lengthConsumer, Consumer<File> fileConsumer) throws IOException {
+    private static void copyDirectoryOrFile(AtomicBoolean isInterrupted, File source, File target, Consumer<Long> onWrite, Consumer<File> onFileStart,
+                                            Consumer<File> onFileComplete) throws IOException {
         if (isInterrupted.get()) {
             return;
         }
 
         if (source.isDirectory()) {
-            copyDirectory(isInterrupted, source, target, lengthConsumer, fileConsumer);
+            copyDirectory(isInterrupted, source, target, onWrite, onFileStart, onFileComplete);
         } else {
+            onFileStart.accept(source);
+
             if (!target.exists() || target.length() != source.length()) {
-                copyFile(isInterrupted, source, target, lengthConsumer);
+                copyFile(isInterrupted, source, target, onWrite);
             } else {
-                lengthConsumer.accept(target.length());
+                onWrite.accept(target.length());
             }
 
             if (!isInterrupted.get()) {
-                fileConsumer.accept(source);
+                onFileComplete.accept(source);
             }
         }
     }
 
-    private static void copyFile(AtomicBoolean isInterrupted, File source, File target, Consumer<Long> lengthConsumer) throws IOException {
+    private static void copyFile(AtomicBoolean isInterrupted, File source, File target, Consumer<Long> onWrite) throws IOException {
         try (
             InputStream inputStream = new FileInputStream(source);
             OutputStream outputStream = new FileOutputStream(target)
@@ -78,7 +82,7 @@ public class FileUtils {
 
             while ((length = inputStream.read(buffer)) > 0 && !isInterrupted.get()) {
                 outputStream.write(buffer, 0, length);
-                lengthConsumer.accept((long) length);
+                onWrite.accept((long) length);
             }
         } catch (IOException e) {
             isInterrupted.set(true);

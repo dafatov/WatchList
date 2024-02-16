@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.demetrious.watchlist.adapter.rest.dto.FileManagerProgressRsDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
+import ru.demetrious.watchlist.adapter.rest.dto.ProgressRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.service.FileService;
 
@@ -38,7 +38,7 @@ public class FileController {
     @GetMapping("/progress")
     public ResponseEntity<?> getProgress() {
         try {
-            FileManagerProgressRsDto progress = fileService.getProgress();
+            ProgressRsDto progress = fileService.getProgress();
 
             return ResponseEntity.ok(progress);
         } catch (Exception e) {
