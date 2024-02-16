@@ -1,6 +1,6 @@
 {
   "name": "ru.demetrious.watch-list.electron",
-  "version": "1.7.3-0",
+  "version": "1.7.3",
   "description": "A local browser to only one url",
   "type": "commonjs",
   "private": true,
