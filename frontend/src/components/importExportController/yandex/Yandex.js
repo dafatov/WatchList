@@ -21,10 +21,10 @@ export const Yandex = memo(() => {
   const [state, setState] = useState({});
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
+  const getLastAnimeList = useCallback(() => {
     fetch('http://localhost:8080/api/animes/import/yandex', {
       headers: {
-        Authorization: `OAuth ${session.access_token}`,
+        Authorization: `OAuth ${session?.access_token}`,
       },
     }).then(throwHttpError)
       .then(response => response.json())
@@ -34,7 +34,9 @@ export const Yandex = memo(() => {
           previous: data,
         }));
       }).catch(() => showError(t('web:page.animes.snackBar.yandex.import.error')));
+  }, [session, setState, showError]);
 
+  const getCurrentAnimeList = useCallback(() => {
     fetch('http://localhost:8080/api/animes')
       .then(throwHttpError)
       .then(response => response.json())
@@ -44,7 +46,14 @@ export const Yandex = memo(() => {
           current: data,
         }));
       }).catch(() => showError(t('web:page.animes.error')));
-  }, [setState, session, showError]);
+  }, [setState, showError]);
+
+  useEffect(() => {
+    if (session) {
+      getLastAnimeList();
+      getCurrentAnimeList();
+    }
+  }, [session, getLastAnimeList, getCurrentAnimeList]);
 
   const handleExport = useCallback(() => {
     setIsLoading(true);
