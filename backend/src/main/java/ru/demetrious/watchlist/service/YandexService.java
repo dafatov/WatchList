@@ -1,13 +1,12 @@
 package ru.demetrious.watchlist.service;
 
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.feign.YandexClient;
@@ -16,12 +15,10 @@ import ru.demetrious.watchlist.feign.dto.ResourceDto;
 import static java.lang.Math.max;
 import static java.lang.Math.toIntExact;
 import static java.net.URI.create;
-import static java.nio.file.Path.of;
 import static java.text.MessageFormat.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static org.springframework.http.HttpEntity.EMPTY;
-import static org.springframework.http.HttpMethod.GET;
+import static java.util.Arrays.stream;
 import static ru.demetrious.watchlist.utils.RestTemplateUtils.createHttpEntity;
 import static ru.demetrious.watchlist.utils.RestTemplateUtils.getRestTemplate;
 
@@ -67,9 +64,8 @@ public class YandexService {
             .flatMap(embedded -> embedded.getItems().stream().min(RESOURCE_DTO_COMPARATOR))
             .map(ResourceDto::getPath)
             .map(path -> yandexClient.getAnimeList(accessToken, path))
-            .map(link -> getRestTemplate().exchange(create(link.getHref()), GET, EMPTY, Anime[].class))
-            .map(HttpEntity::getBody)
-            .map(animeArray -> Arrays.stream(animeArray).toList())
+            .map(link -> getRestTemplate().getForObject(create(link.getHref()), Anime[].class))
+            .map(animeArray -> stream(animeArray).toList())
             .orElse(List.of());
     }
 
@@ -78,10 +74,13 @@ public class YandexService {
     // ===================================================================================================================
 
     private void createMissingFolders(String accessToken, String path) {
-        if (yandexClient.getPathMetadata(accessToken, path).isEmpty()) {
-            String parentPath = of(path).getParent().toString().replaceAll("\\\\", "/");
-            createMissingFolders(accessToken, parentPath);
-            yandexClient.createFolder(accessToken, path);
+        if (yandexClient.getPathMetadata(accessToken, path).isPresent()) {
+            return;
         }
+
+        String parentPath = Path.of(path).getParent().toString().replaceAll("\\\\", "/");
+
+        createMissingFolders(accessToken, parentPath);
+        yandexClient.createFolder(accessToken, path);
     }
 }
