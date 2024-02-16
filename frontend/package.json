@@ -1,6 +1,6 @@
 {
   "name": "ru.demetrious.watch-list.frontend",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "A web application",
   "private": true,
   "scripts": {
@@ -27,6 +27,7 @@
     "i18next": "21.9.2",
     "i18next-browser-languagedetector": "6.1.8",
     "i18next-http-backend": "2.2.1",
+    "jsondiffpatch": "0.6.0",
     "lodash": "4.17.21",
     "mui-datatables": "4.3.0",
     "notistack": "3.0.1",

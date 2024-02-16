@@ -74,6 +74,10 @@ public class AnimeService {
         return yandexService.uploadAnimeList(accessToken, getAnimes());
     }
 
+    public List<Anime> importAnimesToYandex(String accessToken) {
+        return yandexService.getLastAnimeList(accessToken);
+    }
+
     public List<Anime> deleteAnimes(List<UUID> uuidList) {
         return animeRepository.deleteByIdIsIn(uuidList);
     }
@@ -103,7 +107,7 @@ public class AnimeService {
     public List<UUID> getShuffleIndexes() {
         List<Anime> animeList = animeRepository.findAllByStatus(PLANNING).stream()
             .sorted((a, b) -> compare(a.getName(), b.getName()))
-            .toList();;
+            .toList();
 
         if (animeList.size() < 2) {
             throw new IllegalStateException("No at least 2 anime in status isPlanning");

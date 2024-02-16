@@ -1,5 +1,6 @@
 package ru.demetrious.watchlist.service;
 
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -13,10 +14,11 @@ import ru.demetrious.watchlist.feign.dto.ResourceDto;
 
 import static java.lang.Math.max;
 import static java.lang.Math.toIntExact;
-import static java.nio.file.Path.of;
+import static java.net.URI.create;
 import static java.text.MessageFormat.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Arrays.stream;
 import static ru.demetrious.watchlist.utils.RestTemplateUtils.createHttpEntity;
 import static ru.demetrious.watchlist.utils.RestTemplateUtils.getRestTemplate;
 
@@ -31,21 +33,20 @@ public class YandexService {
 
     private final YandexClient yandexClient;
 
-    @Value("${yandex.api.disk.app-folder}")
-    private String APP_FOLDER;
+    @Value("${yandex.api.disk.app-folder}/backups")
+    private String BACKUPS_FOLDER;
 
     public String uploadAnimeList(String accessToken, List<Anime> animeList) {
-        String backupsFolder = APP_FOLDER + "/backups";
-        String animesFile = format(backupsFolder + "/animes_{0}.json", now().format(DATE_TIME_FORMATTER));
+        String animesFile = format(BACKUPS_FOLDER + "/animes_{0}.json", now().format(DATE_TIME_FORMATTER));
 
-        createMissingFolders(accessToken, backupsFolder);
+        createMissingFolders(accessToken, BACKUPS_FOLDER);
 
         getRestTemplate().postForEntity(
             yandexClient.getUploadLink(accessToken, animesFile, true).getHref(),
             createHttpEntity(animeList),
             String.class
         );
-        yandexClient.getPathMetadata(accessToken, backupsFolder)
+        yandexClient.getPathMetadata(accessToken, BACKUPS_FOLDER)
             .map(ResourceDto::get_embedded)
             .ifPresent(embedded -> embedded.getItems().stream()
                 .sorted(RESOURCE_DTO_COMPARATOR)
@@ -57,15 +58,29 @@ public class YandexService {
         return animesFile;
     }
 
+    public List<Anime> getLastAnimeList(String accessToken) {
+        return yandexClient.getPathMetadata(accessToken, BACKUPS_FOLDER)
+            .map(ResourceDto::get_embedded)
+            .flatMap(embedded -> embedded.getItems().stream().min(RESOURCE_DTO_COMPARATOR))
+            .map(ResourceDto::getPath)
+            .map(path -> yandexClient.getAnimeList(accessToken, path))
+            .map(link -> getRestTemplate().getForObject(create(link.getHref()), Anime[].class))
+            .map(animeArray -> stream(animeArray).toList())
+            .orElse(List.of());
+    }
+
     // ===================================================================================================================
     // = Implementation
     // ===================================================================================================================
 
     private void createMissingFolders(String accessToken, String path) {
-        if (yandexClient.getPathMetadata(accessToken, path).isEmpty()) {
-            String parentPath = of(path).getParent().toString().replaceAll("\\\\", "/");
-            createMissingFolders(accessToken, parentPath);
-            yandexClient.createFolder(accessToken, path);
+        if (yandexClient.getPathMetadata(accessToken, path).isPresent()) {
+            return;
         }
+
+        String parentPath = Path.of(path).getParent().toString().replaceAll("\\\\", "/");
+
+        createMissingFolders(accessToken, parentPath);
+        yandexClient.createFolder(accessToken, path);
     }
 }

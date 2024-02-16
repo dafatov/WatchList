@@ -61,7 +61,8 @@ public class Common_ru extends ListResourceBundle {
                     pair("on", "Начать выбор иконки"),
                     pair("off", "Закончить выбор иконки")
                 )),
-                pair("sync", "Синхронизировать остальные поля текущим")
+                pair("sync", "Синхронизировать остальные поля текущим"),
+                pair("showUnchanged", "Отображать неизмененное")
             )),
             pair("validation", wrap(
                 pair("required", "Обязательное"),
