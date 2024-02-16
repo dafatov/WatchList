@@ -129,19 +129,19 @@ public final class FileManager {
             return progressRsDto;
         }
 
-        long currentTimeMillis = currentTimeMillis();
+        Path coping = copingFile.get();
+        FilesRsDto completed = getFiles(completedFiles.get());
         long current = currentSize.get();
         long currentFile = currentFileSize.get();
         long all = allSize.get();
+        long allFile = coping.toFile().length();
+        int percent = getPercent(current, all);
+        int percentFile = getPercent(currentFile, allFile);
+        long currentTimeMillis = currentTimeMillis();
         long speed = floorDivExact(
             current - previousCurrentSize.getLeft(),
             ceilDivExact(currentTimeMillis - previousCurrentSize.getRight(), 1000)
         );
-        int percent = getPercent(current, all);
-        FilesRsDto completed = getFiles(completedFiles.get());
-        String coping = copingFile.get().toString();
-        long allFile = Path.of(coping).toFile().length();
-        int percentFile = getPercent(currentFile, allFile);
 
         previousCurrentSize = Pair.of(current, currentTimeMillis);
 
@@ -156,7 +156,7 @@ public final class FileManager {
                 .setPercent(percentFile))
             .setSpeed(speed)
             .setCompleted(completed)
-            .setCoping(coping);
+            .setCoping(coping.toString());
     }
 
     public void reset() {
