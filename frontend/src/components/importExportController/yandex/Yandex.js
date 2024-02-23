@@ -66,7 +66,7 @@ export const Yandex = memo(() => {
       .then(() => showSuccess(t('web:page.animes.snackBar.yandex.export.success')))
       .catch(() => showError(t('web:page.animes.snackBar.yandex.export.error')))
       .finally(() => setIsLoading(false));
-  }, [setIsLoading, showSuccess, showError, session, getLastAnimeList]);
+  }, [setIsLoading, showSuccess, showError, session]);
 
   return (
     <>
