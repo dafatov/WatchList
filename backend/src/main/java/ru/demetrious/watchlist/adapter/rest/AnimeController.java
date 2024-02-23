@@ -143,6 +143,19 @@ public class AnimeController {
         }
     }
 
+    @PostMapping("/cancelPick")
+    public ResponseEntity<?> cancelCandidates() {
+        try {
+            animeService.cancelCandidates();
+
+            log.info("cancelCandidates");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Can't cancel pick candidates:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/randomize")
     public ResponseEntity<?> randomizeWatching() {
         try {
