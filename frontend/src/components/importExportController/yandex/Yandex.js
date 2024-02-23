@@ -49,11 +49,11 @@ export const Yandex = memo(() => {
   }, [setState, showError]);
 
   useEffect(() => {
-    if (session) {
+    if (session && open) {
       getLastAnimeList();
       getCurrentAnimeList();
     }
-  }, [session, getLastAnimeList, getCurrentAnimeList]);
+  }, [session, getLastAnimeList, getCurrentAnimeList, open]);
 
   const handleExport = useCallback(() => {
     setIsLoading(true);
@@ -66,7 +66,7 @@ export const Yandex = memo(() => {
       .then(() => showSuccess(t('web:page.animes.snackBar.yandex.export.success')))
       .catch(() => showError(t('web:page.animes.snackBar.yandex.export.error')))
       .finally(() => setIsLoading(false));
-  }, [setIsLoading, showSuccess, showError, session]);
+  }, [setIsLoading, showSuccess, showError, session, getLastAnimeList]);
 
   return (
     <>

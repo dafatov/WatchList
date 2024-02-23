@@ -5,6 +5,7 @@ export const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
+    width: '-webkit-fill-available'
   },
   formControlLabel: {
     '&.MuiFormControlLabel-root': {

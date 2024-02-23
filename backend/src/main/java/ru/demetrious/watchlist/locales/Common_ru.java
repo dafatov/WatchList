@@ -13,7 +13,8 @@ public class Common_ru extends ListResourceBundle {
                 pair("toMain", "На главную")
             )),
             pair("data", wrap(
-                pair("notAvailable", "Данные недоступны")
+                pair("notAvailable", "Данные недоступны"),
+                pair("noDifference", "Изменения не обнаружены")
             )),
             pair("unit", wrap(
                 pair("information", "Б"),

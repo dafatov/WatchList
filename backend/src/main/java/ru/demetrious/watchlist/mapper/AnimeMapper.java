@@ -1,7 +1,7 @@
 package ru.demetrious.watchlist.mapper;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -13,7 +13,7 @@ import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
 import ru.demetrious.watchlist.feign.dto.AnimeListDto.AnimeDto;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 @Mapper
@@ -47,14 +47,14 @@ public abstract class AnimeMapper {
     }
 
     @Named("mapSupplements")
-    static Set<AnimeSupplement> mapSupplements(int watchedEpisodes) {
-        Set<AnimeSupplement> supplements = new HashSet<>();
+    static List<AnimeSupplement> mapSupplements(int watchedEpisodes) {
+        List<AnimeSupplement> supplements = new ArrayList<>();
 
         if (watchedEpisodes > 0) {
             AnimeSupplement completed = new AnimeSupplement();
 
             completed.setName(AnimeSupplementEnum.COMPLETED);
-            completed.setEpisodes(range(1, watchedEpisodes + 1).boxed().collect(toSet()));
+            completed.setEpisodes(range(1, watchedEpisodes + 1).boxed().collect(toList()));
             supplements.add(completed);
         }
 

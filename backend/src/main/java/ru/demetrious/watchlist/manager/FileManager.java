@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,7 +32,6 @@ import static java.lang.System.currentTimeMillis;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.forceDelete;
@@ -272,8 +270,8 @@ public final class FileManager {
         return toIntExact(floorDivExact(100 * current, all));
     }
 
-    private Set<AnimeSupplement> getSupplements(FilesGroupsRqDto filesGroups) {
-        Set<AnimeSupplement> animeSupplements = new HashSet<>();
+    private List<AnimeSupplement> getSupplements(FilesGroupsRqDto filesGroups) {
+        List<AnimeSupplement> animeSupplements = new ArrayList<>();
 
         if (filesGroups.getSubtitles().size() != filesGroups.getVoices().size()
             || filesGroups.getVideos().size() != filesGroups.getSubtitles().size()) {
@@ -286,7 +284,7 @@ public final class FileManager {
                 .setEpisodes(range(1, filesGroups.getSubtitles().size() + 1)
                     .filter(index -> filesGroups.getSubtitles().get(index - 1) == null)
                     .boxed()
-                    .collect(toSet())));
+                    .collect(toList())));
         }
 
         if (filesGroups.getVoices().stream().anyMatch(Objects::nonNull)) {
@@ -295,7 +293,7 @@ public final class FileManager {
                 .setEpisodes(range(1, filesGroups.getVoices().size() + 1)
                     .filter(index -> filesGroups.getVoices().get(index - 1) != null)
                     .boxed()
-                    .collect(toSet())));
+                    .collect(toList())));
         }
 
         return animeSupplements;
