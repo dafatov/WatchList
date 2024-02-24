@@ -105,7 +105,7 @@ export const Animes = memo(() => {
         setAnimes(data);
         setIsPendingAnimes(false);
       }).catch(() => showError(t('web:page.animes.error')));
-  }, [setAnimes, setIsPendingAnimes, picked]);
+  }, [setAnimes, setIsPendingAnimes, picked, indexes]);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/tags')

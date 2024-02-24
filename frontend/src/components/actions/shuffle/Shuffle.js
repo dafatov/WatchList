@@ -43,8 +43,12 @@ export const Shuffle = memo(({
   }, [setIndexes, setPicked, onStop]);
 
   const handleCancelShuffleAnimes = useCallback(() => {
-    setIndexes(null);
-    onStop?.();
+    fetch('http://localhost:8080/api/animes/cancelPick', {method: 'POST'})
+      .then(throwHttpError)
+      .then(() => {
+        setIndexes(null);
+        onStop?.();
+      }).catch(() => showError(t('web:page.animes.shuffle.cancelPick.error')));
   }, [setIndexes, onStop]);
 
   return (

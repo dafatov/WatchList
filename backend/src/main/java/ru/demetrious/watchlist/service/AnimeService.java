@@ -22,7 +22,6 @@ import static java.lang.Math.max;
 import static java.nio.file.Path.of;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.StringUtils.compare;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static ru.demetrious.watchlist.domain.enums.WatchStatusEnum.CANDIDATE;
@@ -142,12 +141,18 @@ public class AnimeService {
 
         List<Anime> animeList = animeRepository.findAllByStatus(CANDIDATE);
         int[] nonDuplicatedIntegers = randomOrgClient.generateNonDuplicatedIntegers(info.getRemained(), 0, animeList.size() - 1);
-
-        return animeList.stream()
-            .peek(anime -> anime.setStatus(contains(nonDuplicatedIntegers, animeList.indexOf(anime)) ? WATCHING : PLANNING))
-            .filter(anime -> contains(nonDuplicatedIntegers, animeList.indexOf(anime)))
+        List<UUID> pickedAnimeList = stream(nonDuplicatedIntegers)
+            .mapToObj(animeList::get)
+            .map(anime -> anime.setStatus(WATCHING))
             .map(Anime::getId)
             .toList();
+
+        cancelCandidates();
+        return pickedAnimeList;
+    }
+
+    public void cancelCandidates() {
+        animeRepository.findAllByStatus(CANDIDATE).forEach(anime -> anime.setStatus(PLANNING));
     }
 
     public List<String> randomizeWatching() {
