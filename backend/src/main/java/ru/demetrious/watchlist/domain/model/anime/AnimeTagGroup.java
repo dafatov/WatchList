@@ -5,8 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,5 +34,5 @@ public class AnimeTagGroup {
     @OneToMany(mappedBy = "group")
     @JsonIgnore
     @ToString.Exclude
-    private Set<AnimeTag> tags = new HashSet<>();
+    private List<AnimeTag> tags = new ArrayList<>();
 }

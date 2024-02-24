@@ -52,7 +52,8 @@ public class AnimeService {
             .collect(toList()));
 
         return animeList.stream()
-            .peek(anime -> anime.setPathPackage(getPathPackage(commonPathOptional, anime.getPath())))
+            .map(anime -> anime.setPathPackage(getPathPackage(commonPathOptional, anime.getPath())))
+            .map(Anime::sorted)
             .collect(toList());
     }
 
@@ -73,8 +74,10 @@ public class AnimeService {
         return yandexService.uploadAnimeList(accessToken, getAnimes());
     }
 
-    public List<Anime> importAnimesToYandex(String accessToken) {
-        return yandexService.getLastAnimeList(accessToken);
+    public List<Anime> importAnimesFromYandex(String accessToken) {
+        return yandexService.getLastAnimeList(accessToken).stream()
+            .map(Anime::sorted)
+            .collect(toList());
     }
 
     public List<Anime> deleteAnimes(List<UUID> uuidList) {

@@ -4,7 +4,7 @@ import {FormControlLabel, Switch} from '@mui/material';
 // eslint-disable-next-line import/no-unresolved
 import {format, hideUnchanged, showUnchanged} from 'jsondiffpatch/formatters/html';
 import {memo, useEffect, useMemo, useState} from 'react';
-import {diff} from 'jsondiffpatch';
+import {create} from 'jsondiffpatch';
 import {useStyles} from './jsonDiffStyles';
 import {useTranslation} from 'react-i18next';
 
@@ -24,8 +24,13 @@ export const JsonDiff = memo(({
     }
   }, [hideUnchanged, showUnchanged, hasUnchanged]);
 
-  const delta = useMemo(() => diff(previous, current), [diff, previous, current]);
-  const innerHtml = useMemo(() => ({__html: format(delta, previous)}), [format, delta, previous]);
+  const jsonDiffPatcher = useMemo(() => create({
+    objectHash: obj => obj.id,
+    propertyFilter: name => name !== 'id',
+  }), [create]);
+
+  const delta = useMemo(() => jsonDiffPatcher?.diff(previous, current), [jsonDiffPatcher, previous, current]);
+  const innerHtml = useMemo(() => ({__html: format(delta, previous) || t('common:data.noDifference')}), [format, delta, previous]);
 
   return (
     <div className={classes.root}>

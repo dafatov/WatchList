@@ -6,8 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,5 +38,5 @@ public class AnimeTag {
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore
     @ToString.Exclude
-    private Set<Anime> animes = new HashSet<>();
+    private List<Anime> animes = new ArrayList<>();
 }

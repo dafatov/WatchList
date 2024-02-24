@@ -49,11 +49,11 @@ export const Yandex = memo(() => {
   }, [setState, showError]);
 
   useEffect(() => {
-    if (session) {
+    if (session && open) {
       getLastAnimeList();
       getCurrentAnimeList();
     }
-  }, [session, getLastAnimeList, getCurrentAnimeList]);
+  }, [session, getLastAnimeList, getCurrentAnimeList, open]);
 
   const handleExport = useCallback(() => {
     setIsLoading(true);

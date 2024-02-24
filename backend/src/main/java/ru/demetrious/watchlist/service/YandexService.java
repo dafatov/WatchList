@@ -61,7 +61,7 @@ public class YandexService {
     public List<Anime> getLastAnimeList(String accessToken) {
         return yandexClient.getPathMetadata(accessToken, BACKUPS_FOLDER)
             .map(ResourceDto::get_embedded)
-            .flatMap(embedded -> embedded.getItems().stream().min(RESOURCE_DTO_COMPARATOR))
+            .flatMap(embedded -> embedded.getItems().stream().max(RESOURCE_DTO_COMPARATOR))
             .map(ResourceDto::getPath)
             .map(path -> yandexClient.getAnimeList(accessToken, path))
             .map(link -> getRestTemplate().getForObject(create(link.getHref()), Anime[].class))
