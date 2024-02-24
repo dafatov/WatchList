@@ -11,6 +11,14 @@ const icon = './resources/icons/watch-list.png';
 let loadingWindow;
 let mainWindow;
 
+const doIfNotLocal = (callback, localValue) => {
+  if (process.env.PROFILE === 'local') {
+    return localValue;
+  }
+
+  return callback();
+};
+
 const initUpdater = () => {
   autoUpdater.autoDownload = false;
   autoUpdater.disableWebInstaller = false;
@@ -23,8 +31,14 @@ const initUpdater = () => {
 };
 
 const initApp = () => {
-  app.setPath('userData', path.join(app.getPath('exe'), '../userData'));
-  app.setPath('sessionData', path.join(app.getPath('exe'), '../sessionData'));
+  app.setPath('userData', doIfNotLocal(
+    () => path.join(app.getPath('documents'), '../.watchlist/userData'),
+    path.join(app.getPath('exe'), '../userData'),
+  ));
+  app.setPath('sessionData', doIfNotLocal(
+    () => path.join(app.getPath('documents'), '../.watchlist/sessionData'),
+    path.join(app.getPath('exe'), '../sessionData'),
+  ));
 
   app.on('ready', () => {
     startLoading().then(() => doIfNotLocal(() => autoUpdate(), Promise.resolve()))
@@ -141,14 +155,6 @@ const createMenu = () => {
       enabled: false,
     }));
   }
-};
-
-const doIfNotLocal = (callback, localValue) => {
-  if (process.env.PROFILE === 'local') {
-    return localValue;
-  }
-
-  return callback();
 };
 
 const getRoot = () => doIfNotLocal(() => './src', '.');
