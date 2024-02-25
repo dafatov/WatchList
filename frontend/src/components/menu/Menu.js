@@ -15,9 +15,7 @@ export const Menu = memo(({
   const [isHovered, setIsHovered] = useState(false);
 
   const handleHovered = useCallback(isHovered => {
-    if (!disabled) {
-      setIsHovered(isHovered);
-    }
+    setIsHovered(isHovered && !disabled);
   }, [setIsHovered, disabled]);
 
   return (
@@ -34,7 +32,7 @@ export const Menu = memo(({
       </IconButton>
       <div className={classNames(classes.actions, {
         [classes.actionsHovered]: isHovered,
-        [menuActionsHoveredClassName]: isHovered
+        [menuActionsHoveredClassName]: isHovered,
       })}>
         {children}
       </div>

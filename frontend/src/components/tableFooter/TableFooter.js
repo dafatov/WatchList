@@ -1,7 +1,7 @@
 import {IconButton, MenuItem, TableFooter as MuiTableFooter, Select, TableCell, TableRow} from '@mui/material';
 import {memo, useCallback} from 'react';
 import {AddOutlined} from '@mui/icons-material';
-import {ImportExportController} from '../importExportController/ImportExportController';
+import {ImportExportController} from '../importExport/ImportExportController';
 import MuiTablePagination from '@mui/material/TablePagination';
 import {useStyles} from './tableFooterStyles';
 

@@ -1,5 +1,5 @@
 import {FileDownloadOutlined, LogoutOutlined} from '@mui/icons-material';
-import {memo, useCallback, useEffect, useState} from 'react';
+import {memo, useCallback, useState} from 'react';
 import {Dialog} from '../../dialog/Dialog';
 import {JsonDiff} from '../../jsonDiff/JsonDiff';
 import {Login} from './login/Login';
@@ -21,8 +21,8 @@ export const Yandex = memo(() => {
   const [state, setState] = useState({});
   const [open, setOpen] = useState(false);
 
-  const getLastAnimeList = useCallback(() => {
-    fetch('http://localhost:8080/api/animes/import/yandex', {
+  const getLastAnimeList = useCallback(
+    () => fetch('http://localhost:8080/api/animes/import/yandex', {
       headers: {
         Authorization: `OAuth ${session?.access_token}`,
       },
@@ -33,11 +33,12 @@ export const Yandex = memo(() => {
           ...state,
           previous: data,
         }));
-      }).catch(() => showError(t('web:page.animes.snackBar.yandex.import.error')));
-  }, [session, setState, showError]);
+      }).catch(() => showError(t('web:page.animes.snackBar.yandex.import.error'))),
+    [session, setState, showError],
+  );
 
-  const getCurrentAnimeList = useCallback(() => {
-    fetch('http://localhost:8080/api/animes')
+  const getCurrentAnimeList = useCallback(
+    () => fetch('http://localhost:8080/api/animes')
       .then(throwHttpError)
       .then(response => response.json())
       .then(data => {
@@ -45,15 +46,16 @@ export const Yandex = memo(() => {
           ...state,
           current: data,
         }));
-      }).catch(() => showError(t('web:page.animes.error')));
-  }, [setState, showError]);
+      }).catch(() => showError(t('web:page.animes.error'))),
+    [setState, showError],
+  );
 
-  useEffect(() => {
-    if (session && open) {
-      getLastAnimeList();
-      getCurrentAnimeList();
-    }
-  }, [session, getLastAnimeList, getCurrentAnimeList, open]);
+  const handleShowDiff = useCallback(() => {
+    setIsLoading(true);
+    setOpen(true);
+    Promise.all([getLastAnimeList(), getCurrentAnimeList()])
+      .finally(() => setIsLoading(false));
+  }, [setOpen, getLastAnimeList, getCurrentAnimeList, setIsLoading]);
 
   const handleExport = useCallback(() => {
     setIsLoading(true);
@@ -79,7 +81,7 @@ export const Yandex = memo(() => {
           leftTitle={t('common:action.logout')}
           rightTitle={t('common:action.export')}
           onLeftClick={() => setSession(null)}
-          onRightClick={() => setOpen(true)}
+          onRightClick={handleShowDiff}
         />
         : <Login clientId={process.env.REACT_APP_YANDEX_CLIENT_ID} onSuccess={session => setSession(session)}/>}
       <Dialog
@@ -91,6 +93,7 @@ export const Yandex = memo(() => {
         classes={{content: classes.dialogContent}}
       >
         <JsonDiff
+          loading={isLoading}
           previous={state.previous}
           current={state.current}
         />

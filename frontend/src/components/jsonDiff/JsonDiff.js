@@ -9,6 +9,7 @@ import {useStyles} from './jsonDiffStyles';
 import {useTranslation} from 'react-i18next';
 
 export const JsonDiff = memo(({
+  loading,
   previous,
   current,
 }) => {
@@ -30,7 +31,9 @@ export const JsonDiff = memo(({
   }), [create]);
 
   const delta = useMemo(() => jsonDiffPatcher?.diff(previous, current), [jsonDiffPatcher, previous, current]);
-  const innerHtml = useMemo(() => ({__html: format(delta, previous) || t('common:data.noDifference')}), [format, delta, previous]);
+  const innerHtml = useMemo(() => ({
+    __html: loading && t('common:data.isLoading') || format(delta, previous) || t('common:data.noDifference'),
+  }), [format, delta, previous, loading]);
 
   return (
     <div className={classes.root}>

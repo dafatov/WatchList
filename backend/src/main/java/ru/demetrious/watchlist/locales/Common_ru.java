@@ -14,7 +14,8 @@ public class Common_ru extends ListResourceBundle {
             )),
             pair("data", wrap(
                 pair("notAvailable", "Данные недоступны"),
-                pair("noDifference", "Изменения не обнаружены")
+                pair("noDifference", "Изменения не обнаружены"),
+                pair("isLoading", "Идет загрузка...")
             )),
             pair("unit", wrap(
                 pair("information", "Б"),
