@@ -81,6 +81,9 @@ public class Web_ru extends ListResourceBundle {
                         )),
                         pair("showDiff", wrap(
                             pair("title", "Изменения с последнего экспорта")
+                        )),
+                        pair("editPostfix", wrap(
+                            pair("label", "Постфикс наименования")
                         ))
                     )),
                     pair("snackBar", wrap(

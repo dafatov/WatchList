@@ -66,7 +66,7 @@ public class FileService {
     public Anime getAnimeDirectoryInfo(String path, FilesGroupsRqDto filesGroups) {
         Path folder = of(path);
 
-        filesGroups.acceptAll(fileList -> fileManager.renameFiles(folder, fileList));
+        filesGroups.getFiles().acceptAll(fileList -> fileManager.renameFiles(folder, fileList, filesGroups.getPostfixes()));
 
         return fileManager.getAnimeDirectoryInfo(folder, filesGroups);
     }

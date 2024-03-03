@@ -6,13 +6,19 @@ import lombok.Data;
 
 @Data
 public class FilesGroupsRqDto {
-    private List<String> videos;
-    private List<String> voices;
-    private List<String> subtitles;
+    private List<String> postfixes;
+    private FilesRqDto files;
 
-    public void acceptAll(Consumer<List<String>> consumer) {
-        consumer.accept(videos);
-        consumer.accept(voices);
-        consumer.accept(subtitles);
+    @Data
+    public static class FilesRqDto {
+        private List<String> videos;
+        private List<String> voices;
+        private List<String> subtitles;
+
+        public void acceptAll(Consumer<List<String>> consumer) {
+            consumer.accept(getVideos());
+            consumer.accept(getVoices());
+            consumer.accept(getSubtitles());
+        }
     }
 }

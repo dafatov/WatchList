@@ -25,9 +25,7 @@ import ru.demetrious.watchlist.domain.model.anime.AnimeSupplement;
 
 import static java.lang.Math.ceilDivExact;
 import static java.lang.Math.floorDivExact;
-import static java.lang.Math.max;
 import static java.lang.Math.toIntExact;
-import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
@@ -37,7 +35,6 @@ import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.apache.commons.lang3.StringUtils.leftPad;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.HAS_VOICE;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.NO_SUBS;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.COMPLETED;
@@ -184,7 +181,7 @@ public final class FileManager {
             .setName(source.getFileName().toString())
             .setSize(sizeOfDirectory(source.toFile()))
             .setPath(source.toString())
-            .setEpisodes(toIntExact(filesGroups.getVideos().stream().filter(Objects::nonNull).count()))
+            .setEpisodes(toIntExact(filesGroups.getFiles().getVideos().stream().filter(Objects::nonNull).count()))
             .setSupplements(getSupplements(filesGroups));
     }
 
@@ -204,10 +201,10 @@ public final class FileManager {
                 .collect(toList()));
     }
 
-    public void renameFiles(Path folder, List<String> fileList) {
+    public void renameFiles(Path folder, List<String> fileList, List<String> postfixes) {
         fileList.stream()
             .filter(Objects::nonNull)
-            .forEach(file -> moveFile(folder, file, fileList));
+            .forEach(file -> moveFile(folder, file, postfixes.get(fileList.indexOf(file))));
     }
 
     // ===================================================================================================================
@@ -271,27 +268,28 @@ public final class FileManager {
     }
 
     private List<AnimeSupplement> getSupplements(FilesGroupsRqDto filesGroups) {
+        FilesGroupsRqDto.FilesRqDto files = filesGroups.getFiles();
         List<AnimeSupplement> animeSupplements = new ArrayList<>();
 
-        if (filesGroups.getSubtitles().size() != filesGroups.getVoices().size()
-            || filesGroups.getVideos().size() != filesGroups.getSubtitles().size()) {
+        if (files.getSubtitles().size() != files.getVoices().size()
+            || files.getVideos().size() != files.getSubtitles().size()) {
             throw new IllegalStateException("Not equal size of fileGroups arrays");
         }
 
-        if (filesGroups.getSubtitles().stream().anyMatch(Objects::isNull)) {
+        if (files.getSubtitles().stream().anyMatch(Objects::isNull)) {
             animeSupplements.add(new AnimeSupplement()
                 .setName(NO_SUBS)
-                .setEpisodes(range(1, filesGroups.getSubtitles().size() + 1)
-                    .filter(index -> filesGroups.getSubtitles().get(index - 1) == null)
+                .setEpisodes(range(1, files.getSubtitles().size() + 1)
+                    .filter(index -> files.getSubtitles().get(index - 1) == null)
                     .boxed()
                     .collect(toList())));
         }
 
-        if (filesGroups.getVoices().stream().anyMatch(Objects::nonNull)) {
+        if (files.getVoices().stream().anyMatch(Objects::nonNull)) {
             animeSupplements.add(new AnimeSupplement()
                 .setName(HAS_VOICE)
-                .setEpisodes(range(1, filesGroups.getVoices().size() + 1)
-                    .filter(index -> filesGroups.getVoices().get(index - 1) != null)
+                .setEpisodes(range(1, files.getVoices().size() + 1)
+                    .filter(index -> files.getVoices().get(index - 1) != null)
                     .boxed()
                     .collect(toList())));
         }
@@ -299,22 +297,18 @@ public final class FileManager {
         return animeSupplements;
     }
 
-    private void moveFile(Path folder, String filePath, List<String> pathStringList) {
+    private void moveFile(Path folder, String filePath, String postfix) {
         try {
             Files.move(
                 Path.of(folder + filePath),
-                Path.of(format("{0}\\{1}.{2}", folder, getFileName(folder, filePath, pathStringList), getExtension(filePath)))
+                Path.of(format("{0}\\{1}.{2}", folder, getFileName(folder, postfix), getExtension(filePath)))
             );
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private String getFileName(Path folder, String filePath, List<String> pathStringList) {
-        return format("{0} {1}", folder.getFileName().toString(), leftPad(
-            valueOf(pathStringList.indexOf(filePath) + 1),
-            max(2, valueOf(pathStringList.size()).length()),
-            '0'
-        ));
+    private String getFileName(Path folder, String postfix) {
+        return format("{0} {1}", folder.getFileName().toString(), postfix);
     }
 }
