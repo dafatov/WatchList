@@ -16,7 +16,7 @@ export const DraggableList = memo(({
   list,
   getListTitle,
   provided,
-  snapshot,
+  snapshot: snapshotProp,
   setLists,
 }) => {
   const classes = useStyles({count});
@@ -52,7 +52,7 @@ export const DraggableList = memo(({
         ref={provided.innerRef}
         spacing={1}
         className={classNames(classes.list, {
-          [classes.listDraggingOver]: snapshot.isDraggingOver,
+          [classes.listDraggingOver]: snapshotProp.isDraggingOver,
         })}
         {...provided.droppableProps}
       >
@@ -71,7 +71,13 @@ export const DraggableList = memo(({
                 style={provided.draggableProps.style}
               >
                 {element.data
-                  ? children({data: element.data, isDragging: snapshot.isDragging})
+                  ? children({
+                    data: element.data,
+                    isDragging: snapshot.isDragging,
+                    listName,
+                    index,
+                    isUsingPlaceholder: snapshotProp.isUsingPlaceholder,
+                  })
                   : <Button
                     fullWidth
                     variant="contained"
