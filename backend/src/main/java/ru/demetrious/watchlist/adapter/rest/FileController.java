@@ -110,4 +110,17 @@ public class FileController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
+    @PostMapping("/rename")
+    public ResponseEntity<?> rename(@RequestParam String path, @RequestParam String name) {
+        try {
+            Anime animeInfo = fileService.renameFile(path, name);
+
+            log.info("rename: {}", animeInfo);
+            return ResponseEntity.ok(animeInfo);
+        } catch (Exception e) {
+            log.error("Can't rename:", e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 }

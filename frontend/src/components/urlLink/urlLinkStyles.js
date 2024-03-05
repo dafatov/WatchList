@@ -30,4 +30,13 @@ export const useStyles = makeStyles(theme => ({
       flexShrink: 1,
     },
   },
+  dialRootHovered: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  dialActionsHovered: {
+    flexDirection: 'column',
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
 }));
