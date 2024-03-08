@@ -21,7 +21,7 @@
     </profiles>
 
     <properties>
-        <revision>1.8.4-1</revision>
+        <revision>1.8.4-2</revision>
         <java.version>20</java.version>
         <node.version>v16.13.0</node.version>
         <node.url>https://nodejs.org/dist/</node.url>

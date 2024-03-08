@@ -71,10 +71,6 @@ public class FileUtils {
         return Pair.of(path, getFileName(path, postfix));
     }
 
-    public static Path getFileName(Path file, String postfix) {
-        return of(format("{0}\\{1} {2}.{3}", file.getParent(), file.getParent().getFileName(), postfix, getExtension(file.getFileName().toString())));
-    }
-
     // ===================================================================================================================
     // = Implementation
     // ===================================================================================================================
@@ -122,5 +118,9 @@ public class FileUtils {
                 forceDelete(target);
             }
         }
+    }
+
+    private static Path getFileName(Path file, String postfix) {
+        return of(format("{0}\\{1} {2}.{3}", file.getParent(), file.getParent().getFileName(), postfix, getExtension(file.getFileName().toString())));
     }
 }
