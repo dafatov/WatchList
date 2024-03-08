@@ -21,21 +21,6 @@ public abstract class AnimeMapper {
     @Value("${shikimori.api.url}")
     String SHIKIMORI_URL;
 
-    @Mappings({
-        @Mapping(target = "name", source = "series_title"),
-        @Mapping(target = "episodes", source = "series_episodes"),
-        @Mapping(target = "multipleViews", source = "my_times_watched"),
-        @Mapping(target = "status", source = "my_status", qualifiedByName = "mapStatus"),
-        @Mapping(target = "url", expression = "java(SHIKIMORI_URL + \"/animes/\" + animeDto.getSeries_animedb_id())"),
-        @Mapping(target = "supplements", source = "my_watched_episodes", qualifiedByName = "mapSupplements"),
-        @Mapping(target = "id", ignore = true),
-        @Mapping(target = "path", ignore = true),
-        @Mapping(target = "pathPackage", ignore = true),
-        @Mapping(target = "size", ignore = true),
-        @Mapping(target = "tags", ignore = true)
-    })
-    public abstract Anime animeDtoToAnime(AnimeDto animeDto);
-
     @Named("mapStatus")
     static WatchStatusEnum mapStatus(String status) {
         return switch (status) {
@@ -60,4 +45,19 @@ public abstract class AnimeMapper {
 
         return supplements;
     }
+
+    @Mappings({
+        @Mapping(target = "name", source = "series_title"),
+        @Mapping(target = "episodes", source = "series_episodes"),
+        @Mapping(target = "multipleViews", source = "my_times_watched"),
+        @Mapping(target = "status", source = "my_status", qualifiedByName = "mapStatus"),
+        @Mapping(target = "url", expression = "java(SHIKIMORI_URL + \"/animes/\" + animeDto.getSeries_animedb_id())"),
+        @Mapping(target = "supplements", source = "my_watched_episodes", qualifiedByName = "mapSupplements"),
+        @Mapping(target = "id", ignore = true),
+        @Mapping(target = "path", ignore = true),
+        @Mapping(target = "pathPackage", ignore = true),
+        @Mapping(target = "size", ignore = true),
+        @Mapping(target = "tags", ignore = true)
+    })
+    public abstract Anime animeDtoToAnime(AnimeDto animeDto);
 }

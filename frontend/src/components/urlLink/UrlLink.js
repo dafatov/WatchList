@@ -1,8 +1,12 @@
-import {Badge, Button, Divider, TextField} from '@mui/material';
-import {ContentCopyOutlined, FiberNewOutlined} from '@mui/icons-material';
-import {useCallback, useEffect, useState} from 'react';
+import {Badge, Button, Divider, InputAdornment, TextField} from '@mui/material';
+import {ContentCopyOutlined, FiberNewOutlined, MenuOutlined, OpenInNew, SyncOutlined} from '@mui/icons-material';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {IconButton} from '../iconButton/IconButton';
+import {Menu} from '../menu/Menu';
 import {Tooltip} from '../tooltip/Tooltip';
+import {getComponentsFromObject} from '../../utils/component';
+import {throwHttpError} from '../../utils/reponse';
+import {useSnackBar} from '../../utils/snackBar';
 import {useStyles} from './urlLinkStyles';
 import {useTranslation} from 'react-i18next';
 
@@ -17,9 +21,11 @@ export const UrlLink = (({
 }) => {
   const classes = useStyles();
   const {t} = useTranslation();
+  const {showError} = useSnackBar();
   const [isHovered, setIsHovered] = useState(false);
   const [name, setName] = useState(nameProp);
   const [url, setUrl] = useState(urlProp);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setName(nameProp);
@@ -43,6 +49,32 @@ export const UrlLink = (({
     formik.handleChange(event);
   }, [setUrl, formik.handleChange]);
 
+  const handleSync = useCallback(() => {
+    setIsLoading(true);
+    fetch('http://localhost:8080/api/files/rename?' + new URLSearchParams({
+      path: formik.values.path,
+      name,
+    }), {
+      method: 'POST',
+    }).then(throwHttpError)
+      .then(response => response.json())
+      .then(data => {
+        formik.setFieldValue('path', data.path);
+        setName(data.name);
+      }).catch(() => showError(t('web:page.animes.snackBar.renameFolder.error')))
+      .finally(() => setIsLoading(false));
+  }, [setIsLoading, showError, formik.values.path, name, formik.setFieldValue]);
+
+  const actions = useMemo(() => ({
+    sync: <IconButton
+      title={t('common:action.sync')}
+      disabled={!name || isLoading}
+      onClick={() => handleSync()}
+    >
+      <SyncOutlined/>
+    </IconButton>,
+  }), [name, isLoading, handleSync]);
+
   return (
     <>
       {editable
@@ -54,6 +86,18 @@ export const UrlLink = (({
             onBlur={formik.handleBlur}
             error={!!getError('name')}
             label={getError('name')}
+            InputProps={{
+              endAdornment:
+                <InputAdornment position="end">
+                  <Menu
+                    mainIcon={<MenuOutlined/>}
+                    menuRootHoveredClassName={classes.dialRootHovered}
+                    menuActionsHoveredClassName={classes.dialActionsHovered}
+                  >
+                    {getComponentsFromObject(actions)}
+                  </Menu>
+                </InputAdornment>,
+            }}
           />
           <TextField
             name="url"
@@ -63,6 +107,18 @@ export const UrlLink = (({
             onBlur={formik.handleBlur}
             error={!!getError('url')}
             label={getError('url')}
+            InputProps={{
+              endAdornment:
+                <InputAdornment position="end">
+                  <IconButton
+                    title={url}
+                    disabled={!url || getError('url')}
+                    onClick={onClick}
+                  >
+                    <OpenInNew/>
+                  </IconButton>
+                </InputAdornment>,
+            }}
           />
         </div>
         : <div

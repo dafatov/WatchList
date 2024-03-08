@@ -2,7 +2,6 @@ package ru.demetrious.watchlist.manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +26,12 @@ import static java.lang.Math.ceilDivExact;
 import static java.lang.Math.floorDivExact;
 import static java.lang.Math.toIntExact;
 import static java.lang.System.currentTimeMillis;
-import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.collections4.CollectionUtils.collate;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.sizeOfDirectory;
-import static org.apache.commons.io.FilenameUtils.getExtension;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.HAS_VOICE;
 import static ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum.NO_SUBS;
 import static ru.demetrious.watchlist.domain.enums.FileManagerStatusEnum.COMPLETED;
@@ -201,12 +198,6 @@ public final class FileManager {
                 .collect(toList()));
     }
 
-    public void renameFiles(Path folder, List<String> fileList, List<String> postfixes) {
-        fileList.stream()
-            .filter(Objects::nonNull)
-            .forEach(file -> moveFile(folder, file, postfixes.get(fileList.indexOf(file))));
-    }
-
     // ===================================================================================================================
     // = Implementation
     // ===================================================================================================================
@@ -295,20 +286,5 @@ public final class FileManager {
         }
 
         return animeSupplements;
-    }
-
-    private void moveFile(Path folder, String filePath, String postfix) {
-        try {
-            Files.move(
-                Path.of(folder + filePath),
-                Path.of(format("{0}\\{1}.{2}", folder, getFileName(folder, postfix), getExtension(filePath)))
-            );
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String getFileName(Path folder, String postfix) {
-        return format("{0} {1}", folder.getFileName().toString(), postfix);
     }
 }

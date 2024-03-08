@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
@@ -15,9 +17,12 @@ import ru.demetrious.watchlist.adapter.rest.dto.ProgressRsDto;
 import ru.demetrious.watchlist.domain.model.Anime;
 import ru.demetrious.watchlist.manager.FileManager;
 import ru.demetrious.watchlist.utils.AnimeUtils;
+import ru.demetrious.watchlist.utils.FileUtils;
 
 import static java.nio.file.Path.of;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static ru.demetrious.watchlist.utils.FileUtils.getFromTo;
+import static ru.demetrious.watchlist.utils.FileUtils.moveFile;
 
 @Service
 @RequiredArgsConstructor
@@ -64,11 +69,13 @@ public class FileService {
     }
 
     public Anime getAnimeDirectoryInfo(String path, FilesGroupsRqDto filesGroups) {
-        Path folder = of(path);
+        filesGroups.getFiles().acceptAll(fileList -> fileList.stream()
+            .filter(Objects::nonNull)
+            .map(file -> getFromTo(path, file, filesGroups.getPostfixes().get(fileList.indexOf(file))))
+            .filter(FileUtils::isNotSameFile)
+            .forEach(FileUtils::moveFile));
 
-        filesGroups.getFiles().acceptAll(fileList -> fileManager.renameFiles(folder, fileList, filesGroups.getPostfixes()));
-
-        return fileManager.getAnimeDirectoryInfo(folder, filesGroups);
+        return fileManager.getAnimeDirectoryInfo(of(path), filesGroups);
     }
 
     public void openFolder(String path) throws IOException {
@@ -83,5 +90,14 @@ public class FileService {
             .toList();
 
         return fileManager.getFiles(pathList);
+    }
+
+    public Anime renameFile(String path, String name) {
+        Path from = of(path);
+        Path to = of(from.getParent() + "\\" + name);
+
+        return new Anime()
+            .setName(name)
+            .setPath(moveFile(Pair.of(from, to)).toString());
     }
 }
