@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesGroupsRqDto;
 import ru.demetrious.watchlist.adapter.rest.dto.FilesRsDto;
@@ -97,6 +98,6 @@ public class FileService {
 
         return new Anime()
             .setName(name)
-            .setPath(moveFile(from, to).toString());
+            .setPath(moveFile(Pair.of(from, to)).toString());
     }
 }

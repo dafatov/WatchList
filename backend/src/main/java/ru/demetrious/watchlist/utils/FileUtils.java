@@ -49,6 +49,32 @@ public class FileUtils {
         };
     }
 
+    public static Path moveFile(Pair<Path, Path> fromTo) {
+        try {
+            return Files.move(fromTo.getLeft(), fromTo.getRight());
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static boolean isNotSameFile(Pair<Path, Path> fromTo) {
+        try {
+            return !Files.isSameFile(fromTo.getLeft(), fromTo.getRight());
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static Pair<Path, Path> getFromTo(String folder, String file, String postfix) {
+        Path path = of(folder + file);
+
+        return Pair.of(path, getFileName(path, postfix));
+    }
+
+    public static Path getFileName(Path file, String postfix) {
+        return of(format("{0}\\{1} {2}.{3}", file.getParent(), file.getParent().getFileName(), postfix, getExtension(file.getFileName().toString())));
+    }
+
     // ===================================================================================================================
     // = Implementation
     // ===================================================================================================================
@@ -96,35 +122,5 @@ public class FileUtils {
                 forceDelete(target);
             }
         }
-    }
-
-    public static Path moveFile(Pair<Path, Path> fromTo) {
-        return moveFile(fromTo.getLeft(), fromTo.getRight());
-    }
-
-    public static Path moveFile(Path from, Path to) {
-        try {
-            return Files.move(from, to);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public static boolean isNotSameFile(Pair<Path, Path> fromTo) {
-        try {
-            return !Files.isSameFile(fromTo.getLeft(), fromTo.getRight());
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public static Pair<Path, Path> getFromTo(String folder, String file, String postfix) {
-        Path path = of(folder + file);
-
-        return Pair.of(path, getFileName(path, postfix));
-    }
-
-    public static Path getFileName(Path file, String postfix) {
-        return of(format("{0}\\{1} {2}.{3}", file.getParent(), file.getParent().getFileName(), postfix, getExtension(file.getFileName().toString())));
     }
 }
