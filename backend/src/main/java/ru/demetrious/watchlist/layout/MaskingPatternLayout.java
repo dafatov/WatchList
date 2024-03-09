@@ -22,7 +22,7 @@ import static org.apache.commons.lang3.StringUtils.repeat;
 
 @Configuration
 public class MaskingPatternLayout extends PatternLayout {
-    public static final char MASKING_CHAR = '*';
+    private static final char MASKING_CHAR = '*';
     private static final List<List<String>> REGEXES = List.of(
         List.of(
             createDtoRegex(Anime.class, List.of("name", "url", "path", "pathPackage", "size", "episodes", "status", "multipleViews")),
