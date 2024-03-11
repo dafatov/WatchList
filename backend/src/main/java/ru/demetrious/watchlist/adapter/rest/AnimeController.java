@@ -1,5 +1,7 @@
 package ru.demetrious.watchlist.adapter.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +29,10 @@ public class AnimeController {
     private final AnimeService animeService;
 
     @GetMapping
-    public List<Anime> getAnimes() {
+    public List<Anime> getAnimes() throws JsonProcessingException {
         List<Anime> animeList = animeService.getAnimes();
 
-        log.info("getAnimes: {}", animeList);
+        log.info("getAnimes: {}\n{}", animeList, new ObjectMapper().writeValueAsString(animeList));
         return animeList;
     }
 
