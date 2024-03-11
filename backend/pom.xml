@@ -31,6 +31,7 @@
         <org.projectlombok.lombok-mapstruct-binding.version>0.2.0</org.projectlombok.lombok-mapstruct-binding.version>
         <org.mapstruct.mapstruct.version>1.5.5.Final</org.mapstruct.mapstruct.version>
         <org.glassfish.jaxb.jaxb-runtime.version>4.0.3</org.glassfish.jaxb.jaxb-runtime.version>
+        <com.jayway.jsonpath.version>2.9.0</com.jayway.jsonpath.version>
     </properties>
 
     <dependencies>
@@ -91,6 +92,11 @@
             <groupId>com.owenfeehan.pathpatternfinder</groupId>
             <artifactId>path-pattern-finder</artifactId>
             <version>${com.owenfeehan.pathpatternfinder.path-pattern-finder.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${com.jayway.jsonpath.version}</version>
         </dependency>
 
         <dependency>
