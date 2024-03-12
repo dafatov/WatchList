@@ -59,7 +59,7 @@ public class FileUtils {
 
     public static boolean isNotSameFile(Pair<Path, Path> fromTo) {
         try {
-            return !Files.isSameFile(fromTo.getLeft(), fromTo.getRight());
+            return Files.notExists(fromTo.getRight()) || !Files.isSameFile(fromTo.getLeft(), fromTo.getRight());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
