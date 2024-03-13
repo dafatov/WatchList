@@ -130,29 +130,25 @@ public class MaskingUtils {
     }
 
     private static Pair<Integer, Integer> getMaskingInterval(String string) {
-        if (string.length() == 1) {
+        if (string.length() <= 1) {
             return Pair.of(0, string.length());
         }
 
-        if (string.length() >= 2 && string.length() <= 4) {
+        if (string.length() <= 4) {
             return Pair.of(1, string.length() - 1);
         }
 
         int count = (int) ceil(0.6 * string.length());
 
-        if (string.length() >= 5 && string.length() <= 9) {
+        if (string.length() <= 9) {
             return Pair.of(1, count);
         }
 
-        if (string.length() >= 10 && string.length() <= 15) {
+        if (string.length() <= 15) {
             return Pair.of(2, count);
         }
 
-        if (string.length() >= 16) {
-            return Pair.of(floorDivExact(string.length() - count, 2), count);
-        }
-
-        return Pair.of(0, 0);
+        return Pair.of(floorDivExact(string.length() - count, 2), count);
     }
 
     private static String createDtoRegex(Class<?> oClass, List<String> fieldNames) {
