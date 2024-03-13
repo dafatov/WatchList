@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="MASKING" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ru.demetrious.watchlist.layout.MaskingPatternLayout">
+                <pattern>%black(%d{ISO8601}) %highlight(%-5level{5}) %yellow(%-80logger{80}): %msg%n%throwable</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="MASKING"/>
+    </root>
+</configuration>
