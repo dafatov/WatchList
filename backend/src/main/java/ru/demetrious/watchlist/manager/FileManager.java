@@ -27,6 +27,7 @@ import static java.lang.Math.floorDivExact;
 import static java.lang.Math.toIntExact;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.collections4.CollectionUtils.collate;
@@ -121,12 +122,15 @@ public final class FileManager {
             return progressRsDto;
         }
 
-        Path coping = copingFile.get();
+        Optional<Path> coping = ofNullable(copingFile.get());
         FilesRsDto completed = getFiles(completedFiles.get());
         long current = currentSize.get();
         long currentFile = currentFileSize.get();
         long all = allSize.get();
-        long allFile = coping.toFile().length();
+        long allFile = coping
+            .map(Path::toFile)
+            .map(File::length)
+            .orElse(0L);
         int percent = getPercent(current, all);
         int percentFile = getPercent(currentFile, allFile);
         long currentTimeMillis = currentTimeMillis();
@@ -148,7 +152,9 @@ public final class FileManager {
                 .setPercent(percentFile))
             .setSpeed(speed)
             .setCompleted(completed)
-            .setCoping(coping.toString());
+            .setCoping(coping
+                .map(Path::toString)
+                .orElse("-"));
     }
 
     public void reset() {
