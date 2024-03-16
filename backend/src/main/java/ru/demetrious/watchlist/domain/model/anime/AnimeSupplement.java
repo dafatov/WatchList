@@ -32,7 +32,6 @@ public class AnimeSupplement {
     @Enumerated(STRING)
     @NaturalId
     private AnimeSupplementEnum name;
-
     @JdbcTypeCode(JSON)
     private List<Integer> episodes = new ArrayList<>();
 
