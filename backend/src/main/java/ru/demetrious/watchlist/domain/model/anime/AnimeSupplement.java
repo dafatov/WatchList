@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.NaturalId;
 import ru.demetrious.watchlist.annotation.UuidGenerator;
 import ru.demetrious.watchlist.domain.enums.AnimeSupplementEnum;
 
@@ -29,6 +30,7 @@ public class AnimeSupplement {
     @UuidGenerator
     private UUID id;
     @Enumerated(STRING)
+    @NaturalId
     private AnimeSupplementEnum name;
 
     @JdbcTypeCode(JSON)
